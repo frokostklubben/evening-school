@@ -1,5 +1,6 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../database.js'
+import School from './school.js'
 
 const User = sequelize.define(
   'User',
@@ -9,7 +10,23 @@ const User = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    user_name: {
+    school_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: School,
+        key: 'school_id',
+      },
+    },
+    first_name: {
+      type: DataTypes.STRING(55),
+      allowNull: false,
+    },
+    last_name: {
+      type: DataTypes.STRING(55),
+      allowNull: false,
+    },
+    email: {
       type: DataTypes.STRING(55),
       allowNull: false,
     },
@@ -18,9 +35,14 @@ const User = sequelize.define(
     timestamps: false,
     tableName: 'users',
   },
-);
+)
 
-// adde fejlhåndtering
-await sequelize.sync(); // { alter: true } ?
+try {
+  await sequelize.sync()
+  console.log('User table was just (re)created successfully!')
+} catch (error) {
+  console.error('Error updating the user table:', err)
+  throw err
+}
 
-export default User;
+export default User

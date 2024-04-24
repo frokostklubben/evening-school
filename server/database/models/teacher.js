@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../database.js'
 
 const Teacher = sequelize.define(
   'Teacher',
@@ -17,13 +17,23 @@ const Teacher = sequelize.define(
       type: DataTypes.STRING(55),
       allowNull: false,
     },
+    email: {
+      type: DataTypes.STRING(55),
+      allowNull: false,
+    },
   },
   {
     timestamps: false,
     tableName: 'teachers',
   },
-);
+)
 
-await sequelize.sync(); // { alter: true } ?
+try {
+  await sequelize.sync()
+  console.log('Teacher table was just (re)created successfully!')
+} catch (error) {
+  console.error('Error updating the teacher table:', err)
+  throw err
+}
 
-export default Teacher;
+export default Teacher
