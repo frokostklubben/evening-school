@@ -44,12 +44,4 @@ const Location = sequelize.define(
   },
 )
 
-try {
-  await sequelize.sync() // { alter: true } ?
-  console.log('Location table updated successfully')
-} catch (error) {
-  console.error('Error updating the location table:', err)
-  throw err
-}
-
 export default Location
