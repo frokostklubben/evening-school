@@ -18,6 +18,10 @@ const school = sequelize.define(
         key: 'user_id',
       },
     },
+    name: {
+      type: DataTypes.STRING(55),
+      allowNull: false,
+    },
   },
   {
     timestamps: false,
