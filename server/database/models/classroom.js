@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
-import location from './location.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../database.js'
+import Location from './location.js'
 
-const classroom = sequelize.define(
+const Classroom = sequelize.define(
   'Classroom',
   {
     room_id: {
@@ -14,7 +14,7 @@ const classroom = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: location,
+        model: Location,
         key: 'location_id',
       },
     },
@@ -31,14 +31,14 @@ const classroom = sequelize.define(
     timestamps: false,
     tableName: 'classrooms',
   },
-);
+)
 
 try {
-  await sequelize.sync();
-  console.log('Classroom table was just (re)created successfully!');
+  await sequelize.sync()
+  console.log('Classroom table was just (re)created successfully!')
 } catch (error) {
-  console.error('Error updating the classroom table:', err);
-  throw err;
+  console.error('Error updating the classroom table:', err)
+  throw err
 }
 
-export default classroom;
+export default Classroom

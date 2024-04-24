@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
-import School from './school.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../database.js'
+import School from './school.js'
 
-const location = sequelize.define(
+const Location = sequelize.define(
   'Location',
   {
     location_id: {
@@ -42,14 +42,14 @@ const location = sequelize.define(
     timestamps: false,
     tableName: 'locations',
   },
-);
+)
 
 try {
-  await sequelize.sync(); // { alter: true } ?
-  console.log('Location table updated successfully');
+  await sequelize.sync() // { alter: true } ?
+  console.log('Location table updated successfully')
 } catch (error) {
-  console.error('Error updating the location table:', err);
-  throw err;
+  console.error('Error updating the location table:', err)
+  throw err
 }
 
-export default location;
+export default Location
