@@ -29,11 +29,4 @@ const Course = sequelize.define(
   },
 )
 
-try {
-  await sequelize.sync({ alter: true })
-  console.log('The table for the Course model was just (re)created!')
-} catch (error) {
-  console.error('Unable to create or recreate the table:', error)
-}
-
 export default Course

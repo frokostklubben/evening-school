@@ -28,12 +28,4 @@ const Teacher = sequelize.define(
   },
 )
 
-try {
-  await sequelize.sync()
-  console.log('Teacher table was just (re)created successfully!')
-} catch (error) {
-  console.error('Error updating the teacher table:', err)
-  throw err
-}
-
 export default Teacher
