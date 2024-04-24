@@ -47,6 +47,13 @@
 					data-sveltekit-preload-data
 					href="/admin">Admin</a
 				>
+
+				<a
+					class="nav-link"
+					class:active={$page.url.pathname === '/user'}
+					data-sveltekit-preload-data
+					href="/user">Ny bruger</a
+				>
 			</div>
 		</div>
 	</div>
