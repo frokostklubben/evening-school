@@ -1,9 +1,9 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
-import Course from './course.js';
-import Classroom from './classroom.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../database.js'
+import Course from './course.js'
+import Classroom from './classroom.js'
 
-const classroom_course = sequelize.define(
+const Classroom_course = sequelize.define(
   'Classroom_course',
   {
     course_id: {
@@ -27,13 +27,13 @@ const classroom_course = sequelize.define(
     timestamps: false,
     tableName: 'classroom_course',
   },
-);
+)
 
 try {
-  await sequelize.sync(); // { alter: true }
-  console.log('The table for the Classroom_Course model was just (re)created!');
+  await sequelize.sync() // { alter: true }
+  console.log('The table for the Classroom_Course model was just (re)created!')
 } catch (error) {
-  console.error('Unable to create or recreate the table:', error);
+  console.error('Unable to create or recreate the table:', error)
 }
 
-export default classroom_course;
+export default Classroom_course
