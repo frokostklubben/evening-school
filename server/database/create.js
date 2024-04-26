@@ -1,6 +1,23 @@
 import 'dotenv/config'
-import sequelize from './database.js'
+import { Sequelize } from 'sequelize'
 
+let sequelize = new Sequelize(null, process.env.DB_USER, process.env.DB_PASS, {
+    host: 'localhost',
+    dialect: 'mysql',
+});
+
+try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+    await sequelize.query(`DROP DATABASE IF EXISTS ${process.env.DB_NAME}`)
+    await sequelize.query(`CREATE DATABASE ${process.env.DB_NAME}`)
+    console.log('DATABASE DROPPED AND CREATED');
+    sequelize.close()
+} catch (error) {
+    console.error('Unable to connect to the database:', error);
+}
+
+import connection from './database.js'
 import School from './models/school.js'
 import Role from './models/Role.js'
 import User from './models/user.js'
@@ -15,12 +32,12 @@ import Inventory from './models/inventory.js'
 import Classroom_course from './models/classroomCourse.js'
 import Classroom_inventory from './models/classroomInventory.js'
 
-await sequelize.sync({ force: true });
+await connection.sync({ force: true });
 
 await School.bulkCreate([
-    { name: "FOF"},
-    { name: "AOF"},
-    { name: "Aftenskolerne Varde Kommune"}])
+    { name: "FOF" },
+    { name: "AOF" },
+    { name: "Aftenskolerne Varde Kommune" }])
 
 await Role.bulkCreate([
     { role: "admin" },
