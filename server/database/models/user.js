@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
 import School from './school.js'
+import Role from './Role.js'
 
 const User = sequelize.define(
   'User',
@@ -12,7 +13,7 @@ const User = sequelize.define(
     },
     school_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: School,
         key: 'school_id',
@@ -30,19 +31,19 @@ const User = sequelize.define(
       type: DataTypes.STRING(55),
       allowNull: false,
     },
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Role,
+        key: 'role_id'
+      }
+    }
   },
   {
     timestamps: false,
     tableName: 'users',
   },
 )
-
-try {
-  await sequelize.sync()
-  console.log('User table was just (re)created successfully!')
-} catch (error) {
-  console.error('Error updating the user table:', err)
-  throw err
-}
 
 export default User
