@@ -49,9 +49,9 @@
 				>
 				<a
 					class="nav-link"
-					class:active={$page.url.pathname === '/add_location'}
+					class:active={$page.url.pathname === '/add-location'}
 					data-sveltekit-preload-data
-					href="/add_location">add location</a
+					href="/add-location">add location</a
 				>
 			</div>
 		</div>

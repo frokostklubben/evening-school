@@ -28,7 +28,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     email: {
-      type: DataTypes.STRING(55),
+      type: DataTypes.STRING(55), 
       allowNull: false,
     },
     role_id: {

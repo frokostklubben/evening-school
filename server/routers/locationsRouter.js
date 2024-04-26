@@ -9,7 +9,8 @@ router.get('/api/locations', async (req, res) => {
 })
 
 router.post('/api/locations', async (req, res) => {
-  const { school_id, zip_code, city, street_name, street_number } = req.body.data
+  console.log(req.body)
+  const { school_id, zip_code, city, street_name, street_number } = req.body
 
   try {
     const new_location = await Location.create({
