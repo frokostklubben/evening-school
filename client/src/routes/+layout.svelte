@@ -47,6 +47,12 @@
 					data-sveltekit-preload-data
 					href="/admin">Admin</a
 				>
+				<a
+					class="nav-link"
+					class:active={$page.url.pathname === '/add_location'}
+					data-sveltekit-preload-data
+					href="/add_location">add location</a
+				>
 			</div>
 		</div>
 	</div>
