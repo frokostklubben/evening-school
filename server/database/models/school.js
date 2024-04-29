@@ -20,12 +20,6 @@ const School = sequelize.define(
   },
 )
 
-try {
-  await sequelize.sync()
-  console.log('School table was just (re)created successfully!')
-} catch (error) {
-  console.error('Error updating the school table:', err)
-  throw err
-}
+await sequelize.sync()
 
 export default School

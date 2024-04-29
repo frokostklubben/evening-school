@@ -22,32 +22,30 @@ router.get('/api/users/:schoolId', async (req, res) => {
   }
 })
 
-router.post('/api/users', validateUser, async (req, res) => {
+router.post('/api/users', async (req, res) => {
   const { first_name, last_name, email, school_id } = req.body
 
   console.log(school_id)
 
   try {
-    const user = await User.create({ first_name, last_name, email, school_id, role_id: 1 })
+    const user = await User.create({ first_name, last_name, email, school_id, role_id: 2 })
     console.log(`${user.email} ${user.last_name}`)
     res.status(201).send({ message: 'Bruger oprettet succesfuldt.', data: user })
   } catch (error) {
     console.error('Server Error:', error)
-    res.status(500).send({ message: 'Serverfejl under oprettelse af bruger.' })
+    console.log(error)
+    res.status(500).send({ message: error.errors[0].message })
   }
 })
 
-// validateUserForUpdate
 router.patch('/api/users/:user_id', async (req, res) => {
   const { user_id } = req.params
-  //const { first_name, last_name, email, school_id, role_id } = req.body
   const updates = req.body
 
   try {
-    const user = await User.findByPk(user_id) // Search for a single instance by its primary key
+    const user = await User.findByPk(user_id)
 
     if (user) {
-      // await user.update({ first_name, last_name, email, school_id, role_id: 1 })
       await user.update(updates)
       console.log('user', user)
       res.send({ message: 'Bruger opdateret succesfuldt.', data: user })

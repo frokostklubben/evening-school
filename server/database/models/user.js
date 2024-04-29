@@ -29,6 +29,7 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING(55),
+      unique: true,
       allowNull: false,
     },
     role_id: {
@@ -36,22 +37,14 @@ const User = sequelize.define(
       allowNull: false,
       references: {
         model: Role,
-        key: 'role_id'
-      }
-    }
+        key: 'role_id',
+      },
+    },
   },
   {
     timestamps: false,
     tableName: 'users',
   },
 )
-
-try {
-  await sequelize.sync()
-  console.log('User table was just (re)created successfully!')
-} catch (error) {
-  console.error('Error updating the user table:', err)
-  throw error //TODO: Er dette god fejlhåndtering??
-}
 
 export default User
