@@ -4,6 +4,7 @@
 	import { writable } from 'svelte/store';
 	import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
+	import ListItems from '../../components/ListItems.svelte'
 
 	let schools: School[] = [];
 	let users: User[] = [];
@@ -190,6 +191,20 @@
 	</div>
 </Modal>
 
+<div class="mb-3">
+	<label for="school-select" class="form-label">Vælg en skole</label>
+	<select id="school-select" class="form-select" on:change={onSchoolChange}>
+		<option value="">Vælg en skole</option>
+		{#each schools as school}
+			<option value={school.school_id}>{school.name}</option>
+		{/each}
+	</select>
+</div>
+
+<ListItems list={users} listName={"Users"}/>
+
+
+<!--
 <div class="container mt-5">
 	<div class="row justify-content-center">
 		<div class="col-12 col-md-8 col-lg-6">
@@ -230,3 +245,5 @@
 		</div>
 	</div>
 </div>
+-->
+
