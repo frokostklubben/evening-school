@@ -20,4 +20,5 @@ const School = sequelize.define(
   },
 )
 
+
 export default School

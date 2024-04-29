@@ -24,8 +24,8 @@ const Classroom = sequelize.define(
       allowNull: true,
       references: {
         model: Classroom_purpose,
-        key: 'purpose_id'
-      }
+        key: 'purpose_id',
+      },
     },
     capacity: {
       type: DataTypes.INTEGER,
