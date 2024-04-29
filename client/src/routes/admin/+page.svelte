@@ -38,6 +38,19 @@
 			console.error('Failed to fetch schools');
 		}
 	}
+    async function deleteUser() {
+		try {
+			const response = await fetch(`http://localhost:8080/api/users/${$selectedUser.user_id}`, {
+				method: 'DELETE'
+			});
+			if (!response.ok) throw new Error('Failed to delete user');
+			console.log('Delete Successful');
+			toast.success('Bruger slettet');
+			return 'Deleted Successfully';
+		} catch (error) {
+			console.error('Error deleting user:', error);
+		}
+	}
 
 	async function fetchUsersForSchool(schoolId: string) {
 		if (schoolId) {
@@ -102,19 +115,7 @@
 		}
 	}
 
-	async function deleteUser() {
-		try {
-			const response = await fetch(`http://localhost:8080/api/users/${$selectedUser.user_id}`, {
-				method: 'DELETE'
-			});
-			if (!response.ok) throw new Error('Failed to delete user');
-			console.log('Delete Successful');
-			toast.success('Bruger slettet');
-			return 'Deleted Successfully';
-		} catch (error) {
-			console.error('Error deleting user:', error);
-		}
-	}
+
 </script>
 
 <!-- Modal for edit user -->
@@ -179,18 +180,6 @@
 	<Toaster />
 </Modal>
 
-<!-- Modal for delete user -->
-<Modal bind:open={showDeleteConfirmModal} size="xs" autoclose>
-	<div class="text-center">
-		<h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-			Er du sikker på at du vil slette {$selectedUser.first_name}
-			{$selectedUser.last_name}?
-		</h3>
-		<Button color="red" class="me-2" on:click={deleteUser}>Ja, slet</Button>
-		<Button color="alternative">Afbryd</Button>
-	</div>
-</Modal>
-
 <div class="mb-3">
 	<label for="school-select" class="form-label">Vælg en skole</label>
 	<select id="school-select" class="form-select" on:change={onSchoolChange}>
@@ -201,7 +190,9 @@
 	</select>
 </div>
 
-<ListItems list={users} listName={"Users"} idKey="user_id"/>
+{#if users.length > 0}
+<ListItems list={users} collection={"users"} idKey="user_id"/>
+{/if}
 
 
 <!--

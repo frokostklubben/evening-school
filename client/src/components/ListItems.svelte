@@ -2,15 +2,15 @@
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
     import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
+	import ModalDelete from './ModalDelete.svelte';
 
     let showEditModal = false;
 	let showDeleteConfirmModal = false;
-    let selectedUser = writable({});
+    let selectedItem = writable({});
 	import { writable } from 'svelte/store';
 
-
 	export let list;
-	export let listName;
+	export let collection;
 	export let idKey;
 
 	let headerKeys =
@@ -20,10 +20,9 @@
 <div class="container mt-5">
 	<div class="row justify-content-center">
 		<div class="col-12 col-md-8 col-lg-6">
-			<h2 class="mb-4">{listName}</h2>
 			{#if list.length > 0}
 				<div class="list-group">
-					<table>
+					<table class="col-12 col-md-8 col-lg-6">
 						<thead>
 							<tr>
 								{#each headerKeys as key (key)}
@@ -37,13 +36,15 @@
 									{#each headerKeys as key (key)}
 										<td>{listItem[key]}</td>
 									{/each}
-									<td>
+									<!-- <td>
 										<button class="btn" on:click={() => openEditModal(user)}>
 											<i class="bi bi-pencil-square"></i>
 										</button></td
-									>
+									> -->
 									<td
-										><button class="btn" on:click={() => openDeleteConfirmModal(user)}>
+										><button class="btn" on:click={() =>{
+											selectedItem.set(listItem)  
+											showDeleteConfirmModal=true}}>
 											<i class="bi bi-trash-fill"></i>
 										</button></td
 									>
@@ -75,8 +76,9 @@
 	</div>
 </div>
 
+<ModalDelete bind:showDeleteConfirmModal={showDeleteConfirmModal} bind:selectedItem={selectedItem} collection={collection} idKey={idKey}/>
 
-<!-- MODALS -->
+<!-- MODALS
 <Modal title="Redigere bruger" bind:open={showEditModal} autoclose>
 	<div class="container-fluid mt-5">
 		<div class="row justify-content-center">
@@ -136,16 +138,5 @@
 	</svelte:fragment>
 
 	<Toaster />
-</Modal>
+</Modal> -->
 
-<!-- Modal for delete user -->
-<Modal bind:open={showDeleteConfirmModal} size="xs" autoclose>
-	<div class="text-center">
-		<h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-			Er du sikker på at du vil slette {$selectedUser.first_name}
-			{$selectedUser.last_name}?
-		</h3>
-		<Button color="red" class="me-2" on:click={deleteUser}>Ja, slet</Button>
-		<Button color="alternative">Afbryd</Button>
-	</div>
-</Modal>
