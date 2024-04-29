@@ -201,7 +201,7 @@
 	</select>
 </div>
 
-<ListItems list={users} listName={"Users"}/>
+<ListItems list={users} listName={"Users"} idKey="user_id"/>
 
 
 <!--
