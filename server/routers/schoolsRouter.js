@@ -9,12 +9,10 @@ router.get('/api/schools', async (req, res) => {
 })
 
 router.post('/api/schools', async (req, res) => {
-  const { school_id, user_id, name } = req.body.data
+  const { name } = req.body
 
   try {
-    const school = await Location.create({
-      school_id: school_id,
-      user_id: user_id,
+    const school = await School.create({
       name: name,
     })
 
