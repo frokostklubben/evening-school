@@ -20,6 +20,5 @@ const School = sequelize.define(
   },
 )
 
-await sequelize.sync()
 
 export default School

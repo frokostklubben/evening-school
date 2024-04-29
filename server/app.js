@@ -10,6 +10,7 @@ app.use(
   }),
 )
 
+
 app.use(express.json())
 
 import usersRouter from './routers/usersRouter.js'
