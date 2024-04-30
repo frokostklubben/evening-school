@@ -60,6 +60,18 @@
 					data-sveltekit-preload-data
 					href="/add-location">add location</a
 				>
+				<a
+				class="nav-link"
+				class:active={$page.url.pathname === '/show-users'}
+				data-sveltekit-preload-data
+				href="/show-users">Vis ansatte</a
+			>
+			<a
+				class="nav-link"
+				class:active={$page.url.pathname === '/afdelinger'}
+				data-sveltekit-preload-data
+				href="/location">Vis afdelinger</a
+			>
 			</div>
 		</div>
 	</div>

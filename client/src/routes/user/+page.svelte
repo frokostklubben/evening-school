@@ -1,6 +1,5 @@
-<script lang="ts">
-	import { goto } from '$app/navigation';
-	import type { School } from '$lib/types';
+<script>
+	// @ts-nocheck
 	import { onMount } from 'svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
 
@@ -12,7 +11,7 @@
 		role_id: ''
 	};
 
-	let schools: School[] = [];
+	let schools = [];
 
 	onMount(() => {
 		fetchSchools();
@@ -30,7 +29,7 @@
 		}
 	}
 
-	async function addUser(event: SubmitEvent) {
+	async function addUser() {
 		const response = await fetch('http://localhost:8080/api/users', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -44,7 +43,6 @@
 			console.log(result.message);
 		} else {
 			console.error('Failed to create user');
-			console.log(result.message);
 			toast.error(result.message);
 		}
 	}
@@ -55,7 +53,7 @@
 		<div class="col-md-6">
 			<h2 class="text-center mb-4">Ny bruger</h2>
 
-			<form on:submit|preventDefault={addUser} class="needs-validation" novalidate>
+			<form on:submit|preventDefault={addUser} class="needs-validation">
 				<div class="mb-3">
 					<label for="first_name" class="form-label">Fornavn</label>
 					<input
@@ -81,7 +79,6 @@
 					<input type="email" class="form-control" id="email" bind:value={user.email} required />
 				</div>
 				<div class="mb-3">
-					<!-- <label for="school_id" class="form-label">Vælg skole at tilknytte</label> -->
 					<select class="form-control" id="school_id" bind:value={user.school_id}>
 						<option value="">Vælg en skole</option>
 						{#each schools as school}

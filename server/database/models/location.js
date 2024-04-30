@@ -21,9 +21,6 @@ const Location = sequelize.define(
     zip_code: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      validate: {
-        is: /^\d{4}$/, // must be 4 digits
-      },
     },
     city: {
       type: DataTypes.STRING,

@@ -1,50 +1,67 @@
 <script>
-	import SelectBoxOptions from './SelectBoxOptions.svelte';
-    import { Button, Modal } from 'flowbite-svelte';
-	import { toast, Toaster } from 'svelte-french-toast';
+	// @ts-nocheck
 	import ModalDelete from './ModalDelete.svelte';
+	import ModalEdit from './ModalEdit.svelte';
+	import { itemList } from '../stores/itemListStore.js';
+	import { selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
+	import { displayNames } from '../stores/dictionaryStore.js';
 
-    let showEditModal = false;
-	let showDeleteConfirmModal = false;
-    let selectedItem = writable({});
-	import { writable } from 'svelte/store';
-
-	export let list;
 	export let collection;
 	export let idKey;
 
+	let headerKeysDanish =
+		$itemList.length > 0
+			? Object.keys($itemList[0])
+					.filter((key) => !key.endsWith('_id'))
+					.map((key) => displayNames[key] || key)
+			: [];
+
 	let headerKeys =
-		list.length > 0 ? Object.keys(list[0]).filter((key) => !key.endsWith('_id')) : [];
+		$itemList.length > 0 ? Object.keys($itemList[0]).filter((key) => !key.endsWith('_id')) : [];
+
+	console.log('>>>>>>>>>>>>>>', $displayNames);
 </script>
 
 <div class="container mt-5">
 	<div class="row justify-content-center">
-		<div class="col-12 col-md-8 col-lg-6">
-			{#if list.length > 0}
+		<div class="col-12 col-lg-10">
+			{#if $itemList.length > 0}
 				<div class="list-group">
-					<table class="col-12 col-md-8 col-lg-6">
+					<table class="w-100">
 						<thead>
 							<tr>
-								{#each headerKeys as key (key)}
-									<th>{key}</th>
+								{#each headerKeysDanish as key (key)}
+									<th>{$displayNames[key]}</th>
 								{/each}
 							</tr>
 						</thead>
 						<tbody>
-							{#each list as listItem, index (listItem[idKey])}
-								<tr>
+							{#each $itemList as listItem, index}
+								<tr class="hover-row">
 									{#each headerKeys as key (key)}
 										<td>{listItem[key]}</td>
 									{/each}
-									<!-- <td>
-										<button class="btn" on:click={() => openEditModal(user)}>
+									<td>
+										<button
+											class="btn"
+											on:click={() => {
+												selectedItem.set(listItem);
+												showEditModal.set(true);
+											}}
+											title="Rediger"
+										>
 											<i class="bi bi-pencil-square"></i>
 										</button></td
-									> -->
+									>
 									<td
-										><button class="btn" on:click={() =>{
-											selectedItem.set(listItem)  
-											showDeleteConfirmModal=true}}>
+										><button
+											class="btn"
+											on:click={() => {
+												selectedItem.set(listItem);
+												showDeleteModal.set(true);
+											}}
+											title="Slet"
+										>
 											<i class="bi bi-trash-fill"></i>
 										</button></td
 									>
@@ -52,22 +69,6 @@
 							{/each}
 						</tbody>
 					</table>
-
-					<!--
-							<div class="list-group-item d-flex justify-content-between align-items-center">
-								{listItem.first_name}
-								{user.last_name} <span>{user.email}</span>
-								<span>
-									<button class="btn" on:click={() => openEditModal(user)}>
-										<i class="bi bi-pencil-square"></i>
-									</button>
-									<button class="btn" on:click={() => openDeleteConfirmModal(user)}>
-										<i class="bi bi-trash-fill"></i>
-									</button>
-								</span>
-							</div>
-                            -->
-					<!--{/each}-->
 				</div>
 			{:else}
 				<div class="alert alert-warning" role="alert">Ingen data</div>
@@ -76,67 +77,12 @@
 	</div>
 </div>
 
-<ModalDelete bind:showDeleteConfirmModal={showDeleteConfirmModal} bind:selectedItem={selectedItem} collection={collection} idKey={idKey}/>
+<ModalEdit {collection} {idKey} />
 
-<!-- MODALS
-<Modal title="Redigere bruger" bind:open={showEditModal} autoclose>
-	<div class="container-fluid mt-5">
-		<div class="row justify-content-center">
-			<div class="col-md-6">
-				<form on:submit|preventDefault={updateUser} class="needs-validation" novalidate>
-					<div class="mb-3">
-						<label for="first_name" class="form-label">Fornavn</label>
+<ModalDelete {collection} {idKey} />
 
-						<input
-							type="text"
-							class="form-control"
-							id="first_name"
-							bind:value={$selectedUser.first_name}
-							required
-						/>
-					</div>
-					<div class="mb-3">
-						<label for="last_name" class="form-label">Efternavn</label>
-						<input
-							type="text"
-							class="form-control"
-							id="last_name"
-							bind:value={$selectedUser.last_name}
-							required
-						/>
-					</div>
-					<div class="mb-3">
-						<label for="email" class="form-label">Email</label>
-						<input
-							type="email"
-							class="form-control"
-							id="email"
-							bind:value={$selectedUser.email}
-							required
-						/>
-					</div>
-					<div class="mb-3">
-						<select class="form-control" id="school_id" bind:value={$selectedUser.school_id}>
-							<option value="">Vælg en skole</option>
-							{#each schools as school}
-								<option value={school.school_id}>{school.name}</option>
-							{/each}
-						</select>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-	<svelte:fragment slot="footer">
-		<div class="container">
-			<div class="text-center">
-				<Button type="submit" color="green" on:click={updateUser}>Gem</Button>
-				<Button color="red">Afbryd</Button>
-			</div>
-		</div>
-	</svelte:fragment>
-
-	<Toaster />
-</Modal> -->
-
+<style>
+	.hover-row:hover {
+		background-color: #e0e0e0;
+	}
+</style>
