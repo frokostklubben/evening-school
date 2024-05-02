@@ -15,12 +15,21 @@
 
 	let itemKeys = [];
 
-	let formData = writable({});
+	// let formData = writable({});
+	let formData = {};
 
 	formData = fields.reduce((acc, field) => {
 		acc[field.name] = '';
 		return acc;
 	}, {});
+
+	// Update formData whenever selectedSchoolId changes
+	// $: if (selectedSchoolId) {
+	// 	formData.update((current) => ({
+	// 		...current,
+	// 		school_id: $selectedSchoolId // Adding school_id to formData
+	// 	}));
+	// }
 
 	itemKeys = Object.keys(formData).filter((key) => !key.endsWith('_id'));
 
@@ -34,6 +43,15 @@
 		console.log('school_id in modal:', $selectedSchoolId);
 
 		let data = formData;
+		formData.school_id = $selectedSchoolId;
+
+		console.log('formData:', formData);
+
+		console.log('data:', data);
+
+		formData.school_id = $selectedSchoolId;
+
+		console.log('formData:', formData);
 
 		data.school_id = $selectedSchoolId;
 
@@ -56,16 +74,16 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify(data)
+				body: JSON.stringify({ data: formData })
 			});
 
 			const result = await response.json();
 			if (response.ok) {
 				toast.success('Oprettelse vellykket!');
 
-				// const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
+				// const index = $itemList.findIndex((item) => item[idKey] === formData[idKey]);
 				// if (index !== -1) {
-				// 	$itemList[index] = $selectedItem;
+				// 	$itemList[index] = formData;
 				// }
 
 				showEditModal.set(false);
