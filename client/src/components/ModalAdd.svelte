@@ -1,6 +1,6 @@
 <script>
 	// @ts-nocheck
-	import { writable } from 'svelte/store';
+	import { writable, get } from 'svelte/store';
 	import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { BASE_URL } from '../stores/apiConfig.js';
@@ -15,11 +15,7 @@
 
 	let itemKeys = [];
 
-	$: $selectedSchoolId;
-
 	let formData = writable({});
-
-	// Initialize formData based on fields provided'
 
 	formData = fields.reduce((acc, field) => {
 		acc[field.name] = '';
@@ -35,7 +31,11 @@
 	}
 
 	async function addItem() {
-		const data = formData;
+		console.log('school_id in modal:', $selectedSchoolId);
+
+		let data = formData;
+
+		data.school_id = $selectedSchoolId;
 
 		// Example validation: ensure all required fields are filled
 		if (fields.some((field) => field.required && !data[field.name])) {

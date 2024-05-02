@@ -32,6 +32,7 @@
 	function handleOptionChange(event) {
 		fetchResultOnOption(event.target.value);
 		selectedSchoolId.set(event.target.value);
+		console.log('school_id:', $selectedSchoolId);
 		hasSelected = false;
 	}
 

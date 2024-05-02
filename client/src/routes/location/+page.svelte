@@ -26,11 +26,6 @@
 	});
 </script>
 
-<!-- TODO: burde også checke om afdeling er valgt? -->
-{#if showAddModal}
-	<ModalAdd collection={'locations'} idKey="{'location_id'}}" {fields} {title} />
-{/if}
-
 <DropdownAndList
 	listIdKey={'location_id'}
 	listCollection={'locations'}
@@ -42,4 +37,9 @@
 	<div class="text-center mt-10 mb-10">
 		<Button type="submit" color="green" on:click={addLocation}>Ny afdeling</Button>
 	</div>
+{/if}
+
+<!-- TODO: burde også checke om afdeling er valgt? -->
+{#if showAddModal}
+	<ModalAdd collection={'locations'} idKey="{'location_id'}}" {fields} {title} />
 {/if}
