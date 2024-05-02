@@ -4,7 +4,7 @@
 	import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { BASE_URL } from '../stores/apiConfig.js';
-	import { selectedItem, showAddModal, selectedSchoolId } from '../stores/modalStore.js';
+	import { selectedItem, showAddModal, optionId } from '../stores/modalStore.js';
 	import { itemList } from '../stores/itemListStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 
@@ -40,7 +40,7 @@
 	}
 
 	async function addItem() {
-		formData[idKey] = $selectedSchoolId;
+		formData[idKey] = $optionId;
 
 		// Example validation: ensure all required fields are filled
 		// if (fields.some((field) => field.required && !data[field.name])) {
@@ -71,12 +71,16 @@
 			if (response.ok) {
 				toast.success('Oprettelse vellykket!');
 
+				$itemList.update((currentItems) => {
+					return [...currentItems, result];
+				});
+
 				// const index = $itemList.findIndex((item) => item[idKey] === formData[idKey]);
 				// if (index !== -1) {
 				// 	$itemList[index] = formData;
 				// }
 
-				showEditModal.set(false);
+				showAddModal.set(false);
 			} else {
 				throw new Error(result.message || 'Oprettelse mislykkedes');
 			}

@@ -4,7 +4,7 @@
 	import ListItems from './ListItems.svelte';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
 	import { itemList } from '../stores/itemListStore';
-	import { selectedSchoolId } from '../stores/modalStore';
+	import { optionId } from '../stores/modalStore';
 
 	let options = [];
 	let hasSelected = false;
@@ -31,8 +31,8 @@
 
 	function handleOptionChange(event) {
 		fetchResultOnOption(event.target.value);
-		selectedSchoolId.set(event.target.value);
-		console.log('school_id:', $selectedSchoolId);
+		optionId.set(event.target.value);
+		console.log('school_id:', $optionId);
 		hasSelected = false;
 	}
 

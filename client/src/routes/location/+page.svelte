@@ -3,7 +3,8 @@
 	import { displayNames } from '../../stores/dictionaryStore.js';
 	import ModalAdd from '../../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
-	import { showAddModal, selectedSchoolId } from '../../stores/modalStore.js';
+	import { showAddModal, optionId } from '../../stores/modalStore.js';
+	import { onMount } from 'svelte';
 
 	let title = 'afdeling';
 
@@ -13,6 +14,10 @@
 		{ name: 'street_name', label: 'Vejnavn', type: 'text', required: true },
 		{ name: 'street_number', label: 'Husnummer', type: 'number', required: false }
 	];
+
+	onMount(() => {
+		$optionId = '';
+	});
 
 	function addLocation() {
 		showAddModal.set(true);
@@ -33,7 +38,7 @@
 	label={'Afdelinger'}
 />
 
-{#if $selectedSchoolId}
+{#if $optionId}
 	<div class="text-center mt-10 mb-10">
 		<Button type="submit" color="green" on:click={addLocation}>Ny afdeling</Button>
 	</div>

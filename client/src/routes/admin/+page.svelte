@@ -67,20 +67,20 @@
 
 <h2 class="mb-4">Se alle kontoransatte</h2>
 
-<div class="mb-3">
+<!-- <div class="mb-3">
 	<select id="school-select" class="form-select" on:change={onSchoolChange}>
 		<option value="">Vælg en skole</option>
 		{#each schools as school}
 			<option value={school.school_id}>{school.name}</option>
 		{/each}
 	</select>
-</div>
+</div> -->
 
-{#if $itemList.length > 0}
+<!-- {#if $itemList.length > 0}
 	<ListItems collection={'users'} idKey="user_id" />
 {:else if hasSelected}
 	<div>Ingen brugere fundet</div>
-{/if}
+{/if} -->
 
 <DropdownAndList
 	listIdKey={'user_id'}

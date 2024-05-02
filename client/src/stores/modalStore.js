@@ -8,4 +8,4 @@ export let showAddModal = writable(false);
 
 export let selectedItem = writable({});
 
-export let selectedSchoolId = writable('');
+export let optionId = writable('');
