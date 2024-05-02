@@ -21,7 +21,7 @@ router.get('/api/locations/:schoolId', async (req, res) => {
 })
 
 router.post('/api/locations', async (req, res) => {
-  const { school_id, zip_code, city, street_name, street_number } = req.body.data
+  const { school_id, zip_code, city, street_name, street_number } = req.body
 
   console.log(req.body)
 
@@ -57,6 +57,23 @@ router.patch('/api/locations/:location_id', async (req, res) => {
   } catch (error) {
     console.error('Server Error:', error)
     res.status(500).send({ message: 'Serverfejl under opdatering af afdeling.' })
+  }
+})
+
+router.delete('/api/locations/:location_id', async (req, res) => {
+  const { location_id } = req.params
+
+  try {
+    const location = await Location.findByPk(location_id)
+    if (location) {
+      await location.destroy()
+      res.send({ message: 'Afdeling slettet succesfuldt.' })
+    } else {
+      res.status(404).send({ message: 'Afdeling ikke fundet.' })
+    }
+  } catch (error) {
+    console.error('Server Error:', error)
+    res.status(500).send({ message: 'Serverfejl under sletning af afdeling.' })
   }
 })
 

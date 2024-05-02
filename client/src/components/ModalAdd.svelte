@@ -40,33 +40,20 @@
 	}
 
 	async function addItem() {
-		console.log('school_id in modal:', $selectedSchoolId);
-
-		let data = formData;
-		formData.school_id = $selectedSchoolId;
-
-		console.log('formData:', formData);
-
-		console.log('data:', data);
-
-		formData.school_id = $selectedSchoolId;
-
-		console.log('formData:', formData);
-
-		data.school_id = $selectedSchoolId;
+		formData[idKey] = $selectedSchoolId;
 
 		// Example validation: ensure all required fields are filled
-		if (fields.some((field) => field.required && !data[field.name])) {
-			toast.error('Please fill all required fields.');
-			return;
-		}
+		// if (fields.some((field) => field.required && !data[field.name])) {
+		// 	toast.error('Please fill all required fields.');
+		// 	return;
+		// }
 
-		if (formData.email) {
-			if (!validateEmail(formData.email)) {
-				toast.error('Indtast en gyldig email-adresse.');
-				return;
-			}
-		}
+		// if (formData.email) {
+		// 	if (!validateEmail(formData.email)) {
+		// 		toast.error('Indtast en gyldig email-adresse.');
+		// 		return;
+		// 	}
+		// }
 
 		try {
 			const response = await fetch(`${$BASE_URL}/${collection}`, {
@@ -74,10 +61,13 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ data: formData })
+				body: JSON.stringify(formData)
 			});
 
 			const result = await response.json();
+
+			console.log(response.ok); // Should log true if 200-299
+
 			if (response.ok) {
 				toast.success('Oprettelse vellykket!');
 
@@ -92,7 +82,7 @@
 			}
 		} catch (error) {
 			console.error('Error updating item:', error);
-			toast.error('Fejl ved opdatering:', error.message);
+			toast.error('Fejl ved opdatering:', result.message);
 		}
 	}
 
