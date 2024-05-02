@@ -4,9 +4,10 @@
 	import ListItems from './ListItems.svelte';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
 	import { itemList } from '../stores/itemListStore';
+	import { selectedSchoolId } from '../stores/modalStore';
 
 	let options = [];
-    let hasSelected = false;
+	let hasSelected = false;
 
 	export let listIdKey;
 	export let listCollection;
@@ -14,7 +15,7 @@
 	export let label;
 
 	onMount(() => {
-        itemList.set([])
+		itemList.set([]);
 		fetchOptions();
 	});
 
@@ -30,6 +31,7 @@
 
 	function handleOptionChange(event) {
 		fetchResultOnOption(event.target.value);
+		selectedSchoolId.set(event.target.value);
 		hasSelected = false;
 	}
 
@@ -59,11 +61,10 @@
 </div>
 
 <style>
-    #options-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
+	#options-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
 </style>

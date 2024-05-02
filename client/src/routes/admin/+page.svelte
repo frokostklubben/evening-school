@@ -5,7 +5,7 @@
 	import { itemList } from '../../stores/itemListStore.js';
 	import { BASE_URL } from '../../stores/apiConfig.js';
 	import DropdownAndList from '../../components/DropdownAndList.svelte';
-	import { displayNames } from '../../stores/dictionaryStore.js'
+	import { displayNames } from '../../stores/dictionaryStore.js';
 
 	let schools = [];
 	let users = [];
@@ -65,8 +65,6 @@
 	}
 </script>
 
-
-
 <h2 class="mb-4">Se alle kontoransatte</h2>
 
 <div class="mb-3">
@@ -79,21 +77,15 @@
 </div>
 
 {#if $itemList.length > 0}
-	<ListItems
-		collection={'users'}
-		idKey="user_id"
-	/>
-	
+	<ListItems collection={'users'} idKey="user_id" />
 {:else if hasSelected}
 	<div>Ingen brugere fundet</div>
 {/if}
 
-<!--
 <DropdownAndList
-	listIdKey={'user'}
+	listIdKey={'user_id'}
 	listCollection={'users'}
 	optionsIdKey={'school_id'}
 	optionsCollection={'schools'}
 	label={'Ansatte ved aftenskole'}
 />
--->
