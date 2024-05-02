@@ -1,4 +1,5 @@
 <script>
+	// @ts-nocheck
 	import DropdownAndList from '../../components/DropdownAndList.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
 	import ModalAdd from '../../components/ModalAdd.svelte';
@@ -8,10 +9,9 @@
 	let title = 'kontoransat';
 
 	let fields = [
-		{ name: 'zip_code', label: 'Postnummer', type: 'number', required: true },
-		{ name: 'city', label: 'By', type: 'text', required: true },
-		{ name: 'street_name', label: 'Vejnavn', type: 'text', required: true },
-		{ name: 'street_number', label: 'Husnummer', type: 'number', required: false }
+		{ name: 'first_name', label: 'Fornavn', type: 'text', required: true },
+		{ name: 'last_name', label: 'Efternavn', type: 'text', required: true },
+		{ name: 'email', label: 'Email', type: 'email', required: true }
 	];
 
 	function addUser() {
@@ -19,18 +19,17 @@
 	}
 
 	displayNames.set({
-		zip_code: 'Postnummer',
-		city: 'By',
-		street_name: 'Vejnavn',
-		street_number: 'nr.'
+		first_name: 'Fornavn',
+		last_name: 'Efternavn',
+		email: 'Email'
 	});
 </script>
 
 <DropdownAndList
 	listIdKey={'user_id'}
 	listCollection={'users'}
-	optionsCollection={'users'}
-	label={'Kontoransatte'}
+	optionsCollection={'schools'}
+	label={'Aftenskole'}
 />
 
 {#if $optionId}
@@ -40,7 +39,7 @@
 {/if}
 
 {#if showAddModal}
-	<ModalAdd collection={'users'} idKey={'user_id'} {fields} {title} />
+	<ModalAdd collection={'users'} idKey={'school_id'} {fields} {title} />
 {/if}
 
 <!-- <script>

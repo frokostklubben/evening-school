@@ -23,14 +23,6 @@
 		return acc;
 	}, {});
 
-	// Update formData whenever selectedSchoolId changes
-	// $: if (selectedSchoolId) {
-	// 	formData.update((current) => ({
-	// 		...current,
-	// 		school_id: $selectedSchoolId // Adding school_id to formData
-	// 	}));
-	// }
-
 	itemKeys = Object.keys(formData).filter((key) => !key.endsWith('_id'));
 
 	// TODO: move to service - ts problems
@@ -41,6 +33,10 @@
 
 	async function addItem() {
 		formData[idKey] = $optionId;
+
+		// console.log('optionId in addItem:', $optionId);
+
+		console.log(formData);
 
 		// Example validation: ensure all required fields are filled
 		// if (fields.some((field) => field.required && !data[field.name])) {
@@ -66,14 +62,12 @@
 
 			const result = await response.json();
 
-			console.log(response.ok); // Should log true if 200-299
-
 			if (response.ok) {
 				toast.success('Oprettelse vellykket!');
 
-				$itemList.update((currentItems) => {
-					return [...currentItems, result];
-				});
+				// $itemList.update((currentItems) => {
+				// 	return [...currentItems, result];
+				// });
 
 				// const index = $itemList.findIndex((item) => item[idKey] === formData[idKey]);
 				// if (index !== -1) {
@@ -86,7 +80,7 @@
 			}
 		} catch (error) {
 			console.error('Error updating item:', error);
-			toast.error('Fejl ved opdatering:', result.message);
+			toast.error('Fejl ved opdatering:', error.message);
 		}
 	}
 
