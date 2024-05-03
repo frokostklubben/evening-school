@@ -15,6 +15,7 @@
 	export let optionsIdKey;
 	export let label;
 	export let modalTitle;
+	export let optionName;
 
 	let options = [];
 	let hasSelected = false;
@@ -69,7 +70,7 @@
 
 <div id="options-container">
 	<div id="button-and-dropdown">
-		<SelectBoxOptions {label} selected={''} {options} onOptionChange={handleOptionChange} />
+		<SelectBoxOptions {label} selected={''} idKey={optionsIdKey} {optionName} {options} onOptionChange={handleOptionChange} />
 		{#if $optionId}
 			<div class="text-center">
 				<Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}

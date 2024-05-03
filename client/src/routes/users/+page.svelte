@@ -18,4 +18,5 @@
 	optionsIdKey={'school_id'}
 	label={'Aftenskole'}
 	modalTitle={'kontormedarbejder'}
+	optionName={'name'}
 />  

@@ -2,10 +2,13 @@
 	//@ts-nocheck
 	// import { optionId } from '../stores/modalStore';
 
+
 	export let label = '';
 	export let options; //make a store instead
 	export let selected = '';
 	export let onOptionChange;
+	export let idKey;
+	export let optionName;
 </script>
 
 <label>
@@ -14,7 +17,7 @@
 		<option value="">Vælg</option>
 		{#each options as option (option.name)}
 			<!-- TODO: OBS school_id skal generaliseres!! -->
-			<option value={option.school_id}>{option.name}</option>
+			<option value={option[idKey]}>{option[optionName]}</option>
 		{/each}
 	</select>
 </label>
