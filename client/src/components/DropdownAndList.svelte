@@ -21,8 +21,12 @@
 
 	async function fetchOptions() {
 		const response = await fetch(`http://localhost:8080/api/${optionsCollection}`);
+
+		console.log('fetchOptions url: api/' + optionsCollection);
+
 		if (response.ok) {
 			const result = await response.json();
+
 			options = result.data;
 		} else {
 			console.error(`Failed to fetch ${optionsCollection}`);
@@ -32,15 +36,18 @@
 	function handleOptionChange(event) {
 		fetchResultOnOption(event.target.value);
 		optionId.set(event.target.value);
-		console.log('school_id:', $optionId);
 		hasSelected = false;
 	}
 
 	async function fetchResultOnOption(optionId) {
 		if (optionId) {
 			const response = await fetch(`http://localhost:8080/api/${listCollection}/${optionId}`);
+
+			console.log('fetchResultOnOption url: api/' + listCollection + '/' + optionId);
+
 			if (response.ok) {
 				const result = await response.json();
+				console.log('result from fetch', result.data);
 				itemList.set(result.data);
 				hasSelected = true;
 			} else {
@@ -67,5 +74,6 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		margin-top: 3rem;
 	}
 </style>

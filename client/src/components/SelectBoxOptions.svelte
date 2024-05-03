@@ -1,5 +1,6 @@
 <script>
 	//@ts-nocheck
+	// import { optionId } from '../stores/modalStore';
 
 	export let label = '';
 	export let options; //make a store instead

@@ -4,7 +4,8 @@
 	import { displayNames } from '../../stores/dictionaryStore.js';
 	import ModalAdd from '../../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
-	import { showAddModal, optionId } from '../../stores/modalStore.js';
+	import { showAddModal, optionId, selectedItem } from '../../stores/modalStore.js';
+	import { onMount } from 'svelte';
 
 	let title = 'kontoransat';
 
@@ -13,6 +14,10 @@
 		{ name: 'last_name', label: 'Efternavn', type: 'text', required: true },
 		{ name: 'email', label: 'Email', type: 'email', required: true }
 	];
+
+	onMount(() => {
+		$optionId = '';
+	});
 
 	function addUser() {
 		showAddModal.set(true);
@@ -23,24 +28,33 @@
 		last_name: 'Efternavn',
 		email: 'Email'
 	});
+
+	console.log($selectedItem);
 </script>
 
-<DropdownAndList
+
+<h2>{$selectedItem}</h2>
+
+ {#if $optionId}
+	<div class="text-center mt-10 mb-10">
+		<Button type="submit" color="green" on:click={addUser}>Ny kontoransat</Button>
+	</div>
+{/if}
+
+
+<!-- <DropdownAndList
 	listIdKey={'user_id'}
 	listCollection={'users'}
 	optionsCollection={'schools'}
 	label={'Aftenskole'}
-/>
-
-{#if $optionId}
-	<div class="text-center mt-10 mb-10">
-		<Button type="submit" color="green" on:click={addUser}>Ny kontoransatt</Button>
-	</div>
-{/if}
+/>  -->
 
 {#if showAddModal}
 	<ModalAdd collection={'users'} idKey={'school_id'} {fields} {title} />
 {/if}
+
+
+
 
 <!-- <script>
 	// @ts-nocheck

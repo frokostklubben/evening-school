@@ -11,7 +11,7 @@
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
 	<div class="container-fluid">
-		<a class="navbar-brand" href="/">Home</a>
+		<a class="navbar-brand" href="/">Aftenskolerne</a>
 		<button
 			on:click={toggleOpen}
 			class="navbar-toggler"
@@ -36,42 +36,49 @@
 
 				<a
 					class="nav-link"
-					class:active={$page.url.pathname === '/'}
+					class:active={$page.url.pathname === '/event'}
 					data-sveltekit-preload-data
-					href="/">Page 2</a
+					href="/event">Event</a
 				>
 
-				<a
+				<!-- <a
 					class="nav-link"
 					class:active={$page.url.pathname === '/admin'}
 					data-sveltekit-preload-data
 					href="/admin">Admin</a
+				> -->
+
+				<a
+					class="nav-link"
+					class:active={$page.url.pathname === '/courses'}
+					data-sveltekit-preload-data
+					href="/courses">Hold</a
 				>
 
 				<a
 					class="nav-link"
-					class:active={$page.url.pathname === '/user'}
+					class:active={$page.url.pathname === '/users'}
 					data-sveltekit-preload-data
-					href="/user">Ny bruger</a
+					href="/users">Kontoransatte</a
 				>
-				<a
+				<!-- <a
 					class="nav-link"
 					class:active={$page.url.pathname === '/add-location'}
 					data-sveltekit-preload-data
 					href="/add-location">add location</a
-				>
+				> -->
+				<!-- <a
+					class="nav-link"
+					class:active={$page.url.pathname === '/show-users'}
+					data-sveltekit-preload-data
+					href="/show-users">Ansatte</a
+				> -->
 				<a
-				class="nav-link"
-				class:active={$page.url.pathname === '/show-users'}
-				data-sveltekit-preload-data
-				href="/show-users">Vis ansatte</a
-			>
-			<a
-				class="nav-link"
-				class:active={$page.url.pathname === '/afdelinger'}
-				data-sveltekit-preload-data
-				href="/location">Vis afdelinger</a
-			>
+					class="nav-link"
+					class:active={$page.url.pathname === '/afdelinger'}
+					data-sveltekit-preload-data
+					href="/location">Afdelinger</a
+				>
 			</div>
 		</div>
 	</div>

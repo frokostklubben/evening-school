@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
 import Teacher from './teacher.js'
+import Location from './location.js'
 
 const Course = sequelize.define(
   'Course',
@@ -16,6 +17,14 @@ const Course = sequelize.define(
       references: {
         model: Teacher,
         key: 'teacher_id',
+      },
+    },
+    // TODO: Update create.js?
+    location_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: Location,
+        key: 'location_id',
       },
     },
     course_name: {
