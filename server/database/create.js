@@ -81,6 +81,16 @@ const courses = await Course.bulkCreate([
   { teacher_id: 4, course_name: 'Kor for tonedøve' },
 ])
 
+// const courses = await Course.bulkCreate([
+//   { teacher_id: 1, location_id: 1, course_name: 'Italiensk opera 1' },
+//   { teacher_id: 1, location_id: 1, course_name: 'Italiensk opera 2' },
+//   { teacher_id: 2, location_id: 2, course_name: 'Git 101' },
+//   { teacher_id: 2, location_id: 2, course_name: 'Sveltestrap for øvede' },
+//   { teacher_id: 3, location_id: 3, course_name: 'Byg en båd' },
+//   { teacher_id: 3, location_id: 3, course_name: "Kritisk læsning af 'Ib i en kø'" },
+//   { teacher_id: 4, location_id: 1, course_name: 'Kor for tonedøve' },
+// ])
+
 // Inventory
 const inventory = await Inventory.bulkCreate([{ item_name: 'Borde' }, { item_name: 'Instrumenter' }, { item_name: 'Computere' }, { item_name: 'Spanskrør' }])
 

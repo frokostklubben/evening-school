@@ -5,6 +5,7 @@
 	import { itemList } from '../stores/itemListStore.js';
 	import { selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
+	import { goto } from '$app/navigation';
 
 	export let collection;
 	export let idKey;
@@ -18,8 +19,6 @@
 
 	let headerKeys =
 		$itemList.length > 0 ? Object.keys($itemList[0]).filter((key) => !key.endsWith('_id')) : [];
-
-	console.log('>>>>>>>>>>>>>>', $displayNames);
 </script>
 
 <div class="container mt-5">
@@ -64,6 +63,15 @@
 										>
 											<i class="bi bi-trash-fill"></i>
 										</button></td
+									>
+									<td
+										><button
+											class="btn"
+											on:click={() => {
+												selectedItem.set(listItem);
+												goto('/courses');
+											}}>Se hold</button
+										></td
 									>
 								</tr>
 							{/each}

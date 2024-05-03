@@ -1,1 +1,1 @@
-<h2>Forside</h2>
+<h1>Forside</h1>
