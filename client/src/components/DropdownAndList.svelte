@@ -15,6 +15,7 @@
 	export let optionsIdKey
 	export let label;
 	export let modalTitle
+	export let optionName;
 
 	let options = [];
 	let hasSelected = false;
@@ -68,7 +69,7 @@
 </script>
 
 <div id="options-container">
-	<SelectBoxOptions {label} selected={''} {options} onOptionChange={handleOptionChange} />
+	<SelectBoxOptions {label} selected={''} idKey={optionsIdKey} {optionName} {options} onOptionChange={handleOptionChange} />
 
 	{#if $optionId}
 		<div class="text-center mt-10 mb-10">

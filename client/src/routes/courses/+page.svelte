@@ -1,7 +1,6 @@
 <script>
-	import DropdownAndList from '../../components/DropdownAndList.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
-
+	import DropdownAndList from '../../components/DropdownAndList.svelte';
 	// displayNames.set({
 	// 	let fields = [
 	// 	{ name: 'zip_code', label: 'Postnummer', type: 'number', required: true },
@@ -16,10 +15,11 @@
 
 <DropdownAndList
 	listIdKey={'course_id'}
-	listCollection={'courses'}
+	listCollection={'locations'}
 	optionsCollection={'schools'}
 	optionsIdKey={'school_id'}
-	label={'Afdelinger'}
+	label={'Skole'}
+	optionName={'name'}
 	modalTitle={'hold'}
 />
 

@@ -17,5 +17,6 @@
 	optionsIdKey={'school_id'}
 	label={'Aftenskole'}
 	modalTitle={'afdeling'}
+	optionName={'name'}
 />
 
