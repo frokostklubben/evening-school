@@ -3,17 +3,20 @@
 	import { onMount } from 'svelte';
 	import ListItems from './ListItems.svelte';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
-	import { itemList } from '../stores/itemListStore';
+	import { headerKeys, itemList } from '../stores/itemListStore';
 	import { optionId } from '../stores/modalStore';
-	import { ModalAdd } from '../components/ModalAdd.svelte';
+	import ModalAdd from '../components/ModalAdd.svelte';
 
 	let options = [];
 	let hasSelected = false;
 
-	export let listIdKey;
+	export let listIdKey; // f.eks. user_id, hvis resultatet er users
 	export let listCollection;
 	export let optionsCollection;
+	export let optionsIdKey
 	export let label;
+	export let modalTitle
+
 
 	onMount(() => {
 		itemList.set([]);
@@ -44,11 +47,8 @@
 		if (optionId) {
 			const response = await fetch(`http://localhost:8080/api/${listCollection}/${optionId}`);
 
-			console.log('fetchResultOnOption url: api/' + listCollection + '/' + optionId);
-
 			if (response.ok) {
 				const result = await response.json();
-				console.log('result from fetch', result.data);
 				itemList.set(result.data);
 				hasSelected = true;
 			} else {
@@ -64,7 +64,7 @@
 	<SelectBoxOptions {label} selected={''} {options} onOptionChange={handleOptionChange} />
 
 	<!-- {#if showAddModal} -->
-	<ModalAdd collection={listCollection} title={label} />
+	<ModalAdd collection={listCollection} title={label} idKey={optionsIdKey} {modalTitle} />
 	<!-- {/if} -->
 
 	{#if $itemList.length > 0}

@@ -1,7 +1,7 @@
 <script>
 	import DropdownAndList from '../../components/DropdownAndList.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
-	import ModalAdd from '../../components/ModalAdd.svelte';
+	//import ModalAdd from '../../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
 	import { showAddModal, optionId } from '../../stores/modalStore.js';
 	import { onMount } from 'svelte';
@@ -35,7 +35,10 @@
 	listIdKey={'location_id'}
 	listCollection={'locations'}
 	optionsCollection={'schools'}
-	label={'Afdelinger'}
+	optionsIdKey={'school_id'}
+	label={'Aftenskole'}
+	modalTitle={'afdeling'}
+
 />
 
 {#if $optionId}

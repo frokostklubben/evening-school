@@ -2,7 +2,7 @@
 	// @ts-nocheck
 	import ModalDelete from './ModalDelete.svelte';
 	import ModalEdit from './ModalEdit.svelte';
-	import { itemList } from '../stores/itemListStore.js';
+	import { headerKeys, headerKeysDanish, itemList } from '../stores/itemListStore.js';
 	import { selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import { goto } from '$app/navigation';
@@ -10,15 +10,17 @@
 	export let collection;
 	export let idKey;
 
-	let headerKeysDanish =
+	headerKeysDanish.set(
 		$itemList.length > 0
 			? Object.keys($itemList[0])
 					.filter((key) => !key.endsWith('_id'))
 					.map((key) => displayNames[key] || key)
-			: [];
+			: []
+	);
 
-	let headerKeys =
-		$itemList.length > 0 ? Object.keys($itemList[0]).filter((key) => !key.endsWith('_id')) : [];
+	headerKeys.set(
+		$itemList.length > 0 ? Object.keys($itemList[0]).filter((key) => !key.endsWith('_id')) : []
+	);
 </script>
 
 <div class="container mt-5">
@@ -29,7 +31,7 @@
 					<table class="w-100">
 						<thead>
 							<tr>
-								{#each headerKeysDanish as key (key)}
+								{#each $headerKeysDanish as key (key)}
 									<th>{$displayNames[key]}</th>
 								{/each}
 							</tr>
@@ -37,7 +39,7 @@
 						<tbody>
 							{#each $itemList as listItem, index}
 								<tr class="hover-row">
-									{#each headerKeys as key (key)}
+									{#each $headerKeys as key (key)}
 										<td>{listItem[key]}</td>
 									{/each}
 									<td>

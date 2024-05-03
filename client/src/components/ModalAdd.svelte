@@ -5,9 +5,12 @@
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { showAddModal, optionId } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
+	import { itemList, headerKeys, headerKeysDanish } from '../stores/itemListStore.js';
+	import { onMount } from 'svelte';
 
-	// export let idKey;
+	export let idKey;
 	export let collection = '';
+	export let modalTitle
 	// export let fields = [];
 	export let title;
 
@@ -16,12 +19,9 @@
 	// let formData = writable({});
 	let formData = {};
 
-	formData = fields.reduce((acc, field) => {
-		acc[field.name] = '';
-		return acc;
-	}, {});
+	//itemKeys = Object.keys($headerKeys).filter((key) => !key.endsWith('_id'));
 
-	itemKeys = Object.keys(formData).filter((key) => !key.endsWith('_id'));
+	
 
 	// TODO: move to service - ts problems
 	function validateEmail(email) {
@@ -31,10 +31,11 @@
 
 	async function addItem() {
 		formData[idKey] = $optionId;
+		
 
 		// console.log('optionId in addItem:', $optionId);
 
-		console.log(formData);
+		//console.log(formData);
 
 		// Example validation: ensure all required fields are filled
 		// if (fields.some((field) => field.required && !data[field.name])) {
@@ -89,12 +90,12 @@
 </script>
 
 <!-- TODO: translate table_name -->
-<Modal title="Læg til ny {title}" bind:open={$showAddModal} autoclose>
+<Modal title="Læg til ny {modalTitle}" bind:open={$showAddModal} autoclose>
 	<div class="container-fluid mt-5">
 		<div class="row justify-content-center">
 			<div class="col-md-8">
 				<form on:submit|preventDefault={addItem} class="needs-validation">
-					{#each itemKeys as key (key)}
+					{#each $headerKeys as key (key)}
 						<div class="mb-3">
 							<label for={key} class="form-label">{$displayNames[key]}</label>
 
