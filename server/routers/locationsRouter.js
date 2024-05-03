@@ -23,8 +23,6 @@ router.get('/api/locations/:schoolId', async (req, res) => {
 router.post('/api/locations', async (req, res) => {
   const { school_id, zip_code, city, street_name, street_number } = req.body
 
-  console.log(req.body)
-
   try {
     const new_location = await Location.create({
       school_id: school_id,
@@ -49,7 +47,6 @@ router.patch('/api/locations/:location_id', async (req, res) => {
 
     if (location) {
       await location.update(updates)
-      console.log('location', location)
       res.send({ message: 'Afdeling opdateret.', data: location })
     } else {
       res.status(404).send({ message: 'Afdeling ikke fundet.' })

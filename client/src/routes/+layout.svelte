@@ -40,14 +40,6 @@
 					data-sveltekit-preload-data
 					href="/event">Event</a
 				>
-
-				<!-- <a
-					class="nav-link"
-					class:active={$page.url.pathname === '/admin'}
-					data-sveltekit-preload-data
-					href="/admin">Admin</a
-				> -->
-
 				<a
 					class="nav-link"
 					class:active={$page.url.pathname === '/courses'}
@@ -61,18 +53,6 @@
 					data-sveltekit-preload-data
 					href="/users">Kontoransatte</a
 				>
-				<!-- <a
-					class="nav-link"
-					class:active={$page.url.pathname === '/add-location'}
-					data-sveltekit-preload-data
-					href="/add-location">add location</a
-				> -->
-				<!-- <a
-					class="nav-link"
-					class:active={$page.url.pathname === '/show-users'}
-					data-sveltekit-preload-data
-					href="/show-users">Ansatte</a
-				> -->
 				<a
 					class="nav-link"
 					class:active={$page.url.pathname === '/afdelinger'}

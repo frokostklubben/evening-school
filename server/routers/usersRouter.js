@@ -1,13 +1,6 @@
 import Router from 'express'
-const router = Router()
 import User from '../database/models/user.js'
-import { validateUser, validateUserForUpdate } from '../middlewares/validateUser.js'
-
-router.get('/api/users', async (req, res) => {
-  const users = await User.findAll()
-  console.log(users)
-  res.send({ data: users })
-})
+const router = Router()
 
 router.get('/api/users/:schoolId', async (req, res) => {
   try {
@@ -25,15 +18,11 @@ router.get('/api/users/:schoolId', async (req, res) => {
 router.post('/api/users', async (req, res) => {
   const { first_name, last_name, email, school_id } = req.body
 
-  console.log(school_id)
-
   try {
     const user = await User.create({ first_name, last_name, email, school_id, role_id: 2 })
-    console.log(`${user.email} ${user.last_name}`)
     res.status(201).send({ message: 'Bruger oprettet succesfuldt.', data: user })
   } catch (error) {
     console.error('Server Error:', error)
-    console.log(error)
     res.status(500).send({ message: error.errors[0].message })
   }
 })
@@ -47,7 +36,6 @@ router.patch('/api/users/:user_id', async (req, res) => {
 
     if (user) {
       await user.update(updates)
-      console.log('user', user)
       res.send({ message: 'Bruger opdateret succesfuldt.', data: user })
     } else {
       res.status(404).send({ message: 'Bruger ikke fundet.' })

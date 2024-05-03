@@ -4,11 +4,9 @@
 	import ListItems from './ListItems.svelte';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
 	import { headerKeys, itemList } from '../stores/itemListStore';
-	import { optionId } from '../stores/modalStore';
+	import { optionId, showAddModal } from '../stores/modalStore';
 	import ModalAdd from '../components/ModalAdd.svelte';
-
-	let options = [];
-	let hasSelected = false;
+	import { Button } from 'flowbite-svelte';
 
 	export let listIdKey; // f.eks. user_id, hvis resultatet er users
 	export let listCollection;
@@ -17,16 +15,21 @@
 	export let label;
 	export let modalTitle
 
+	let options = [];
+	let hasSelected = false;
 
 	onMount(() => {
+		$optionId = '';
 		itemList.set([]);
 		fetchOptions();
 	});
 
+	function addItem() {
+		showAddModal.set(true);
+	}
+
 	async function fetchOptions() {
 		const response = await fetch(`http://localhost:8080/api/${optionsCollection}`);
-
-		console.log('fetchOptions url: api/' + optionsCollection);
 
 		if (response.ok) {
 			const result = await response.json();
@@ -49,6 +52,9 @@
 
 			if (response.ok) {
 				const result = await response.json();
+
+				//Her skal der ske noget med headerkeys, hvis listen er tom
+				let list = result.data;
 				itemList.set(result.data);
 				hasSelected = true;
 			} else {
@@ -63,9 +69,15 @@
 <div id="options-container">
 	<SelectBoxOptions {label} selected={''} {options} onOptionChange={handleOptionChange} />
 
-	<!-- {#if showAddModal} -->
+	{#if $optionId}
+		<div class="text-center mt-10 mb-10">
+			<Button type="submit" color="green" on:click={addItem}>Ny {modalTitle}</Button>
+		</div>
+	{/if}
+
+	{#if showAddModal}
 	<ModalAdd collection={listCollection} title={label} idKey={optionsIdKey} {modalTitle} />
-	<!-- {/if} -->
+	{/if}
 
 	{#if $itemList.length > 0}
 		<ListItems idKey={listIdKey} collection={listCollection} />

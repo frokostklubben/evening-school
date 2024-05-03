@@ -5,23 +5,12 @@
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { showAddModal, optionId } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
-	import { itemList, headerKeys, headerKeysDanish } from '../stores/itemListStore.js';
-	import { onMount } from 'svelte';
+	import { itemList, headerKeys } from '../stores/itemListStore.js';
 
 	export let idKey;
 	export let collection = '';
 	export let modalTitle
-	// export let fields = [];
-	export let title;
-
-	let itemKeys = [];
-
-	// let formData = writable({});
 	let formData = {};
-
-	//itemKeys = Object.keys($headerKeys).filter((key) => !key.endsWith('_id'));
-
-	
 
 	// TODO: move to service - ts problems
 	function validateEmail(email) {
@@ -31,11 +20,7 @@
 
 	async function addItem() {
 		formData[idKey] = $optionId;
-		
 
-		// console.log('optionId in addItem:', $optionId);
-
-		//console.log(formData);
 
 		// Example validation: ensure all required fields are filled
 		// if (fields.some((field) => field.required && !data[field.name])) {
@@ -63,15 +48,9 @@
 
 			if (response.ok) {
 				toast.success('Oprettelse vellykket!');
-
-				// $itemList.update((currentItems) => {
-				// 	return [...currentItems, result];
-				// });
-
-				// const index = $itemList.findIndex((item) => item[idKey] === formData[idKey]);
-				// if (index !== -1) {
-				// 	$itemList[index] = formData;
-				// }
+				itemList.update((currentItems) => {
+					return [...currentItems, result.data];
+				});
 
 				showAddModal.set(false);
 			} else {

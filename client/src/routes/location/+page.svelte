@@ -1,27 +1,6 @@
 <script>
 	import DropdownAndList from '../../components/DropdownAndList.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
-	//import ModalAdd from '../../components/ModalAdd.svelte';
-	import { Button } from 'flowbite-svelte';
-	import { showAddModal, optionId } from '../../stores/modalStore.js';
-	import { onMount } from 'svelte';
-
-	let title = 'afdeling';
-
-	let fields = [
-		{ name: 'zip_code', label: 'Postnummer', type: 'number', required: true },
-		{ name: 'city', label: 'By', type: 'text', required: true },
-		{ name: 'street_name', label: 'Vejnavn', type: 'text', required: true },
-		{ name: 'street_number', label: 'Husnummer', type: 'number', required: false }
-	];
-
-	onMount(() => {
-		$optionId = '';
-	});
-
-	function addLocation() {
-		showAddModal.set(true);
-	}
 
 	displayNames.set({
 		zip_code: 'Postnummer',
@@ -38,17 +17,5 @@
 	optionsIdKey={'school_id'}
 	label={'Aftenskole'}
 	modalTitle={'afdeling'}
-
 />
 
-{#if $optionId}
-	<div class="text-center mt-10 mb-10">
-		<Button type="submit" color="green" on:click={addLocation}>Ny afdeling</Button>
-	</div>
-{/if}
-
-<!-- TODO: burde også checke om afdeling er valgt? -->
-<!-- {#if showAddModal}
-	<ModalAdd collection={'locations'} idKey={'school_id'} {fields} {title} />
-{/if}
- -->

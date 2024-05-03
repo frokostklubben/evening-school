@@ -22,8 +22,6 @@
 	async function fetchOptions() {
 		const response = await fetch(`http://localhost:8080/api/${optionsCollection}`);
 
-		console.log('fetchOptions url: api/' + optionsCollection);
-
 		if (response.ok) {
 			const result = await response.json();
 
@@ -43,11 +41,8 @@
 		if (optionId) {
 			const response = await fetch(`http://localhost:8080/api/${listCollection}/${optionId}`);
 
-			console.log('fetchResultOnOption url: api/' + listCollection + '/' + optionId);
-
 			if (response.ok) {
 				const result = await response.json();
-				console.log('result from fetch', result.data);
 				itemList.set(result.data);
 				hasSelected = true;
 			} else {
