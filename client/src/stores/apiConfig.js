@@ -1,3 +1,3 @@
-import { writable } from 'svelte/store';
+import { readable } from 'svelte/store';
 
-export const BASE_URL = writable('http://localhost:8080/api');
+export const BASE_URL = readable('http://localhost:8080/api');

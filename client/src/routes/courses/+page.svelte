@@ -15,7 +15,7 @@
 <h2>Oversigt over en afdelings hold</h2>
 
 <DropdownAndList
-	listIdKey={'courses_id'}
+	listIdKey={'course_id'}
 	listCollection={'courses'}
 	optionsCollection={'schools'}
 	optionsIdKey={'school_id'}
