@@ -7,14 +7,14 @@
 	import { optionId, showAddModal } from '../stores/modalStore';
 	import ModalAdd from '../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
-	import { BASE_URL } from '../stores/apiConfig.js'
+	import { BASE_URL } from '../stores/apiConfig.js';
 
 	export let listIdKey; // f.eks. user_id, hvis resultatet er users
 	export let listCollection;
 	export let optionsCollection;
-	export let optionsIdKey
+	export let optionsIdKey;
 	export let label;
-	export let modalTitle
+	export let modalTitle;
 
 	let options = [];
 	let hasSelected = false;
@@ -68,17 +68,16 @@
 </script>
 
 <div id="options-container">
-	<SelectBoxOptions {label} selected={''} {options} onOptionChange={handleOptionChange} />
-
-	{#if $optionId}
-		<div class="text-center mt-10 mb-10">
-			<Button type="submit" color="green" on:click={addItem}>Ny {modalTitle}</Button>
-		</div>
-	{/if}
-
-	{#if showAddModal}
-	<ModalAdd collection={listCollection} idKey={optionsIdKey} {modalTitle} />
-	{/if}
+	<div id="button-and-dropdown">
+		<SelectBoxOptions {label} selected={''} {options} onOptionChange={handleOptionChange} />
+		{#if $optionId}
+			<div class="text-center">
+				<Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}
+					>Ny {modalTitle}</Button
+				>
+			</div>
+		{/if}
+	</div>
 
 	{#if $itemList.length > 0}
 		<ListItems idKey={listIdKey} collection={listCollection} />
@@ -87,12 +86,24 @@
 	{/if}
 </div>
 
+{#if showAddModal}
+	<ModalAdd collection={listCollection} idKey={optionsIdKey} {modalTitle} />
+{/if}
+
 <style>
 	#options-container {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: baseline;
 		align-items: center;
 		margin-top: 3rem;
+	}
+
+	#button-and-dropdown {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		gap: 15px;
 	}
 </style>
