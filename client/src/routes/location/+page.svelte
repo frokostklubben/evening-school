@@ -14,5 +14,8 @@
 	listIdKey={'location_id'}
 	listCollection={'locations'}
 	optionsCollection={'schools'}
-	label={'Afdelinger'}
+	optionsIdKey={'school_id'}
+	label={'Aftenskole'}
+	modalTitle={'afdeling'}
 />
+

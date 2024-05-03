@@ -10,7 +10,6 @@ app.use(
   }),
 )
 
-
 app.use(express.json())
 
 import usersRouter from './routers/usersRouter.js'
@@ -21,6 +20,9 @@ app.use(schoolsRouter)
 
 import locationsRouter from './routers/locationsRouter.js'
 app.use(locationsRouter)
+
+import coursesRouter from './routers/coursesRouter.js'
+app.use(coursesRouter)
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, error => {
