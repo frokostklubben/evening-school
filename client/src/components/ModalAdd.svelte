@@ -1,16 +1,14 @@
 <script>
 	// @ts-nocheck
-	import { writable, get } from 'svelte/store';
 	import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { BASE_URL } from '../stores/apiConfig.js';
-	import { selectedItem, showAddModal, optionId } from '../stores/modalStore.js';
-	import { itemList } from '../stores/itemListStore.js';
+	import { showAddModal, optionId } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 
-	export let idKey;
+	// export let idKey;
 	export let collection = '';
-	export let fields = [];
+	// export let fields = [];
 	export let title;
 
 	let itemKeys = [];

@@ -6,16 +6,16 @@
 	import { Button } from 'flowbite-svelte';
 	import { showAddModal, optionId, selectedItem } from '../../stores/modalStore.js';
 	import { onMount } from 'svelte';
-	import { onMount } from 'svelte';
+
 
 	let title = 'kontoransat';
-
+/* 
 	let fields = [
 		{ name: 'first_name', label: 'Fornavn', type: 'text', required: true },
 		{ name: 'last_name', label: 'Efternavn', type: 'text', required: true },
 		{ name: 'email', label: 'Email', type: 'email', required: true }
 	];
-
+ */
 	onMount(() => {
 		$optionId = '';
 	});
@@ -47,10 +47,10 @@
 	label={'Aftenskole'}
 />  
 
-{#if showAddModal}
-	<ModalAdd collection={'users'} idKey={'school_id'} {fields} {title} />
+<!-- {#if showAddModal}
+	<ModalAdd collection={'users'} idKey={'school_id'} {title} />
 {/if}
-
+ -->
 
 
 

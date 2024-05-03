@@ -45,6 +45,7 @@
 {/if}
 
 <!-- TODO: burde også checke om afdeling er valgt? -->
-{#if showAddModal}
+<!-- {#if showAddModal}
 	<ModalAdd collection={'locations'} idKey={'school_id'} {fields} {title} />
 {/if}
+ -->

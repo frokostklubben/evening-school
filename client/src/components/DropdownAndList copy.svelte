@@ -5,7 +5,6 @@
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
 	import { itemList } from '../stores/itemListStore';
 	import { optionId } from '../stores/modalStore';
-	import { ModalAdd } from '../components/ModalAdd.svelte';
 
 	let options = [];
 	let hasSelected = false;
@@ -62,11 +61,6 @@
 
 <div id="options-container">
 	<SelectBoxOptions {label} selected={''} {options} onOptionChange={handleOptionChange} />
-
-	<!-- {#if showAddModal} -->
-	<ModalAdd collection={listCollection} title={label} />
-	<!-- {/if} -->
-
 	{#if $itemList.length > 0}
 		<ListItems idKey={listIdKey} collection={listCollection} />
 	{:else if hasSelected}
