@@ -7,6 +7,7 @@
 	import { optionId, showAddModal } from '../stores/modalStore';
 	import ModalAdd from '../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
+	import { BASE_URL } from '../stores/apiConfig.js'
 
 	export let listIdKey; // f.eks. user_id, hvis resultatet er users
 	export let listCollection;
@@ -29,7 +30,7 @@
 	}
 
 	async function fetchOptions() {
-		const response = await fetch(`http://localhost:8080/api/${optionsCollection}`);
+		const response = await fetch(`${$BASE_URL}/${optionsCollection}`);
 
 		if (response.ok) {
 			const result = await response.json();
@@ -76,7 +77,7 @@
 	{/if}
 
 	{#if showAddModal}
-	<ModalAdd collection={listCollection} title={label} idKey={optionsIdKey} {modalTitle} />
+	<ModalAdd collection={listCollection} idKey={optionsIdKey} {modalTitle} />
 	{/if}
 
 	{#if $itemList.length > 0}
