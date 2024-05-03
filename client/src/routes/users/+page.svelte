@@ -6,6 +6,7 @@
 	import { Button } from 'flowbite-svelte';
 	import { showAddModal, optionId, selectedItem } from '../../stores/modalStore.js';
 	import { onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	let title = 'kontoransat';
 
