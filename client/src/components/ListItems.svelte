@@ -1,5 +1,4 @@
 <script>
-	// @ts-nocheck
 	import ModalDelete from './ModalDelete.svelte';
 	import ModalEdit from './ModalEdit.svelte';
 	import { headerKeys, headerKeysDanish, itemList } from '../stores/itemListStore.js';

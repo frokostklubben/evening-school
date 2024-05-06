@@ -1,5 +1,4 @@
 <script>
-	//@ts-nocheck
 	// import { optionId } from '../stores/modalStore';
 
 
