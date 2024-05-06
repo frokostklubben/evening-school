@@ -1,33 +1,32 @@
-// import { BASE_URL } from "../src/stores/apiConfig.js";
+import { get } from 'svelte/store';
+import { AUTH_URL } from '../src/stores/apiConfig.js';
 
-/* export async function login() {
+console.log('AUTH_URL:',get(AUTH_URL));
+
+async function login() {
 
   try {
-    const response = await fetch(`${$BASE_URL}/${collection}`, {
+    const response = await fetch(`${$AUTH_URL}/auth/login`, {
+      credentials: 'include',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(newUser)
     });
 
-    const result = await response.json();
-
     if (response.ok) {
-      toast.success('Oprettelse vellykket!');
-      itemList.update((currentItems) => {
-        return [...currentItems, result.data];
-      });
+      const result = await response.json();
+      user.set(result.data);
+      console.log($user);
 
-      showAddModal.set(false);
-    } else {
-      throw new Error(result.message || 'Oprettelse mislykkedes');
+      newUser.email = '';
+      newUser.password = '';
     }
   } catch (error) {
-    console.error('Error updating item:', error);
-    toast.error('Fejl ved opdatering:', error.message);
+    console.error('Error login:', error);
+    // toast.error('Fejl ved login:', error.message);
   }
 }
 
-
-} */
+export { login };

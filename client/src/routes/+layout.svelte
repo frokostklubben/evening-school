@@ -1,5 +1,4 @@
 <script>
-	// @ts-nocheck
 	import 'bootstrap/dist/css/bootstrap.css';
 	import { page } from '$app/stores';
 	import { AUTH_URL } from '../stores/apiConfig.js';
@@ -7,6 +6,33 @@
 	let isOpen = false;
 	import { user } from '../stores/userStore.js';
 	import toast from 'svelte-french-toast';
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		if (localStorage.getItem('sid')) {
+
+			async function validateSession() {
+			const sid = localStorage.getItem('sid');
+			const response = await fetch(`${$AUTH_URL}/auth/validateSession`, {
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ sid })
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+				user.set(result.data);
+			} else {
+				localStorage.removeItem('sid');
+			}
+		}
+		
+			validateSession();
+
+		}
+	});
 
 	let newUser = {
 		email: 'admin@jensen.dk',
@@ -48,6 +74,7 @@
 			if (response.ok) {
 				const result = await response.json();
 				user.set(result.data);
+				localStorage.setItem('sid', result.session)
 				console.log($user);
 
 				newUser.email = '';

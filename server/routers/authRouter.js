@@ -21,7 +21,11 @@ router.post('/auth/login', async (req, res) => {
         schoolId: foundUser.school_id,
         roleId: foundUser.role_id,
       }
-      res.status(200).send({ message: 'logged in', data: req.session.user })
+
+      //can i log the session id?
+      console.log(req.session.id);
+
+      res.status(200).send({ message: 'logged in', data: req.session.user, session: req.session.id})
     } else {
       res.status(400).send({ message: 'not logged in' })
     }
@@ -62,20 +66,21 @@ router.get('/auth/logout', (req, res) => {
   })
 })
 
-/*
+
 router.post('/auth/validateSession', async (req, res) => {
-    const { currentUserId } = req.body;
+    const { sid } = req.body;
+    
     let sessionId = '';
-    if (req.session && req.session.user) {
-        sessionId = req.session?.user.uid;
+    if (req.session && req.session.id) {
+        sessionId = req.session.id
     }
 
-    if (currentUserId === sessionId) {
+    if (sid  === sessionId) {
         res.status(200).send({ data: 'Session validated' });
     } else {
         res.status(400).send({ data: 'Session not validated' });
     }
 });
-*/
+
 
 export default router
