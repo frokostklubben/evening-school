@@ -9,7 +9,7 @@
 
 	export let idKey;
 	export let collection = '';
-	export let modalTitle
+	export let modalTitle;
 	let formData = {};
 
 	// TODO: move to service - ts problems
@@ -20,7 +20,6 @@
 
 	async function addItem() {
 		formData[idKey] = $optionId;
-
 
 		// Example validation: ensure all required fields are filled
 		// if (fields.some((field) => field.required && !data[field.name])) {
@@ -37,6 +36,7 @@
 
 		try {
 			const response = await fetch(`${$BASE_URL}/${collection}`, {
+				credentials: 'include',
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -68,7 +68,6 @@
 	}
 </script>
 
-<!-- TODO: translate table_name -->
 <Modal title="Læg til ny {modalTitle}" bind:open={$showAddModal} autoclose>
 	<div class="container-fluid mt-5">
 		<div class="row justify-content-center">

@@ -31,7 +31,9 @@
 	}
 
 	async function fetchOptions() {
-		const response = await fetch(`${$BASE_URL}/${optionsCollection}`);
+		const response = await fetch(`${$BASE_URL}/${optionsCollection}`, {
+			credentials: 'include',
+		});
 
 		if (response.ok) {
 			const result = await response.json();
@@ -50,7 +52,9 @@
 
 	async function fetchResultOnOption(optionId) {
 		if (optionId) {
-			const response = await fetch(`http://localhost:8080/api/${listCollection}/${optionId}`);
+			const response = await fetch(`http://localhost:8080/api/${listCollection}/${optionId}`, {
+				credentials: 'include',
+			});
 
 			if (response.ok) {
 				const result = await response.json();
