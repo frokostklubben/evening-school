@@ -1,6 +1,10 @@
+import 'dotenv/config'
 import express from 'express'
+import helmet from 'helmet'
+import { checkAuth } from './middlewares/authMiddleware.js';
 
 const app = express()
+app.use(helmet());
 
 import cors from 'cors'
 app.use(
@@ -11,6 +15,23 @@ app.use(
 )
 
 app.use(express.json())
+
+import session from 'express-session'
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: false,
+    maxAge: 1000 * 60 * 60, // 1 time
+  },
+});
+app.use(sessionMiddleware);
+
+app.use(checkAuth)
+
+import authRouter from './routers/authRouter.js'
+app.use(authRouter)
 
 import usersRouter from './routers/usersRouter.js'
 app.use(usersRouter)

@@ -1,15 +1,19 @@
 import Router from 'express'
 const router = Router()
 import Location from '../database/models/location.js'
+import { adminCheck } from '../middlewares/authMiddleware.js'
 
-router.get('/api/locations', async (req, res) => {
+router.get('/api/locations', adminCheck, async (req, res) => {
   const locations = await Location.findAll()
   res.send({ data: locations })
 })
 
 router.get('/api/locations/:schoolId', async (req, res) => {
   try {
-    const schoolId = req.params.schoolId
+    let schoolId = req.params.schoolId
+    if (req.session.user.roleId === 2) {
+      schoolId = req.session.user.schoolId
+    }
     const locations = await Location.findAll({
       where: { school_id: schoolId },
     })
@@ -20,11 +24,11 @@ router.get('/api/locations/:schoolId', async (req, res) => {
   }
 })
 
-router.post('/api/locations', async (req, res) => {
+router.post('/api/locations', adminCheck, async (req, res) => {
   const { school_id, zip_code, city, street_name, street_number } = req.body
 
   try {
-    const new_location = await Location.create({
+    const newLocation = await Location.create({
       school_id: school_id,
       zip_code: zip_code,
       city: city,
@@ -32,18 +36,18 @@ router.post('/api/locations', async (req, res) => {
       street_number: street_number,
     })
 
-    res.status(200).send({ data: new_location })
+    res.status(200).send({ data: newLocation })
   } catch (error) {
     res.status(500).send({ error: 'Failed to create location' })
   }
 })
 
-router.patch('/api/locations/:location_id', async (req, res) => {
-  const { location_id } = req.params
+router.patch('/api/locations/:locationId', adminCheck, async (req, res) => {
+  const { locationId } = req.params
   const updates = req.body
 
   try {
-    const location = await Location.findByPk(location_id)
+    const location = await Location.findByPk(locationId)
 
     if (location) {
       await location.update(updates)
@@ -57,11 +61,11 @@ router.patch('/api/locations/:location_id', async (req, res) => {
   }
 })
 
-router.delete('/api/locations/:location_id', async (req, res) => {
-  const { location_id } = req.params
+router.delete('/api/locations/:locationId', adminCheck, async (req, res) => {
+  const { locationId } = req.params
 
   try {
-    const location = await Location.findByPk(location_id)
+    const location = await Location.findByPk(locationId)
     if (location) {
       await location.destroy()
       res.send({ message: 'Afdeling slettet succesfuldt.' })
