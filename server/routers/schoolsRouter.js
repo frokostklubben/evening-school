@@ -1,13 +1,14 @@
 import Router from 'express'
 const router = Router()
 import School from '../database/models/school.js'
+import { adminCheck } from '../middlewares/authMiddleware.js'
 
-router.get('/api/schools', async (req, res) => {
+router.get('/api/schools', adminCheck, async (req, res) => {
   const schools = await School.findAll()
   res.send({ data: schools })
 })
 
-router.post('/api/schools', async (req, res) => {
+router.post('/api/schools', adminCheck, async (req, res) => {
   const { name } = req.body
 
   try {

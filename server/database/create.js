@@ -39,9 +39,9 @@ await School.bulkCreate([{ name: 'FOF' }, { name: 'AOF' }, { name: 'Aftenskolern
 await Role.bulkCreate([{ role: 'admin' }, { role: 'office_employee' }])
 
 await User.bulkCreate([
-  { school_id: 1, first_name: 'admin', last_name: 'jensen', email: 'admin@jensen.dk', role_id: 1 },
-  { school_id: 1, first_name: 'Kurt', last_name: 'Konthorsen', email: 'kurt@konthorsen.dk', role_id: 2 },
-  { school_id: 2, first_name: 'Lars', last_name: 'Mortensen', email: 'lars@mortensen.dk', role_id: 2 },
+  { school_id: 1, first_name: 'admin', last_name: 'jensen', email: 'admin@jensen.dk', role_id: 1, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
+  { school_id: 1, first_name: 'Kurt', last_name: 'Konthorsen', email: 'kurt@konthorsen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
+  { school_id: 2, first_name: 'Lars', last_name: 'Mortensen', email: 'lars@mortensen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
 ])
 
 await Location.bulkCreate([
