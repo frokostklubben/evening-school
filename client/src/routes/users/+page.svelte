@@ -1,5 +1,4 @@
 <script>
-	// @ts-nocheck
 	import DropdownAndList from '../../components/DropdownAndList.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
 

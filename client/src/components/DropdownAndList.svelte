@@ -1,5 +1,4 @@
 <script>
-	//@ts-nocheck
 	import { onMount } from 'svelte';
 	import ListItems from './ListItems.svelte';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';

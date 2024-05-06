@@ -1,5 +1,4 @@
 <script>
-	// @ts-nocheck
 	import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { itemList } from '../stores/itemListStore.js';
