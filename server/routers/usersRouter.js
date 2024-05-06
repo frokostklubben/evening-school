@@ -12,7 +12,11 @@ router.get('/api/users/:schoolId', async (req, res) => {
     const users = await User.findAll({
       where: { school_id: schoolId },
     })
-    res.send({ data: users })
+
+    const filteredUsers = users.map(({ hashed_password, ...dataValues }) => dataValues)
+    console.log(filteredUsers)
+
+    res.send({ data: filteredUsers })
   } catch (error) {
     console.error('Error fetching users for school:', error)
     res.status(500).send({ error: 'Failed to fetch users' })
