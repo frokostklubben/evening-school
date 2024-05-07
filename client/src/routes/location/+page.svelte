@@ -2,6 +2,7 @@
 	//@ts-nocheck
 	import DropdownAndList from '../../components/DropdownAndList.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
+	import { user } from '../../stores/userStore.js';
 
 	displayNames.set({
 		zip_code: 'Postnummer',
@@ -11,6 +12,7 @@
 	});
 </script>
 
+<!-- {#if $user.email} -->
 <DropdownAndList
 	listIdKey={'location_id'}
 	listCollection={'locations'}
@@ -20,3 +22,6 @@
 	modalTitle={'afdeling'}
 	optionName={'name'}
 />
+<!-- {:else}
+	<div>Du har ikke adgang her</div>
+{/if} -->
