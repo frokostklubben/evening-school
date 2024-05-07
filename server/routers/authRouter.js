@@ -22,9 +22,6 @@ router.post('/auth/login', async (req, res) => {
         roleId: foundUser.role_id,
       }
 
-      //can i log the session id?
-      console.log(req.session.id);
-
       res.status(200).send({ message: 'logged in', data: req.session.user, session: req.session.id})
     } else {
       res.status(400).send({ message: 'not logged in' })
@@ -76,7 +73,7 @@ router.post('/auth/validateSession', async (req, res) => {
     }
 
     if (sid  === sessionId) {
-        res.status(200).send({ data: 'Session validated' });
+        res.status(200).send({ data: req.session.user });
     } else {
         res.status(400).send({ data: 'Session not validated' });
     }

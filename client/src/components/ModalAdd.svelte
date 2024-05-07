@@ -119,35 +119,3 @@
 </Modal>
 
 <Toaster />
-
-<!-- 	{#each itemKeys as key (key)}
-						<div class="mb-3">
-							<label for={key} class="form-label">{$displayNames[key]}</label>
-
-							{#if typeof $selectedItem[key] === 'number'}
-								<input
-									type="number"
-									class="form-control"
-									id={key}
-									bind:value={$selectedItem[key]}
-									required
-								/>
-							{:else if isEmail($selectedItem[key])}
-								<input
-									type="email"
-									class="form-control"
-									id={key}
-									bind:value={$selectedItem[key]}
-									required
-								/>
-							{:else}
-								<input
-									type="text"
-									class="form-control"
-									id={key}
-									bind:value={$selectedItem[key]}
-									required
-								/>
-							{/if}
-						</div>
-					{/each} -->

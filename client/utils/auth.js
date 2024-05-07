@@ -22,6 +22,7 @@ async function login() {
 
       newUser.email = '';
       newUser.password = '';
+      
     }
   } catch (error) {
     console.error('Error login:', error);
