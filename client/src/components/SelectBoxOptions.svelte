@@ -1,6 +1,4 @@
 <script>
-	// import { optionId } from '../stores/modalStore';
-
 	export let label = '';
 	export let options; //make a store instead
 	export let selected = '';
@@ -13,7 +11,7 @@
 	{label}
 	<select class="form-select" bind:value={selected} on:change={onOptionChange}>
 		<option value="">Vælg</option>
-		{#each options as option (option.name)}
+		{#each options as option}
 			<option value={option[idKey]}>{option[optionName]}</option>
 		{/each}
 	</select>

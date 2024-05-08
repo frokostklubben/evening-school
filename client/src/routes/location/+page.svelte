@@ -3,6 +3,7 @@
 	import { displayNames } from '../../stores/dictionaryStore.js';
 
 	displayNames.set({
+		school_name: 'Skole',
 		zip_code: 'Postnummer',
 		city: 'By',
 		street_name: 'Vejnavn',
