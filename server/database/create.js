@@ -67,10 +67,10 @@ const classrooms = await Classroom.bulkCreate([
 ])
 
 await Teacher.bulkCreate([
-  { first_name: 'Birgit', last_name: 'Vejen', email: 'bv@fof.dk' },
-  { first_name: 'Michael', last_name: 'Jørgensen', email: 'mj@fof.dk' },
-  { first_name: 'Amdi', last_name: 'Holm', email: 'ah@aof.dk' },
-  { first_name: 'Claus', last_name: 'Larsen', email: 'oksefarsen@aof.dk' },
+  { school_id: 1, first_name: 'Birgit', last_name: 'Vejen', email: 'bv@fof.dk' },
+  { school_id: 1, first_name: 'Michael', last_name: 'Jørgensen', email: 'mj@fof.dk' },
+  { school_id: 2, first_name: 'Amdi', last_name: 'Holm', email: 'ah@aof.dk' },
+  { school_id: 3, first_name: 'Claus', last_name: 'Larsen', email: 'oksefarsen@aof.dk' },
 ])
 
 await Course.bulkCreate([

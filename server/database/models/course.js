@@ -19,7 +19,6 @@ const Course = sequelize.define(
         key: 'teacher_id',
       },
     },
-    // TODO: Update create.js?
     location_id: {
       type: DataTypes.INTEGER,
       references: {

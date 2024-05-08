@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import { AUTH_URL } from '../stores/apiConfig.js';
 import { goto } from '$app/navigation';
-import { isLoading } from '../stores/generalStore.js';
+import { isLoading, loginLoading } from '../stores/generalStore.js';
 import { user, newUser } from '../stores/userStore.js';
 
 export async function validateSession() {
@@ -35,10 +35,10 @@ export async function validateSession() {
 }
 
 export async function logout() {
+	loginLoading.set(true);
 	user.set({});
 	localStorage.removeItem('sid');
 	goto('/');
-
 	try {
 		const response = await fetch(`${get(AUTH_URL)}/auth/logout`, {
 			credentials: 'include'
@@ -49,10 +49,13 @@ export async function logout() {
 		}
 	} catch (error) {
 		console.error(error.message);
+	} finally {
+		loginLoading.set(false);
 	}
 }
 
 export async function login() {
+	loginLoading.set(true);
 	try {
 		const response = await fetch(`${get(AUTH_URL)}/auth/login`, {
 			credentials: 'include',
@@ -77,5 +80,7 @@ export async function login() {
 	} catch (error) {
 		console.error('Error login:', error);
 		toast.error('Fejl ved login:', error.message);
+	} finally {
+		loginLoading.set(false);
 	}
 }
