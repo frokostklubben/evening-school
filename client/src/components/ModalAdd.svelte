@@ -8,7 +8,7 @@
 
 	export let idKey;
 	export let collection = '';
-	export let modalTitle
+	export let modalTitle;
 	let formData = {};
 
 	// TODO: move to service - ts problems
@@ -19,7 +19,6 @@
 
 	async function addItem() {
 		formData[idKey] = $optionId;
-
 
 		// Example validation: ensure all required fields are filled
 		// if (fields.some((field) => field.required && !data[field.name])) {
@@ -36,6 +35,7 @@
 
 		try {
 			const response = await fetch(`${$BASE_URL}/${collection}`, {
+				credentials: 'include',
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -67,7 +67,6 @@
 	}
 </script>
 
-<!-- TODO: translate table_name -->
 <Modal title="Læg til ny {modalTitle}" bind:open={$showAddModal} autoclose>
 	<div class="container-fluid mt-5">
 		<div class="row justify-content-center">
@@ -120,35 +119,3 @@
 </Modal>
 
 <Toaster />
-
-<!-- 	{#each itemKeys as key (key)}
-						<div class="mb-3">
-							<label for={key} class="form-label">{$displayNames[key]}</label>
-
-							{#if typeof $selectedItem[key] === 'number'}
-								<input
-									type="number"
-									class="form-control"
-									id={key}
-									bind:value={$selectedItem[key]}
-									required
-								/>
-							{:else if isEmail($selectedItem[key])}
-								<input
-									type="email"
-									class="form-control"
-									id={key}
-									bind:value={$selectedItem[key]}
-									required
-								/>
-							{:else}
-								<input
-									type="text"
-									class="form-control"
-									id={key}
-									bind:value={$selectedItem[key]}
-									required
-								/>
-							{/if}
-						</div>
-					{/each} -->

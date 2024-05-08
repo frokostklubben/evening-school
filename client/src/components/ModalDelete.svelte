@@ -11,6 +11,7 @@
 	async function deleteItem() {
 		try {
 			const response = await fetch(`${$BASE_URL}/${collection}/${$selectedItem[idKey]}`, {
+				credentials: 'include',
 				method: 'DELETE'
 			});
 			if (!response.ok) throw new Error('Failed to delete item');

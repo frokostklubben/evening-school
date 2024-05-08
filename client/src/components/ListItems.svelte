@@ -5,6 +5,7 @@
 	import { selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import { goto } from '$app/navigation';
+	import { user } from '../stores/userStore.js';
 
 	export let collection;
 	export let idKey;
@@ -65,6 +66,7 @@
 											<i class="bi bi-trash-fill"></i>
 										</button></td
 									>
+									<!-- {#if $user.roleId === 1} -->
 									<td
 										><button
 											class="btn"
@@ -74,6 +76,7 @@
 											}}>Se hold</button
 										></td
 									>
+									<!-- {/if} -->
 								</tr>
 							{/each}
 						</tbody>

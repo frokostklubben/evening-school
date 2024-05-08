@@ -19,4 +19,3 @@
 	modalTitle={'afdeling'}
 	optionName={'name'}
 />
-

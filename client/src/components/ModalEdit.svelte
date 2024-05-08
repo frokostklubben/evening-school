@@ -32,6 +32,7 @@
 
 		try {
 			const response = await fetch(`${$BASE_URL}/${collection}/${$selectedItem[idKey]}`, {
+				credentials: 'include',
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json'

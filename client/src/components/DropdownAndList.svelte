@@ -7,6 +7,7 @@
 	import ModalAdd from '../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
 	import { BASE_URL } from '../stores/apiConfig.js';
+	import { user } from '../stores/userStore.js';
 
 	export let listIdKey; // f.eks. user_id, hvis resultatet er users
 	export let listCollection;
@@ -30,7 +31,9 @@
 	}
 
 	async function fetchOptions() {
-		const response = await fetch(`${$BASE_URL}/${optionsCollection}`);
+		const response = await fetch(`${$BASE_URL}/${optionsCollection}`, {
+			credentials: 'include'
+		});
 
 		if (response.ok) {
 			const result = await response.json();
@@ -49,7 +52,9 @@
 
 	async function fetchResultOnOption(optionId) {
 		if (optionId) {
-			const response = await fetch(`http://localhost:8080/api/${listCollection}/${optionId}`);
+			const response = await fetch(`http://localhost:8080/api/${listCollection}/${optionId}`, {
+				credentials: 'include'
+			});
 
 			if (response.ok) {
 				const result = await response.json();
@@ -69,7 +74,14 @@
 
 <div id="options-container">
 	<div id="button-and-dropdown">
-		<SelectBoxOptions {label} selected={''} idKey={optionsIdKey} {optionName} {options} onOptionChange={handleOptionChange} />
+		<SelectBoxOptions
+			{label}
+			selected={''}
+			idKey={optionsIdKey}
+			{optionName}
+			{options}
+			onOptionChange={handleOptionChange}
+		/>
 		{#if $optionId}
 			<div class="text-center">
 				<Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}
