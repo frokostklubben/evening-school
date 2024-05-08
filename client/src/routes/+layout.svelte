@@ -1,103 +1,24 @@
 <script>
 	import 'bootstrap/dist/css/bootstrap.css';
 	import { page } from '$app/stores';
-	import { AUTH_URL } from '../stores/apiConfig.js';
-	// import { login } from '../../utils/auth.js';
-	let isOpen = false;
-	import { user } from '../stores/userStore.js';
-	import toast from 'svelte-french-toast';
+	import { user, newUser } from '../stores/userStore.js';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { validateSession, login, logout } from '../utils/auth.js';
+	import { isLoading } from '../stores/generalStore.js';
 
-	let newUser = {
-		email: 'admin@jensen.dk',
-		password: '1'
-	};
-
-	let isLoading = true;
+	let isOpen = false;
+	$: testUser = $newUser;
 
 	onMount(async () => {
-		if (localStorage.getItem('sid')) {
-			try {
-				const sid = localStorage.getItem('sid');
-				const response = await fetch(`${$AUTH_URL}/auth/validateSession`, {
-					method: 'POST',
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ sid })
-				});
-
-				if (response.ok) {
-					const result = await response.json();
-					user.set(result.data);
-					goto('/'); // Should navigate back to the previous page
-				} else {
-					localStorage.removeItem('sid');
-				}
-			} catch (error) {
-				console.error(error);
-			} finally {
-				isLoading = false;
-			}
-		} else {
-			isLoading = false;
-		}
+		validateSession();
 	});
 
 	function toggleOpen() {
 		isOpen = !isOpen;
 	}
-
-	async function logout() {
-		user.set({});
-		localStorage.removeItem('sid');
-		goto('/'); // TODO: Dobbel kode
-
-		try {
-			const response = await fetch(`${$AUTH_URL}/auth/logout`, {
-				credentials: 'include'
-			});
-
-			if (response.ok) {
-				goto('/');
-			} else {
-				toast.error('Fejl ved logud, kontakt admin');
-			}
-		} catch (error) {
-			console.error(error.message);
-		}
-	}
-
-	async function login() {
-		try {
-			const response = await fetch(`${$AUTH_URL}/auth/login`, {
-				credentials: 'include',
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(newUser)
-			});
-
-			if (response.ok) {
-				const result = await response.json();
-				user.set(result.data);
-				localStorage.setItem('sid', result.session);
-
-				newUser.email = '';
-				newUser.password = '';
-				goto('/');
-			}
-		} catch (error) {
-			console.error('Error login:', error);
-			// toast.error('Fejl ved login:', error.message);
-		}
-	}
 </script>
 
-{#if !isLoading}
+{#if !$isLoading}
 	<nav class="navbar navbar-expand-lg bg-body-tertiary">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="/">Aftenskolerne</a>
@@ -114,8 +35,9 @@
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class:show={isOpen} class="collapse navbar-collapse" id="navbarNavAltMarkup">
-				{#if $user.email}
-					<div class="navbar-nav">
+				<div class="navbar-nav">
+					<!-- navbar showing for admin -->
+					{#if $user.roleId === 1}
 						<a
 							class="nav-link"
 							aria-current="page"
@@ -136,22 +58,44 @@
 							data-sveltekit-preload-data
 							href="/courses">Hold</a
 						>
-						{#if $user.roleId === 1}
-							<a
-								class="nav-link"
-								class:active={$page.url.pathname === '/users'}
-								data-sveltekit-preload-data
-								href={$user.roleId === 1 ? '/users' : '/'}>Kontoransatte</a
-							>
-							<a
-								class="nav-link"
-								class:active={$page.url.pathname === '/afdelinger'}
-								data-sveltekit-preload-data
-								href={$user.roleId === 1 ? '/location' : '/'}>Afdelinger</a
-							>
-						{/if}
-					</div>
-				{/if}
+
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/users'}
+							data-sveltekit-preload-data
+							href={$user.email ? '/users' : '/'}>Kontoransatte</a
+						>
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/afdelinger'}
+							data-sveltekit-preload-data
+							href={$user.email ? '/location' : '/'}>Afdelinger</a
+						>
+
+						<!-- navbar showing for office employees -->
+					{:else if $user.roleId === 2}
+						<a
+							class="nav-link"
+							aria-current="page"
+							class:active={$page.url.pathname === '/booking'}
+							data-sveltekit-preload-data
+							href="/booking">Booking</a
+						>
+
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/event'}
+							data-sveltekit-preload-data
+							href="/event">Event</a
+						>
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/courses'}
+							data-sveltekit-preload-data
+							href="/courses">Hold</a
+						>
+					{/if}
+				</div>
 
 				{#if !$user.email}
 					<form on:submit|preventDefault={login} class="d-flex ms-auto">
@@ -160,14 +104,14 @@
 							type="text"
 							placeholder="Email"
 							aria-label="Email"
-							bind:value={newUser.email}
+							bind:value={testUser.email}
 						/>
 						<input
 							class="form-control me-2"
 							type="password"
 							placeholder="Password"
 							aria-label="Password"
-							bind:value={newUser.password}
+							bind:value={testUser.password}
 						/>
 						<button class="btn btn-outline-success" type="submit">Login</button>
 					</form>
@@ -192,11 +136,3 @@
 		<div class="spinner-border text-primary" role="status"></div>
 	</div>
 {/if}
-
-<style>
-	.nav-container {
-		display: flex;
-		flex-direction: row;
-		align-items: space-between;
-	}
-</style>

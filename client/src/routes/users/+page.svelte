@@ -10,7 +10,6 @@
 	});
 </script>
 
-<!-- {#if $user.email} -->
 <DropdownAndList
 	listIdKey={'user_id'}
 	listCollection={'users'}
@@ -20,6 +19,3 @@
 	modalTitle={'kontormedarbejder'}
 	optionName={'name'}
 />
-<!-- {:else}
-	<div>Du har ikke adgang her</div>
-{/if} -->
