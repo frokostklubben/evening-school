@@ -31,10 +31,10 @@
 
 <Modal bind:open={$showDeleteModal} size="xs" autoclose>
 	<div class="text-center">
-		<h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+		<h3 class="mb-3 text-lg font-normal text-gray-500 dark:text-gray-400">
 			Er du sikker på at du vil slette?
 		</h3>
-		<Button color="red" on:click={deleteItem}>Ja, slet</Button>
+		<Button class="me-2" color="red" on:click={deleteItem}>Ja, slet</Button>
 		<Button color="alternative">Afbryd</Button>
 	</div>
 </Modal>

@@ -66,7 +66,7 @@
 </script>
 
 <Modal title="Redigere" bind:open={$showEditModal} autoclose>
-	<div class="container-fluid mt-5">
+	<div class="container-fluid mt-3">
 		<div class="row justify-content-center">
 			<div class="col-md-8">
 				<form on:submit|preventDefault={saveChanges} class="needs-validation">
@@ -109,7 +109,7 @@
 	<svelte:fragment slot="footer">
 		<div class="container">
 			<div class="text-center">
-				<Button type="submit" color="green" on:click={saveChanges}>Gem</Button>
+				<Button class="me-2" type="submit" color="green" on:click={saveChanges}>Gem</Button>
 				<Button color="red">Afbryd</Button>
 			</div>
 		</div>
