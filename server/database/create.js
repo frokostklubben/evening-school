@@ -29,7 +29,8 @@ import Course from './models/course.js'
 import Inventory from './models/inventory.js'
 
 // DO NOT DELETE THE FOLLOWING IMPORTS - EVEN THOUGH THEY ARE NOT ACTIVELY USED
-import Classroom_course from './models/classroomCourse.js'
+import Booking from './models/booking.js'
+import TimeSlot from './models/timeSlot.js'
 import Classroom_inventory from './models/classroomInventory.js'
 
 await connection.sync({ force: true })
@@ -72,7 +73,7 @@ await Teacher.bulkCreate([
   { first_name: 'Claus', last_name: 'Larsen', email: 'oksefarsen@aof.dk' },
 ])
 
-const courses = await Course.bulkCreate([
+await Course.bulkCreate([
   { teacher_id: 1, course_name: 'Italiensk opera 1' },
   { teacher_id: 1, course_name: 'Italiensk opera 2' },
   { teacher_id: 2, course_name: 'Git 101' },
@@ -82,33 +83,32 @@ const courses = await Course.bulkCreate([
   { teacher_id: 4, course_name: 'Kor for tonedøve' },
 ])
 
-// const courses = await Course.bulkCreate([
-//   { teacher_id: 1, location_id: 1, course_name: 'Italiensk opera 1' },
-//   { teacher_id: 1, location_id: 1, course_name: 'Italiensk opera 2' },
-//   { teacher_id: 2, location_id: 2, course_name: 'Git 101' },
-//   { teacher_id: 2, location_id: 2, course_name: 'Sveltestrap for øvede' },
-//   { teacher_id: 3, location_id: 3, course_name: 'Byg en båd' },
-//   { teacher_id: 3, location_id: 3, course_name: "Kritisk læsning af 'Ib i en kø'" },
-//   { teacher_id: 4, location_id: 1, course_name: 'Kor for tonedøve' },
-// ])
+var endTime1 = new Date();
+endTime1.setHours(21);
+endTime1.setMinutes(5);
+endTime1.setSeconds(15);
+
+
+var endTime2 = new Date();
+endTime2.setHours(23);
+endTime2.setMinutes(5);
+endTime2.setSeconds(25);
+
+
+await TimeSlot.bulkCreate([
+  { start_time: '14:30:00', end_time: '16:30:00' },
+  { start_time: '12:00:00', end_time: '14:00:00' }
+])
+
+await Booking.bulkCreate([
+  { course_id: 1, room_id: 1, time_slot_id: 1, date: new Date() },
+  { course_id: 2, room_id: 2, time_slot_id: 2, date: new Date() }
+])
+
 
 // Inventory
 const inventory = await Inventory.bulkCreate([{ item_name: 'Borde' }, { item_name: 'Instrumenter' }, { item_name: 'Computere' }, { item_name: 'Spanskrør' }])
 
-//const classrooms = await Classroom.findAll()
-//const courses = await Course.findAll()
-
-await courses[0].addClassroom(classrooms[0])
-await courses[1].addClassroom(classrooms[0])
-await courses[2].addClassroom(classrooms[0])
-await courses[3].addClassroom(classrooms[1])
-await courses[4].addClassroom(classrooms[1])
-await courses[5].addClassroom(classrooms[1])
-await courses[6].addClassroom(classrooms[2])
-await courses[2].addClassroom(classrooms[2])
-await courses[4].addClassroom(classrooms[2])
-await courses[1].addClassroom(classrooms[3])
-await courses[0].addClassroom(classrooms[3])
 
 await inventory[0].addClassroom(classrooms[0])
 await inventory[1].addClassroom(classrooms[0])
