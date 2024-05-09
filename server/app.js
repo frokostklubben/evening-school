@@ -30,6 +30,9 @@ app.use(sessionMiddleware);
 
 app.use(checkAuth)
 
+import customRouter from './routers/customRouter.js'
+app.use(customRouter)
+
 import authRouter from './routers/authRouter.js'
 app.use(authRouter)
 
