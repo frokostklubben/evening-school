@@ -21,8 +21,8 @@
 		}
 	});
 
-	let selectedTeacher = '';
-	let selectedCourse;
+	let selectedTeacher = 'empty';
+	let selectedCourse = '';
 	let selectedLocation = '';
 	let selectedClassroom = '';
 
@@ -38,9 +38,10 @@
 	let description = '';
 	function handleDraftChange(event) {
 		if (event.target.value === 'empty') {
-			title = ''
-			description = ''
-			selectedTeacher = 'empty'
+			title = '';
+			description = '';
+			selectedTeacher = 'empty';
+			selectedCourse = '';
 		} else {
 			let course = courses.find((c) => {
 				return c.course_id == event.target.value;
@@ -48,6 +49,62 @@
 			title = course.course_name;
 			description = course.description;
 			selectedTeacher = course.teacher_id;
+			selectedCourse = event.target.value
+		}
+	}
+
+	function handleTeacherChange(event) {
+		selectedTeacher = event.target.value;
+	}
+
+	async function saveDraft() {
+		if (selectedCourse !== '') {
+			try {
+				const response = await fetch(`${$BASE_URL}/courses/${selectedCourse}`, {
+					credentials: 'include',
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						course_id: selectedCourse,
+						course_name: title,
+						description,
+						teacher_id: selectedTeacher
+					})
+				});
+
+				if (response.ok) {
+					//open next formular
+					console.log('PATCH - Success! Open next formular');
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		} else {
+			try {
+				const response = await fetch(`${$BASE_URL}/courses`, {
+					credentials: 'include',
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						course_name: title,
+						description,
+						teacher_id: selectedTeacher
+					})
+				});
+
+				if (response.ok) {
+					console.log("POST - Success! Open next formular");
+				} else {
+					throw new Error(result.message || 'Oprettelse mislykkedes');
+				}
+			} catch (error) {
+				console.error('Error creating course:', error);
+				toast.error('Fejl ved at oprette event:', error.message);
+			}
 		}
 	}
 </script>
@@ -72,11 +129,11 @@
 		options={courses}
 		onOptionChange={handleDraftChange}
 	/>
-	<form on:submit|preventDefault={saveChanges} class="needs-validation">
+	<form on:submit|preventDefault={saveDraft} class="needs-validation">
 		<label for="title">Titel</label>
-		<input type="text" id="title" class="form-control" bind:value={title} required />
+		<input type="text" id="title" class="form-control" bind:value={title} />
 		<label for="title">Beskrivelse</label>
-		<textarea type="text" id="description" class="form-control" bind:value={description} required />
+		<textarea type="text" id="description" class="form-control" bind:value={description} />
 
 		<SelectBoxOptions
 			label={'Vælg underviser'}
@@ -84,9 +141,13 @@
 			idKey={'teacher_id'}
 			optionName={'email'}
 			options={teachers}
-			onOptionChange={handleOptionChange}
+			onOptionChange={handleTeacherChange}
 		/>
-		<button type="submit" class="btn btn-primary">Fortsæt</button>
+		<button
+			type="submit"
+			class="btn btn-primary"
+			disabled={title == '' || description == '' || selectedTeacher == 'empty'}>Fortsæt</button
+		>
 	</form>
 </div>
 

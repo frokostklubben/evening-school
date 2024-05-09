@@ -23,4 +23,38 @@ router.get('/api/courses/:locationId', async (req, res) => {
   }
 })
 
+router.patch('/api/courses/:courseId', async (req, res) => {
+  const { course_id, course_name, description, teacher_id } = req.body
+
+  try {
+    const course = await Course.findByPk(course_id)
+    await course.update({
+      course_name,
+      description,
+      teacher_id
+    })
+
+    res.status(200).send({ data: "Course updated" })
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ data: "Server error updating course" })
+  }
+})
+
+router.post('/api/courses', async (req, res) => {
+  const { course_name, description, teacher_id } = req.body
+
+  try {
+    await Course.create({
+      course_name,
+      description,
+      teacher_id,
+    })
+
+    res.status(200).send({ data: 'Course was created' })
+  } catch (error) {
+    res.status(500).send({ data: 'course could not be created' })
+  }
+})
+
 export default router
