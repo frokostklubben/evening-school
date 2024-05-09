@@ -34,7 +34,7 @@ router.patch('/api/courses/:courseId', async (req, res) => {
       teacher_id
     })
 
-    res.status(200).send({ data: "Course updated" })
+    res.status(200).send({ data: course_name })
   } catch (error) {
     console.error(error);
     res.status(500).send({ data: "Server error updating course" })

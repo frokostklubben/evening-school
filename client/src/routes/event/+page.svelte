@@ -3,8 +3,6 @@
 	import SelectBoxOptions from '../../components/SelectBoxOptions.svelte';
 	import { BASE_URL } from '../../stores/apiConfig.js';
 
-	let courses = [];
-
 	onMount(async () => {
 		try {
 			const response = await fetch(`${$BASE_URL}/booking-form-info`, {
@@ -15,6 +13,8 @@
 				const result = await response.json();
 				teachers = result.data.teachers;
 				courses = result.data.courses;
+				locations = result.data.locations;
+				classrooms = result.data.classrooms;
 			}
 		} catch (error) {
 			console.error(error);
@@ -23,10 +23,13 @@
 
 	let selectedTeacher = 'empty';
 	let selectedCourse = 'empty';
-	let selectedLocation = '';
-	let selectedClassroom = '';
+	let selectedLocation = 'empty';
+	let selectedClassroom = 'empty';
 
 	let teachers = [];
+	let courses = [];
+	let locations = [];
+	let classrooms = [];
 
 	function saveChanges() {
 		console.log('saved');
@@ -37,7 +40,6 @@
 	let title = '';
 	let description = '';
 	function handleDraftChange(event) {
-		console.log(">>>>>>>>>>>>>>>>>>>>>", event.target.value === "empty");
 		if (event.target.value === 'empty') {
 			title = '';
 			description = '';
@@ -50,10 +52,7 @@
 			title = course.course_name;
 			description = course.description;
 			selectedTeacher = course.teacher_id;
-			console.log(">>>>>>>>>>>> teacher id type",typeof course.teacher_id);
-			selectedCourse = Number(event.target.value)
-			console.log(">>>>>>>>>>>> selected course id type",typeof event.target.value);
-
+			selectedCourse = Number(event.target.value);
 		}
 	}
 
@@ -61,8 +60,24 @@
 		selectedTeacher = event.target.value;
 	}
 
+	function handleLocationChange(event) {
+		if (event.target.value === 'empty') {
+			selectedLocation = 'empty';
+		} else {
+			selectedLocation = Number(event.target.value);
+		}
+	}
+
+	function handleClassroomChange(event) {
+		if (event.target.value === 'empty') {
+			selectedClassroom = 'empty';
+		} else {
+			selectedClassroom = Number(event.target.value);
+		}
+	}
+
 	async function saveDraft() {
-		if (selectedCourse !== '') {
+		if (selectedCourse !== 'empty') {
 			try {
 				const response = await fetch(`${$BASE_URL}/courses/${selectedCourse}`, {
 					credentials: 'include',
@@ -79,6 +94,10 @@
 				});
 
 				if (response.ok) {
+					const result = await response.json();
+					console.log(result);
+					selectedCourse = '';
+					courseSaved = true;
 					//open next formular
 					console.log('PATCH - Success! Open next formular');
 				}
@@ -101,7 +120,8 @@
 				});
 
 				if (response.ok) {
-					console.log("POST - Success! Open next formular");
+					courseSaved = true;
+					console.log('POST - Success! Open next formular');
 				} else {
 					throw new Error(result.message || 'Oprettelse mislykkedes');
 				}
@@ -159,21 +179,25 @@
 	<p><strong>Trin 2</strong></p>
 	<SelectBoxOptions
 		label={'Vælg afdeling'}
-		selected={""}
-		idKey={'teacher_id'}
-		optionName={'email'}
-		options={teachers}
-		onOptionChange={handleOptionChange}
+		selected={selectedLocation}
+		idKey={'location_id'}
+		optionName={'street_name'}
+		options={locations}
+		onOptionChange={handleLocationChange}
 	/>
 	<SelectBoxOptions
 		label={'Vælg lokale'}
-		selected={''}
-		idKey={'teacher_id'}
-		optionName={'email'}
-		options={teachers}
-		onOptionChange={handleOptionChange}
+		selected={selectedClassroom}
+		idKey={'room_id'}
+		optionName={'room_id'}
+		options={classrooms}
+		onOptionChange={handleClassroomChange}
 	/>
-	<button type="button" class="btn btn-primary">forsæt</button>
+	<button
+		type="button"
+		class="btn btn-primary"
+		disabled={selectedLocation == 'empty' || selectedClassroom == 'empty'}>forsæt</button
+	>
 </div>
 
 <div class="border border-2 p-3 m-3">
