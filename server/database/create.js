@@ -67,20 +67,20 @@ const classrooms = await Classroom.bulkCreate([
 ])
 
 await Teacher.bulkCreate([
-  { school_id: 1, first_name: 'Birgit', last_name: 'Vejen', email: 'bv@fof.dk' },
-  { school_id: 1, first_name: 'Michael', last_name: 'Jørgensen', email: 'mj@fof.dk' },
-  { school_id: 2, first_name: 'Amdi', last_name: 'Holm', email: 'ah@aof.dk' },
-  { school_id: 3, first_name: 'Claus', last_name: 'Larsen', email: 'oksefarsen@aof.dk' },
+  { school_id: 1, first_name: 'Birgit', last_name: 'Vejen', email: 'bv@fof.dk', is_active: 1 },
+  { school_id: 1, first_name: 'Michael', last_name: 'Jørgensen', email: 'mj@fof.dk', is_active: 1 },
+  { school_id: 2, first_name: 'Amdi', last_name: 'Holm', email: 'ah@aof.dk', is_active: 1 },
+  { school_id: 3, first_name: 'Claus', last_name: 'Larsen', email: 'oksefarsen@aof.dk', is_active: 0 },
 ])
 
 await Course.bulkCreate([
-  { teacher_id: 1, course_name: 'Italiensk opera 1' },
-  { teacher_id: 1, course_name: 'Italiensk opera 2' },
-  { teacher_id: 2, course_name: 'Git 101' },
-  { teacher_id: 2, course_name: 'Sveltestrap for øvede' },
-  { teacher_id: 3, course_name: 'Byg en båd' },
-  { teacher_id: 3, course_name: "Kritisk læsning af 'Ib i en kø'" },
-  { teacher_id: 4, course_name: 'Kor for tonedøve' },
+  { teacher_id: 1, course_name: 'Italiensk opera 1', description: 'Et kursus' },
+  { teacher_id: 1, course_name: 'Italiensk opera 2', description: 'Et kursus' },
+  { teacher_id: 2, course_name: 'Git 101', description: 'Et kursus' },
+  { teacher_id: 2, course_name: 'Sveltestrap for øvede', description: 'Et kursus' },
+  { teacher_id: 3, course_name: 'Byg en båd', description: 'Et kursus' },
+  { teacher_id: 3, course_name: "Kritisk læsning af 'Ib i en kø'", description: 'Et kursus' },
+  { teacher_id: 4, course_name: 'Kor for tonedøve', description: 'Et kursus' },
 ])
 
 var endTime1 = new Date();

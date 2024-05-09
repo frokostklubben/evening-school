@@ -30,6 +30,10 @@ const Teacher = sequelize.define(
       type: DataTypes.STRING(55),
       allowNull: false,
     },
+    is_active: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
   },
   {
     timestamps: false,
