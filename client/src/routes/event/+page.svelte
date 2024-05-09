@@ -22,7 +22,7 @@
 	});
 
 	let selectedTeacher = 'empty';
-	let selectedCourse = '';
+	let selectedCourse = 'empty';
 	let selectedLocation = '';
 	let selectedClassroom = '';
 
@@ -37,11 +37,12 @@
 	let title = '';
 	let description = '';
 	function handleDraftChange(event) {
+		console.log(">>>>>>>>>>>>>>>>>>>>>", event.target.value === "empty");
 		if (event.target.value === 'empty') {
 			title = '';
 			description = '';
 			selectedTeacher = 'empty';
-			selectedCourse = '';
+			selectedCourse = 'empty';
 		} else {
 			let course = courses.find((c) => {
 				return c.course_id == event.target.value;
@@ -49,7 +50,10 @@
 			title = course.course_name;
 			description = course.description;
 			selectedTeacher = course.teacher_id;
-			selectedCourse = event.target.value
+			console.log(">>>>>>>>>>>> teacher id type",typeof course.teacher_id);
+			selectedCourse = Number(event.target.value)
+			console.log(">>>>>>>>>>>> selected course id type",typeof event.target.value);
+
 		}
 	}
 
@@ -155,7 +159,7 @@
 	<p><strong>Trin 2</strong></p>
 	<SelectBoxOptions
 		label={'Vælg afdeling'}
-		selected={selectedTeacher}
+		selected={""}
 		idKey={'teacher_id'}
 		optionName={'email'}
 		options={teachers}
@@ -163,7 +167,7 @@
 	/>
 	<SelectBoxOptions
 		label={'Vælg lokale'}
-		selected={selectedTeacher}
+		selected={''}
 		idKey={'teacher_id'}
 		optionName={'email'}
 		options={teachers}
