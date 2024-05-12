@@ -25,11 +25,15 @@
 	let selectedCourse = 'empty';
 	let selectedLocation = 'empty';
 	let selectedClassroom = 'empty';
+	let selectedBooking = 'empty';
 
 	let teachers = [];
-	let courses = [];
+	$: courses = [];
 	let locations = [];
 	let classrooms = [];
+	$: filteredClassrooms = [];
+	let bookings = [];
+	let courseSaved = false;
 
 	function saveChanges() {
 		console.log('saved');
@@ -63,8 +67,10 @@
 	function handleLocationChange(event) {
 		if (event.target.value === 'empty') {
 			selectedLocation = 'empty';
+			selectedClassroom = 'empty';
 		} else {
 			selectedLocation = Number(event.target.value);
+			filteredClassrooms = classrooms.filter((classroom)  => classroom.location_id == selectedLocation)
 		}
 	}
 
@@ -73,6 +79,7 @@
 			selectedClassroom = 'empty';
 		} else {
 			selectedClassroom = Number(event.target.value);
+		
 		}
 	}
 
@@ -95,11 +102,24 @@
 
 				if (response.ok) {
 					const result = await response.json();
-					console.log(result);
-					selectedCourse = '';
+
 					courseSaved = true;
+
+					//update the saved course info 
+					let course = courses.find((c) => {
+					return c.course_id == selectedCourse
+					});
+					course.course_name = title;
+					course.description = description;
+					course.teacher_id = selectedTeacher
+					console.log(course.course_name);
+
+					//this makes the list updated in the selectbox
+					courses = courses
+					
 					//open next formular
 					console.log('PATCH - Success! Open next formular');
+
 				}
 			} catch (error) {
 				console.error(error);
@@ -139,10 +159,10 @@
 	<p><strong>Trin 1</strong></p>
 	<SelectBoxOptions
 		label={'Kopier fra tidligere oprettet booking'}
-		selected={selectedTeacher}
-		idKey={'teacher_id'}
-		optionName={'email'}
-		options={teachers}
+		selected={selectedBooking}
+		idKey={'booking_id'}
+		optionName={'course_id'}
+		options={bookings}
 		onOptionChange={handleOptionChange}
 	/>
 	<SelectBoxOptions
@@ -190,7 +210,7 @@
 		selected={selectedClassroom}
 		idKey={'room_id'}
 		optionName={'room_id'}
-		options={classrooms}
+		options={filteredClassrooms}
 		onOptionChange={handleClassroomChange}
 	/>
 	<button

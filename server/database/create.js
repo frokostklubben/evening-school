@@ -64,6 +64,8 @@ const classrooms = await Classroom.bulkCreate([
   { location_id: 3, purpose_id: 3, capacity: 16 },
   { location_id: 4, purpose_id: 4, capacity: 16 },
   { location_id: 4, purpose_id: 5, capacity: 16 },
+  { location_id: 5, purpose_id: 5, capacity: 16 },
+  { location_id: 5, purpose_id: 5, capacity: 16 },
 ])
 
 await Teacher.bulkCreate([
