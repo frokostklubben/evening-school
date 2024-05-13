@@ -48,6 +48,9 @@ app.use(locationsRouter)
 import coursesRouter from './routers/coursesRouter.js'
 app.use(coursesRouter)
 
+import bookingsRouter from './routers/bookingsRouter.js'
+app.use(bookingsRouter)
+
 const PORT = process.env.PORT || 8080
 app.listen(PORT, error => {
   if (error) {

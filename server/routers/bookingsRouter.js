@@ -9,19 +9,21 @@ router.get('/api/bookings', async (req, res) => {
 })
 
 router.post('/api/bookings', async (req, res) => {
-    const { courseId, roomId, timeSlotId, date } = req.body
+    const { course_id, room_id, days } = req.body;
+
+    const bookings = days.map(({ startTime, endTime, date }) => ({
+        course_id,
+        room_id,
+        date,
+        start_time: startTime,
+        end_time: endTime,
+    }));
 
     try {
-        await Booking.create({
-            course_id: courseId,
-            room_id: roomId,
-            time_slot_id: timeSlotId,
-            date,
-        })
-
-        res.status(200).send({ data: 'Booking was created' })
+        await Booking.bulkCreate(bookings);
+        res.send({ data: 'Bookings were created', bookings });
     } catch (error) {
-        res.status(500).send({ data: 'Booking could not be created' })
+        res.status(500).send({ error: 'Failed to create bookings' });
     }
 })
 

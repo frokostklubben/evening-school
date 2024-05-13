@@ -30,7 +30,6 @@ import Inventory from './models/inventory.js'
 
 // DO NOT DELETE THE FOLLOWING IMPORTS - EVEN THOUGH THEY ARE NOT ACTIVELY USED
 import Booking from './models/booking.js'
-import TimeSlot from './models/timeSlot.js'
 import Classroom_inventory from './models/classroomInventory.js'
 
 await connection.sync({ force: true })
@@ -85,26 +84,9 @@ await Course.bulkCreate([
   { teacher_id: 4, course_name: 'Kor for tonedøve', description: 'Et kursus' },
 ])
 
-var endTime1 = new Date();
-endTime1.setHours(21);
-endTime1.setMinutes(5);
-endTime1.setSeconds(15);
-
-
-var endTime2 = new Date();
-endTime2.setHours(23);
-endTime2.setMinutes(5);
-endTime2.setSeconds(25);
-
-
-await TimeSlot.bulkCreate([
-  { start_time: '14:30:00', end_time: '16:30:00' },
-  { start_time: '12:00:00', end_time: '14:00:00' }
-])
-
 await Booking.bulkCreate([
-  { course_id: 1, room_id: 1, time_slot_id: 1, date: new Date() },
-  { course_id: 2, room_id: 2, time_slot_id: 2, date: new Date() }
+  { course_id: 1, room_id: 1, start_time: "16:30:00", end_time: "19:30:00", date: "2024-05-22" },
+  { course_id: 2, room_id: 2, start_time: '12:00:00', end_time: "14:00:00", date: "2024-05-24" },
 ])
 
 
