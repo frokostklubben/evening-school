@@ -259,4 +259,35 @@
 
 <div class="border border-2 p-3 m-3">
 	<p><strong>Trin 3</strong></p>
+	<form>
+		<div class="mb-3">
+			<label for="weeks" class="form-label">Antal gange:</label>
+			<input type="number" id="weeks" name="weeks" class="form-control">
+		</div>
+		<div class="mb-3">
+			<label for="startdate" class="form-label">Ugens første dato:</label>
+			<input type="date" id="startdate" name="startdate" class="form-control">
+		</div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Vælg</th>
+					<th scope="col">Dag</th>
+					<th scope="col">Start Time</th>
+					<th scope="col">End Time</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'] as day (day)}
+					<tr>
+						<td><input type="checkbox" id={day} name={day}></td>
+						<td>{day}</td>
+						<td><input type="time" id={`start-${day}`} name={`start-${day}`}></td>
+						<td><input type="time" id={`end-${day}`} name={`end-${day}`}></td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+		<button type="submit" class="btn btn-primary">Forsøg oprettelse</button>
+	</form>
 </div>
