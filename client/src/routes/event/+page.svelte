@@ -26,6 +26,12 @@
 	let selectedLocation = 'empty';
 	let selectedClassroom = 'empty';
 	let selectedBooking = 'empty';
+	let title = '';
+	let description = '';
+	$: courseSaved = false;
+	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
+	$: step2Criteria = selectedLocation == 'empty' || selectedClassroom == 'empty' || !courseSaved;
+	$: locationSaved = false;
 
 	let teachers = [];
 	$: courses = [];
@@ -33,7 +39,24 @@
 	let classrooms = [];
 	$: filteredClassrooms = [];
 	let bookings = [];
-	let courseSaved = false;
+
+	let step1Data = {}
+	let step2Data = {}
+
+	$: {
+		if (courseSaved) {
+			if (step1Data.course_name != title || step1Data.description != description || step1Data.teacher_id != selectedTeacher){
+			courseSaved = false;
+			locationSaved = false;
+			}
+		}
+
+		if (locationSaved) {
+			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom){
+				locationSaved = false;
+			}
+		}
+	}
 
 	function saveChanges() {
 		console.log('saved');
@@ -41,8 +64,7 @@
 
 	function handleOptionChange() {}
 
-	let title = '';
-	let description = '';
+
 	function handleDraftChange(event) {
 		if (event.target.value === 'empty') {
 			title = '';
@@ -112,13 +134,15 @@
 					course.course_name = title;
 					course.description = description;
 					course.teacher_id = selectedTeacher
-					console.log(course.course_name);
+
+					step1Data = course
 
 					//this makes the list updated in the selectbox
 					courses = courses
 					
 					//open next formular
-					console.log('PATCH - Success! Open next formular');
+					courseSaved = true;
+					locationSaved = false;
 
 				}
 			} catch (error) {
@@ -141,7 +165,10 @@
 
 				if (response.ok) {
 					courseSaved = true;
-					console.log('POST - Success! Open next formular');
+					locationSaved = false;
+					form1Data.course_name = title
+					form1Data.description = description
+					form1Data.teacher_id = selectedTeacher
 				} else {
 					throw new Error(result.message || 'Oprettelse mislykkedes');
 				}
@@ -151,6 +178,13 @@
 			}
 		}
 	}
+
+	function saveLocation() {
+		locationSaved = true
+		step2Data.location_id = selectedLocation
+		step2Data.room_id = selectedClassroom
+	}
+
 </script>
 
 <h2>Event/foredrag</h2>
@@ -189,9 +223,9 @@
 		/>
 		<button
 			type="submit"
-			class="btn btn-primary"
-			disabled={title == '' || description == '' || selectedTeacher == 'empty'}>Fortsæt</button
-		>
+			class="btn {courseSaved ? 'btn-success' : 'btn-primary'}"
+			disabled={step1Criteria}>{courseSaved ? 'Ok' : 'Bekræft'}
+		</button>
 	</form>
 </div>
 
@@ -205,6 +239,8 @@
 		options={locations}
 		onOptionChange={handleLocationChange}
 	/>
+	<div class="mb-2"> Formål? </div>
+
 	<SelectBoxOptions
 		label={'Vælg lokale'}
 		selected={selectedClassroom}
@@ -214,9 +250,10 @@
 		onOptionChange={handleClassroomChange}
 	/>
 	<button
+		on:click={saveLocation}
 		type="button"
-		class="btn btn-primary"
-		disabled={selectedLocation == 'empty' || selectedClassroom == 'empty'}>forsæt</button
+		class="btn {locationSaved ? 'btn-success' : 'btn-primary'}"
+		disabled={step2Criteria}>{locationSaved ? 'OK' : 'Bekræft'}</button
 	>
 </div>
 
