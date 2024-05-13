@@ -1,7 +1,6 @@
 import Router from 'express'
 import User from '../database/models/user.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
-import { hashPassword, randomPassword } from '../encrypt/encryption.js'
 const router = Router()
 
 router.get('/api/users/:schoolId', async (req, res) => {
@@ -20,31 +19,6 @@ router.get('/api/users/:schoolId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching users for school:', error)
     res.status(500).send({ error: 'Failed to fetch users' })
-  }
-})
-
-// Dette er samme kode som signup, men skal ligge her fordi koden er generaliseret til at kigge på users
-router.post('/api/users', adminCheck, async (req, res) => {
-  const { first_name, last_name, email, school_id } = req.body
-  const role_id = 2
-  const existingUser = await User.findOne({ where: { email } })
-
-  if (!existingUser) {
-    const password = await randomPassword()
-    const hashed_password = await hashPassword(password)
-    const response = await User.create({
-      first_name,
-      last_name,
-      email,
-      school_id,
-      hashed_password,
-      role_id,
-    })
-    //const message = `Velkommen til luffelands staffbestilling. \nDin adgangskode er: ${password} \nDu kan ændre din adgangskode når du er logget ind.`;
-    //sendMail(email, 'Velkommen til luffelands staffbestilling', message);
-    res.status(200).send({ data: ['User was created', response] })
-  } else {
-    res.status(400).send({ data: 'User was not created: user already exists' })
   }
 })
 

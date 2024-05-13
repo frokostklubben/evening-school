@@ -11,12 +11,16 @@ router.get('/api/locations', adminCheck, async (req, res) => {
 router.get('/api/locations/:schoolId', async (req, res) => {
   try {
     let schoolId = req.params.schoolId
+
     if (req.session.user.roleId === 2) {
       schoolId = req.session.user.schoolId
+      console.log('schoolId:', schoolId)
     }
+
     const locations = await Location.findAll({
       where: { school_id: schoolId },
     })
+
     res.send({ data: locations })
   } catch (error) {
     console.error('Error fetching locations for school:', error)
@@ -25,10 +29,11 @@ router.get('/api/locations/:schoolId', async (req, res) => {
 })
 
 router.post('/api/locations', adminCheck, async (req, res) => {
-  const { school_id, zip_code, city, street_name, street_number } = req.body
+  const { school_id, zip_code, school_name, city, street_name, street_number } = req.body
 
   try {
     const newLocation = await Location.create({
+      school_name: school_name,
       school_id: school_id,
       zip_code: zip_code,
       city: city,

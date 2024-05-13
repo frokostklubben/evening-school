@@ -3,6 +3,7 @@ import { AUTH_URL } from '../stores/apiConfig.js';
 import { goto } from '$app/navigation';
 import { isLoading } from '../stores/generalStore.js';
 import { user, newUser } from '../stores/userStore.js';
+import { toast } from 'svelte-french-toast';
 
 export async function validateSession() {
 	if (localStorage.getItem('sid')) {

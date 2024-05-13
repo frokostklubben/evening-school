@@ -18,6 +18,10 @@ const Location = sequelize.define(
         key: 'school_id',
       },
     },
+    school_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     zip_code: {
       type: DataTypes.INTEGER,
       allowNull: false,

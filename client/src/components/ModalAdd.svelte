@@ -1,7 +1,7 @@
 <script>
 	import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
-	import { BASE_URL } from '../stores/apiConfig.js';
+	import { BASE_URL, AUTH_URL } from '../stores/apiConfig.js';
 	import { showAddModal, optionId } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import { itemList, headerKeys } from '../stores/itemListStore.js';
@@ -33,8 +33,14 @@
 		// 	}
 		// }
 
+		let url = `${$BASE_URL}/${collection}`;
+
+		if (collection === 'users') {
+			url = `${$AUTH_URL}/auth/signup`;
+		}
+
 		try {
-			const response = await fetch(`${$BASE_URL}/${collection}`, {
+			const response = await fetch(url, {
 				credentials: 'include',
 				method: 'POST',
 				headers: {

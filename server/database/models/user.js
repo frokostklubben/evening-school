@@ -43,7 +43,7 @@ const User = sequelize.define(
     hashed_password: {
       type: DataTypes.STRING(100),
       allowNull: false,
-    }
+    },
   },
   {
     timestamps: false,
