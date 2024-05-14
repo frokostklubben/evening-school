@@ -9,6 +9,7 @@
 
 	export let collection;
 	export let idKey;
+	export let showCoursesButton = false;
 </script>
 
 <div class="container mt-5">
@@ -54,7 +55,7 @@
 											<i class="bi bi-trash-fill"></i>
 										</button></td
 									>
-									{#if $user.roleId === 1}
+									{#if showCoursesButton}
 										<td
 											><button
 												class="btn"

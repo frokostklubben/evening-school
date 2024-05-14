@@ -61,6 +61,13 @@
 
 						<a
 							class="nav-link"
+							class:active={$page.url.pathname === '/classrooms'}
+							data-sveltekit-preload-data
+							href="/classrooms">Lokaler</a
+						>
+
+						<a
+							class="nav-link"
 							class:active={$page.url.pathname === '/users'}
 							data-sveltekit-preload-data
 							href={$user.email ? '/users' : '/'}>Kontoransatte</a
