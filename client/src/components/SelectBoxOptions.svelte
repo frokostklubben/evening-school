@@ -1,6 +1,4 @@
 <script>
-	// import { optionId } from '../stores/modalStore';
-
 	export let label = '';
 	export let options; //make a store instead
 	export let selected = '';

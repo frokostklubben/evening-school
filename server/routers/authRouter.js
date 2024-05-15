@@ -22,7 +22,7 @@ router.post('/auth/login', async (req, res) => {
         roleId: foundUser.role_id,
       }
 
-      res.status(200).send({ message: 'logged in', data: req.session.user, session: req.session.id})
+      res.status(200).send({ message: 'logged in', data: req.session.user, session: req.session.id })
     } else {
       res.status(400).send({ message: 'not logged in' })
     }
@@ -49,7 +49,7 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     })
     //const message = `Velkommen til luffelands staffbestilling. \nDin adgangskode er: ${password} \nDu kan ændre din adgangskode når du er logget ind.`;
     //sendMail(email, 'Velkommen til luffelands staffbestilling', message);
-    res.status(200).send({ data: ['User was created', response] })
+    res.status(200).send({ data: response })
   } else {
     res.status(400).send({ data: 'User was not created: user already exists' })
   }
@@ -63,21 +63,19 @@ router.get('/auth/logout', (req, res) => {
   })
 })
 
-
 router.post('/auth/validateSession', async (req, res) => {
-    const { sid } = req.body;
-    
-    let sessionId = '';
-    if (req.session && req.session.id) {
-        sessionId = req.session.id
-    }
+  const { sid } = req.body
 
-    if (sid  === sessionId) {
-        res.status(200).send({ data: req.session.user });
-    } else {
-        res.status(400).send({ data: 'Session not validated' });
-    }
-});
+  let sessionId = ''
+  if (req.session && req.session.id) {
+    sessionId = req.session.id
+  }
 
+  if (sid === sessionId) {
+    res.status(200).send({ data: req.session.user })
+  } else {
+    res.status(400).send({ data: 'Session not validated' })
+  }
+})
 
 export default router

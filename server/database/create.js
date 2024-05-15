@@ -46,12 +46,12 @@ await User.bulkCreate([
 ])
 
 await Location.bulkCreate([
-  { school_id: 1, zip_code: 6823, city: 'Ansager', street_name: 'Havevej', street_number: 1 },
-  { school_id: 1, zip_code: 6000, city: 'Kolding', street_name: 'Irisvej', street_number: 8 },
-  { school_id: 1, zip_code: 8000, city: 'Aarhus C', street_name: 'Fuglesangs Allé', street_number: 28 },
-  { school_id: 2, zip_code: 9000, city: 'Aalborg', street_name: 'Første divisionsvej', street_number: 5 },
-  { school_id: 2, zip_code: 3660, city: 'Stenløse', street_name: 'Byvej', street_number: 2 },
-  { school_id: 2, zip_code: 2820, city: 'Gentofte', street_name: 'Nybrovej', street_number: 2 },
+  { school_id: 1, school_name: 'FOF Ansager', zip_code: 6823, city: 'Ansager', street_name: 'Havevej', street_number: 1 },
+  { school_id: 1, school_name: 'FOF Kolding', zip_code: 6000, city: 'Kolding', street_name: 'Irisvej', street_number: 8 },
+  { school_id: 1, school_name: 'FOF Aarhus', zip_code: 8000, city: 'Aarhus C', street_name: 'Fuglesangs Allé', street_number: 28 },
+  { school_id: 2, school_name: 'AOF Aalborg', zip_code: 9000, city: 'Aalborg', street_name: 'Første divisionsvej', street_number: 5 },
+  { school_id: 2, school_name: 'AOF Stenløse', zip_code: 3660, city: 'Stenløse', street_name: 'Byvej', street_number: 2 },
+  { school_id: 2, school_name: 'AOF Gentofte', zip_code: 2820, city: 'Gentofte', street_name: 'Nybrovej', street_number: 2 },
 ])
 
 await Classroom_purpose.bulkCreate([{ purpose: 'Musik' }, { purpose: 'EDB' }, { purpose: 'Sløjd' }, { purpose: 'Håndarbejde' }, { purpose: 'Foredrag' }])

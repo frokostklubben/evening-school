@@ -1,10 +1,10 @@
 import 'dotenv/config'
 import express from 'express'
 import helmet from 'helmet'
-import { checkAuth } from './middlewares/authMiddleware.js';
+import { checkAuth } from './middlewares/authMiddleware.js'
 
 const app = express()
-app.use(helmet());
+app.use(helmet())
 
 import cors from 'cors'
 app.use(
@@ -25,8 +25,8 @@ const sessionMiddleware = session({
     secure: false,
     maxAge: 1000 * 60 * 60, // 1 time
   },
-});
-app.use(sessionMiddleware);
+})
+app.use(sessionMiddleware)
 
 app.use(checkAuth)
 
@@ -50,6 +50,10 @@ app.use(coursesRouter)
 
 import bookingsRouter from './routers/bookingsRouter.js'
 app.use(bookingsRouter)
+
+import headerKeyRouter from './routers/headerKeyRouter.js'
+app.use(headerKeyRouter)
+
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, error => {
