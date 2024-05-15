@@ -4,46 +4,70 @@ import Course from '../database/models/course.js'
 import Classroom from '../database/models/classroom.js'
 import Booking from '../database/models/booking.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
+import { Op } from 'sequelize'
 
 router.get('/api/courses', adminCheck, async (req, res) => {
   const courses = await Course.findAll()
   res.send({ data: courses })
 })
 
-// TODO: change name? combined endpoint for courses and classrooms
 router.get('/api/courses/:locationId', async (req, res) => {
   try {
     const locationId = req.params.locationId
 
     const classrooms = await Classroom.findAll({
       where: { location_id: locationId },
-      include: [
-        {
-          model: Booking,
-          include: [
-            {
-              model: Course,
-              attributes: ['course_name', 'course_description'],
-            },
-          ],
-        },
-      ],
     })
 
-    // Saml alle kurser fra de hentede klasserum
-    const courses = classrooms.reduce((listOfCourses, classroom) => {
-      classroom.Bookings.forEach(booking => {
-        if (booking.Course) {
-          listOfCourses.push(booking.Course)
-        }
-      })
-      return listOfCourses
-    }, [])
+    console.log('classrooms:', classrooms)
 
-    // Send kun unikke kurser tilbage baseret på et kriterie, f.eks. kursusnavn
-    // const uniqueCourses = [...new Map(courses.map(course => [course['course_name'], course])).values()]
+    let roomIds = classrooms.map(classroom => classroom.room_id)
 
-    res.send({ data: listOfCourses })
+    const bookings = await Booking.findAll({
+      where: { room_id: { [Op.in]: roomIds } },
+    })
+
+    let courseIds = bookings.map(booking => booking.course_id)
+
+    const courses = await Course.findAll({
+      where: { course_id: { [Op.in]: courseIds } },
+    })
+
+    // Filter unique courses by course_name to avoid duplicates
+    // const uniqueCourses = Array.from(new Map(courses.map(course => [course['course_name'], course])).values())
+
+    res.send({ data: courses })
+  } catch (error) {
+    console.error('Error fetching courses for location:', error)
+    res.status(500).send({ error: 'Failed to fetch courses' })
+  }
+})
+
+router.get('/api/courses/:locationId/:roomId', async (req, res) => {
+  try {
+    const locationId = req.params.locationId
+    const roomId = req.params.roomId
+
+    const classrooms = await Classroom.findAll({
+      where: { location_id: locationId },
+    })
+
+    let roomIds = classrooms.map(classroom => classroom.room_id)
+
+    const bookings = await Booking.findAll({
+      where: { room_id: roomId },
+    })
+
+    let courseIds = bookings.map(booking => booking.course_id)
+
+    const courses = await Course.findAll({
+      where: { course_id: { [Op.in]: courseIds } },
+    })
+
+    // Filter unique courses by course_name to avoid duplicates
+    // const uniqueCourses = Array.from(new Map(courses.map(course => [course['course_name'], course])).values())
+
+    res.send({ data: courses })
   } catch (error) {
     console.error('Error fetching courses for location:', error)
     res.status(500).send({ error: 'Failed to fetch courses' })

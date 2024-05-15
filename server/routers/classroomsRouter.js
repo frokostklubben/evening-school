@@ -2,7 +2,10 @@ import Router from 'express'
 const router = Router()
 import Classroom from '../database/models/classroom.js'
 import Classroom_purpose from '../database/models/classroomPurpose.js'
+import Inventory from '../database/models/inventory.js'
+import Classroom_inventory from '../database/models/classroomInventory.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
+import { Op } from 'sequelize'
 
 router.get('/api/classrooms', adminCheck, async (req, res) => {
   const classrooms = await Classroom.findAll()
@@ -12,16 +15,19 @@ router.get('/api/classrooms', adminCheck, async (req, res) => {
 router.get('/api/classrooms/:locationId', async (req, res) => {
   try {
     const locationId = req.params.locationId
-    const classroom = await Classroom.findAll(locationId)
 
-    if (classroom) {
-      res.send({ data: classroom })
+    const classrooms = await Classroom.findAll({
+      where: { location_id: locationId },
+    })
+
+    if (classrooms && classrooms.length > 0) {
+      res.send({ data: classrooms })
     } else {
       res.status(404).send({ error: 'Classroom not found' })
     }
   } catch (error) {
-    console.error('Error fetching classroom:', error)
-    res.status(500).send({ error: 'Failed to fetch classroom' })
+    console.error('Error fetching classrooms:', error)
+    res.status(500).send({ error: 'Failed to fetch classrooms' })
   }
 })
 
@@ -74,6 +80,62 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   } catch (error) {
     console.error('Server Error:', error)
     res.status(500).send({ message: 'Server error while deleting classroom.' })
+  }
+})
+
+router.get('/api/classrooms/purposes/:locationId', async (req, res) => {
+  try {
+    const locationId = req.params.locationId
+
+    const classrooms = await Classroom.findAll({
+      where: { location_id: locationId },
+    })
+
+    let purposeIds = classrooms.map(classroom => classroom.purpose_id)
+
+    const purposes = await Classroom_purpose.findAll({
+      where: { purpose_id: { [Op.in]: purposeIds } },
+    })
+
+    const purposeMap = purposes.reduce((map, purpose) => {
+      map[purpose.purpose_id] = purpose.purpose
+      return map
+    }, {})
+
+    let roomIds = classrooms.map(classroom => classroom.room_id)
+
+    const classroomInventories = await Classroom_inventory.findAll({
+      where: { room_id: { [Op.in]: roomIds } },
+    })
+
+    let inventoryIds = classroomInventories.map(ci => ci.inventory_id)
+
+    const inventories = await Inventory.findAll({
+      where: { inventory_id: { [Op.in]: inventoryIds } },
+    })
+
+    const inventoryMap = classroomInventories.reduce((map, ci) => {
+      if (!map[ci.room_id]) {
+        map[ci.room_id] = []
+      }
+      const inventory = inventories.find(inv => inv.inventory_id === ci.inventory_id)
+      if (inventory) {
+        map[ci.room_id].push(inventory.item_name)
+      }
+      return map
+    }, {})
+
+    // Add purpose and inventory details to each classroom
+    const classroomsWithInventoryAndPurpose = classrooms.map(classroom => ({
+      ...classroom.dataValues,
+      purpose: purposeMap[classroom.purpose_id],
+      inventories: inventoryMap[classroom.room_id] || [],
+    }))
+
+    res.send({ data: classroomsWithInventoryAndPurpose })
+  } catch (error) {
+    console.error('Error fetching classrooms for location:', error)
+    res.status(500).send({ error: 'Failed to fetch classrooms' })
   }
 })
 
