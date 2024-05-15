@@ -9,8 +9,8 @@
 
 <label>
 	{label}
-	<select class="form-select" bind:value={selected} on:change={onOptionChange}>
-		<option value="">Vælg</option>
+	<select class="form-select" bind:value={selected} on:change={(event) => onOptionChange(event)}>
+		<option value="empty">Vælg</option>
 		{#each options as option}
 			<option value={option[idKey]}>{option[optionName]}</option>
 		{/each}

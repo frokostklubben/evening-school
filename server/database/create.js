@@ -30,7 +30,6 @@ import Inventory from './models/inventory.js'
 
 // DO NOT DELETE THE FOLLOWING IMPORTS - EVEN THOUGH THEY ARE NOT ACTIVELY USED
 import Booking from './models/booking.js'
-import TimeSlot from './models/timeSlot.js'
 import Classroom_inventory from './models/classroomInventory.js'
 
 await connection.sync({ force: true })
@@ -64,45 +63,30 @@ const classrooms = await Classroom.bulkCreate([
   { location_id: 3, purpose_id: 3, capacity: 16 },
   { location_id: 4, purpose_id: 4, capacity: 16 },
   { location_id: 4, purpose_id: 5, capacity: 16 },
+  { location_id: 5, purpose_id: 5, capacity: 16 },
+  { location_id: 5, purpose_id: 5, capacity: 16 },
 ])
 
 await Teacher.bulkCreate([
-  { first_name: 'Birgit', last_name: 'Vejen', email: 'bv@fof.dk' },
-  { first_name: 'Michael', last_name: 'Jørgensen', email: 'mj@fof.dk' },
-  { first_name: 'Amdi', last_name: 'Holm', email: 'ah@aof.dk' },
-  { first_name: 'Claus', last_name: 'Larsen', email: 'oksefarsen@aof.dk' },
+  { school_id: 1, first_name: 'Birgit', last_name: 'Vejen', email: 'bv@fof.dk', is_active: 1 },
+  { school_id: 1, first_name: 'Michael', last_name: 'Jørgensen', email: 'mj@fof.dk', is_active: 1 },
+  { school_id: 2, first_name: 'Amdi', last_name: 'Holm', email: 'ah@aof.dk', is_active: 1 },
+  { school_id: 3, first_name: 'Claus', last_name: 'Larsen', email: 'oksefarsen@aof.dk', is_active: 0 },
 ])
 
 await Course.bulkCreate([
-  { teacher_id: 1, course_name: 'Italiensk opera 1' },
-  { teacher_id: 1, course_name: 'Italiensk opera 2' },
-  { teacher_id: 2, course_name: 'Git 101' },
-  { teacher_id: 2, course_name: 'Sveltestrap for øvede' },
-  { teacher_id: 3, course_name: 'Byg en båd' },
-  { teacher_id: 3, course_name: "Kritisk læsning af 'Ib i en kø'" },
-  { teacher_id: 4, course_name: 'Kor for tonedøve' },
-])
-
-var endTime1 = new Date();
-endTime1.setHours(21);
-endTime1.setMinutes(5);
-endTime1.setSeconds(15);
-
-
-var endTime2 = new Date();
-endTime2.setHours(23);
-endTime2.setMinutes(5);
-endTime2.setSeconds(25);
-
-
-await TimeSlot.bulkCreate([
-  { start_time: '14:30:00', end_time: '16:30:00' },
-  { start_time: '12:00:00', end_time: '14:00:00' }
+  { teacher_id: 1, course_name: 'Italiensk opera 1', description: 'Et kursus' },
+  { teacher_id: 1, course_name: 'Italiensk opera 2', description: 'Et kursus' },
+  { teacher_id: 2, course_name: 'Git 101', description: 'Et kursus' },
+  { teacher_id: 2, course_name: 'Sveltestrap for øvede', description: 'Et kursus' },
+  { teacher_id: 3, course_name: 'Byg en båd', description: 'Et kursus' },
+  { teacher_id: 3, course_name: "Kritisk læsning af 'Ib i en kø'", description: 'Et kursus' },
+  { teacher_id: 4, course_name: 'Kor for tonedøve', description: 'Et kursus' },
 ])
 
 await Booking.bulkCreate([
-  { course_id: 1, room_id: 1, time_slot_id: 1, date: new Date() },
-  { course_id: 2, room_id: 2, time_slot_id: 2, date: new Date() }
+  { course_id: 1, room_id: 1, start_time: "16:30:00", end_time: "19:30:00", date: "2024-05-22" },
+  { course_id: 2, room_id: 2, start_time: '12:00:00', end_time: "14:00:00", date: "2024-05-24" },
 ])
 
 

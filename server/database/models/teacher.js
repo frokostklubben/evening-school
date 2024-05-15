@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
+import School from './school.js'
 
 const Teacher = sequelize.define(
   'Teacher',
@@ -8,6 +9,14 @@ const Teacher = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+    },
+    school_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: School,
+        key: 'school_id',
+      },
     },
     first_name: {
       type: DataTypes.STRING(55),
@@ -19,6 +28,10 @@ const Teacher = sequelize.define(
     },
     email: {
       type: DataTypes.STRING(55),
+      allowNull: false,
+    },
+    is_active: {
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
   },

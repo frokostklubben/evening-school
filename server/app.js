@@ -30,6 +30,9 @@ app.use(sessionMiddleware)
 
 app.use(checkAuth)
 
+import customRouter from './routers/customRouter.js'
+app.use(customRouter)
+
 import authRouter from './routers/authRouter.js'
 app.use(authRouter)
 
@@ -45,8 +48,12 @@ app.use(locationsRouter)
 import coursesRouter from './routers/coursesRouter.js'
 app.use(coursesRouter)
 
+import bookingsRouter from './routers/bookingsRouter.js'
+app.use(bookingsRouter)
+
 import headerKeyRouter from './routers/headerKeyRouter.js'
 app.use(headerKeyRouter)
+
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, error => {
