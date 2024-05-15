@@ -9,15 +9,21 @@ router.get('/api/bookings', async (req, res) => {
 })
 
 router.post('/api/bookings', async (req, res) => {
-    const { course_id, room_id, days } = req.body;
 
-    const bookings = days.map(({ startTime, endTime, date }) => ({
-        course_id,
-        room_id,
-        date,
-        start_time: startTime,
-        end_time: endTime,
-    }));
+    const bookingData = req.body;
+
+    const bookings = [];
+
+    for (const booking of bookingData) {
+        const { course_id, room_id, startTime, endTime, date } = booking;
+        bookings.push({
+            course_id,
+            room_id,
+            date,
+            start_time: startTime,
+            end_time: endTime,
+        });
+    }
 
     try {
         await Booking.bulkCreate(bookings);

@@ -41,6 +41,8 @@
 	let classrooms = [];
 	$: filteredClassrooms = [];
 	let bookings = [];
+	$: checkedBookings = [];
+	let courseStartDate;
 
 	let step1Data = {};
 	let step2Data = {};
@@ -198,18 +200,10 @@
 	}));
 
 	async function saveBooking() {
-		const bookingData = {
-			course_id: step1Data.course_id,
-			room_id: step2Data.room_id,
-			days: days
-				.filter((day) => day.startTime && day.endTime && day.startDate)
-				.map((day) => ({
-					startTime: day.startTime,
-					endTime: day.endTime,
-					date: day.startDate
-				}))
-		};
 
+		checkedBookings = checkedBookings.map(({ conflict, ...rest }) => rest);
+		console.log(checkedBookings);
+		
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings`, {
 				credentials: 'include',
@@ -217,7 +211,7 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify(bookingData)
+				body: JSON.stringify(checkedBookings)
 			});
 			const result = await response.json();
 
@@ -225,6 +219,7 @@
 		} catch (error) {
 			console.error('Error saving booking:', error);
 		}
+		
 	}
 
 	async function checkBookingDates() {
@@ -263,9 +258,14 @@
 				},
 				body: JSON.stringify(bookingDates)
 			});
-			const result = await response.json();
 
-			console.log(result);
+			if (response.ok) {
+				const result = await response.json();
+				checkedBookings = result.data.map((booking) => ({
+					...booking,
+					date: new Date(booking.date)
+				}));
+			}
 		} catch (error) {
 			console.error('Error saving booking:', error);
 		}
@@ -278,7 +278,7 @@
 		} else {
 			day.startTime = '';
 			day.endTime = '';
-			days = days
+			days = days;
 			selectedDays = selectedDays.filter((d) => d.name !== day.name);
 		}
 	}
@@ -299,7 +299,7 @@
 	}
 
 	function updateStartDates(event) {
-		let courseStartDate = new Date(event.target.value);
+		courseStartDate = new Date(event.target.value);
 
 		// Get the day of the week (0 for Sunday, 1 for Monday, etc.)
 		let dayOfWeek = courseStartDate.getDay();
@@ -485,4 +485,29 @@
 </div>
 <div class="border border-2 p-3 m-3">
 	<p><strong>Trin 4</strong></p>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Date</th>
+				<th scope="col">Start Time</th>
+				<th scope="col">End Time</th>
+				<th scope="col">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each checkedBookings as booking}
+				<tr>
+					<td
+						>{booking.date.toLocaleDateString('da-DK', { weekday: 'long' })[0].toUpperCase() +
+							booking.date.toLocaleDateString('da-DK', { weekday: 'long' }).slice(1).toLowerCase()}
+						{booking.date.getDate()}/{booking.date.getMonth()}/{booking.date.getFullYear()}</td
+					>
+					<td>{booking.startTime}</td>
+					<td>{booking.endTime}</td>
+					<td>{booking.conflict === true ? booking.bookingConflicts[0] : 'No Conflict'}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+	<button class="btn btn-primary" on:click={saveBooking} disabled={false}>Færdiggør booking</button>
 </div>
