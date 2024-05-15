@@ -28,7 +28,7 @@
 	let selectedBooking = 'empty';
 	let title = '';
 	let description = '';
-	let weeks = 1
+	let weeks = 1;
 
 	$: courseSaved = false;
 	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
@@ -42,27 +42,30 @@
 	$: filteredClassrooms = [];
 	let bookings = [];
 
-	let step1Data = {}
-	let step2Data = {}
-	let step3Data = {}
+	let step1Data = {};
+	let step2Data = {};
+	let step3Data = {};
 
 	$: {
 		if (courseSaved) {
-			if (step1Data.course_name != title || step1Data.description != description || step1Data.teacher_id != selectedTeacher){
-			courseSaved = false;
-			locationSaved = false;
+			if (
+				step1Data.course_name != title ||
+				step1Data.description != description ||
+				step1Data.teacher_id != selectedTeacher
+			) {
+				courseSaved = false;
+				locationSaved = false;
 			}
 		}
 
 		if (locationSaved) {
-			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom){
+			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom) {
 				locationSaved = false;
 			}
 		}
 	}
 
 	function handleOptionChange() {}
-
 
 	function handleDraftChange(event) {
 		if (event.target.value === 'empty') {
@@ -91,7 +94,9 @@
 			selectedClassroom = 'empty';
 		} else {
 			selectedLocation = Number(event.target.value);
-			filteredClassrooms = classrooms.filter((classroom)  => classroom.location_id == selectedLocation)
+			filteredClassrooms = classrooms.filter(
+				(classroom) => classroom.location_id == selectedLocation
+			);
 		}
 	}
 
@@ -100,7 +105,6 @@
 			selectedClassroom = 'empty';
 		} else {
 			selectedClassroom = Number(event.target.value);
-		
 		}
 	}
 
@@ -126,23 +130,22 @@
 
 					courseSaved = true;
 
-					//update the saved course info 
+					//update the saved course info
 					let course = courses.find((c) => {
-					return c.course_id == selectedCourse
+						return c.course_id == selectedCourse;
 					});
 					course.course_name = title;
 					course.description = description;
-					course.teacher_id = selectedTeacher
+					course.teacher_id = selectedTeacher;
 
-					step1Data = course
+					step1Data = course;
 
 					//this makes the list updated in the selectbox
-					courses = courses
-					
+					courses = courses;
+
 					//open next formular
 					courseSaved = true;
 					locationSaved = false;
-
 				}
 			} catch (error) {
 				console.error(error);
@@ -165,9 +168,9 @@
 				if (response.ok) {
 					courseSaved = true;
 					locationSaved = false;
-					form1Data.course_name = title
-					form1Data.description = description
-					form1Data.teacher_id = selectedTeacher
+					form1Data.course_name = title;
+					form1Data.description = description;
+					form1Data.teacher_id = selectedTeacher;
 				} else {
 					throw new Error(result.message || 'Oprettelse mislykkedes');
 				}
@@ -179,15 +182,14 @@
 	}
 
 	function saveLocation() {
-		locationSaved = true
-		step2Data.location_id = selectedLocation
-		step2Data.room_id = selectedClassroom
+		locationSaved = true;
+		step2Data.location_id = selectedLocation;
+		step2Data.room_id = selectedClassroom;
 	}
 
 	$: selectedDays = [];
 
-	$:
-		days = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'].map(day => ({
+	$: days = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'].map((day) => ({
 		name: day,
 		startTime: '',
 		endTime: '',
@@ -196,17 +198,18 @@
 	}));
 
 	async function saveBooking() {
-
 		const bookingData = {
 			course_id: step1Data.course_id,
 			room_id: step2Data.room_id,
-			days: days.filter(day => day.startTime && day.endTime && day.startDate).map(day => ({
-				startTime: day.startTime,
-				endTime: day.endTime,
-				date: day.startDate
-			}))
-		};		
-		
+			days: days
+				.filter((day) => day.startTime && day.endTime && day.startDate)
+				.map((day) => ({
+					startTime: day.startTime,
+					endTime: day.endTime,
+					date: day.startDate
+				}))
+		};
+
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings`, {
 				credentials: 'include',
@@ -216,41 +219,40 @@
 				},
 				body: JSON.stringify(bookingData)
 			});
-			const result = await response.json()
+			const result = await response.json();
 
 			console.log(result);
-
-		} catch(error) {
+		} catch (error) {
 			console.error('Error saving booking:', error);
 		}
-		
 	}
 
-	async function checkBookingDates () {
+	async function checkBookingDates() {
+		let bookingDates = [];
 
-		let bookingDates = []
-		
-		if ( weeks < 1 ) {
-			weeks = 1
+		if (weeks < 1) {
+			weeks = 1;
 		}
 		//filter the selected days off and then map all the selected days * weeks into potential booking dates
-		bookingDates = days.filter(day => day.selected).map((day) => {
-			let bookings = [];
-			let startDate = new Date(day.startDate);
-			for (let i = 0; i < weeks; i++) {
-
-				let booking = {
-					course_id: step1Data.course_id,
-					room_id: step2Data.room_id,
-					startTime: day.startTime,
-					endTime: day.endTime,
-					date: new Date(startDate)
+		bookingDates = days
+			.filter((day) => day.selected)
+			.map((day) => {
+				let bookings = [];
+				let startDate = new Date(day.startDate);
+				for (let i = 0; i < weeks; i++) {
+					let booking = {
+						course_id: step1Data.course_id,
+						room_id: step2Data.room_id,
+						startTime: day.startTime,
+						endTime: day.endTime,
+						date: new Date(startDate)
+					};
+					startDate.setDate(startDate.getDate() + 7);
+					bookings.push(booking);
 				}
-				startDate.setDate(startDate.getDate() + 7);
-				bookings.push(booking);
-			}
-			return bookings;
-		}).flat();
+				return bookings;
+			})
+			.flat();
 
 		try {
 			const response = await fetch(`${$BASE_URL}/check-booking-dates`, {
@@ -261,85 +263,77 @@
 				},
 				body: JSON.stringify(bookingDates)
 			});
-			const result = await response.json()
+			const result = await response.json();
 
 			console.log(result);
-
-		} catch(error) {
+		} catch (error) {
 			console.error('Error saving booking:', error);
 		}
-
-
-
 	}
 
 	function toggleDay(day) {
-
 		if (day.selected) {
 			selectedDays.push(day);
-			selectedDays = selectedDays
+			selectedDays = selectedDays;
 		} else {
-			selectedDays = selectedDays.filter(d => d.name !== day.name);
+			day.startTime = '';
+			day.endTime = '';
+			days = days
+			selectedDays = selectedDays.filter((d) => d.name !== day.name);
 		}
 	}
 
 	function updateStartTime(day, event) {
 		day.startTime = event.target.value;
-		selectedDays = selectedDays
+		selectedDays = selectedDays;
 	}
 
 	function updateEndTime(day, event) {
 		day.endTime = event.target.value;
-		selectedDays = selectedDays
-		}
+		selectedDays = selectedDays;
+	}
 
 	function updateStartDate(day, event) {
 		day.startDate = event.target.value;
-		selectedDays = selectedDays
+		selectedDays = selectedDays;
 	}
 
 	function updateStartDates(event) {
 		let courseStartDate = new Date(event.target.value);
-	
+
 		// Get the day of the week (0 for Sunday, 1 for Monday, etc.)
 		let dayOfWeek = courseStartDate.getDay();
-	
+
 		// If the day of the week is 0 (Sunday), set it to 7
 		if (dayOfWeek === 0) dayOfWeek = 7;
-	
+
 		// Subtract the day of the week from the date to get the Monday of the week
 		courseStartDate.setDate(courseStartDate.getDate() - dayOfWeek + 1);
 
-
 		days.forEach((day) => {
-		let date = `${courseStartDate.getFullYear()}-${(courseStartDate.getMonth() + 1).toString().padStart(2, '0')}-${courseStartDate.getDate().toString().padStart(2, '0')}`;	
-		day.startDate = date;
-		courseStartDate.setDate(courseStartDate.getDate() + 1);
-	});
+			let date = `${courseStartDate.getFullYear()}-${(courseStartDate.getMonth() + 1).toString().padStart(2, '0')}-${courseStartDate.getDate().toString().padStart(2, '0')}`;
+			day.startDate = date;
+			courseStartDate.setDate(courseStartDate.getDate() + 1);
+		});
 		//update days
-		days = days
-
+		days = days;
 	}
 
-	$: AllInfoIsGiven = false
-
+	$: AllInfoIsGiven = false;
 
 	$: if (selectedDays.length >= 1 && locationSaved && courseSaved) {
-		let allInfo = true
+		let allInfo = true;
 		for (let day of selectedDays) {
 			if (day.startTime == '' || day.endTime == '' || day.startDate == '') {
 				allInfo = false;
 			}
 		}
 
-		console.log("checking info");
-		AllInfoIsGiven = allInfo
+		console.log('checking info');
+		AllInfoIsGiven = allInfo;
 	} else {
-		AllInfoIsGiven = false
+		AllInfoIsGiven = false;
 	}
-
-
-
 </script>
 
 <h2>Event/foredrag</h2>
@@ -491,5 +485,4 @@
 </div>
 <div class="border border-2 p-3 m-3">
 	<p><strong>Trin 4</strong></p>
-	
 </div>
