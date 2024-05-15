@@ -4,10 +4,11 @@
 	import { user, newUser } from '../stores/userStore.js';
 	import { onMount } from 'svelte';
 	import { validateSession, login, logout } from '../utils/auth.js';
-	import { isLoading } from '../stores/generalStore.js';
+	import { isLoading, loginLoading } from '../stores/generalStore.js';
 
 	let isOpen = false;
 	$: testUser = $newUser;
+	$: loginLoadingSpinner = $loginLoading;
 
 	onMount(async () => {
 		validateSession();
@@ -44,13 +45,6 @@
 							class:active={$page.url.pathname === '/booking'}
 							data-sveltekit-preload-data
 							href="/booking">Booking</a
-						>
-
-						<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/event'}
-							data-sveltekit-preload-data
-							href="/event">Event</a
 						>
 						<a
 							class="nav-link"
@@ -103,27 +97,33 @@
 						>
 					{/if}
 				</div>
-
-				{#if !$user.email}
-					<form on:submit|preventDefault={login} class="d-flex ms-auto">
-						<input
-							class="form-control me-2"
-							type="text"
-							placeholder="Email"
-							aria-label="Email"
-							bind:value={testUser.email}
-						/>
-						<input
-							class="form-control me-2"
-							type="password"
-							placeholder="Password"
-							aria-label="Password"
-							bind:value={testUser.password}
-						/>
-						<button class="btn btn-outline-success" type="submit">Login</button>
-					</form>
+				{#if !loginLoadingSpinner}
+					{#if !$user.email}
+						<form on:submit|preventDefault={login} class="d-flex ms-auto">
+							<input
+								class="form-control me-2"
+								type="text"
+								placeholder="Email"
+								aria-label="Email"
+								bind:value={testUser.email}
+							/>
+							<input
+								class="form-control me-2"
+								type="password"
+								placeholder="Password"
+								aria-label="Password"
+								bind:value={testUser.password}
+							/>
+							<button class="btn btn-outline-success" type="submit">Login</button>
+						</form>
+					{:else}
+						<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Logud</button>
+					{/if}
 				{:else}
-					<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Logud</button>
+					<!-- Show spinner while loading -->
+					<div class="d-flex ms-auto">
+						<div class="spinner-border text-primary" role="status"></div>
+					</div>
 				{/if}
 			</div>
 		</div>

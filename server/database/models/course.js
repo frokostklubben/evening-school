@@ -19,16 +19,12 @@ const Course = sequelize.define(
         key: 'teacher_id',
       },
     },
-    // TODO: Update create.js?
-    location_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: Location,
-        key: 'location_id',
-      },
-    },
     course_name: {
       type: DataTypes.STRING(55),
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING(250),
       allowNull: false,
     },
   },
