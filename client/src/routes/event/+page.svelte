@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import SelectBoxOptions from '../../components/SelectBoxOptions.svelte';
 	import { BASE_URL } from '../../stores/apiConfig.js';
+	import { toast, Toaster } from 'svelte-french-toast';
 
 	onMount(async () => {
 		try {
@@ -34,6 +35,7 @@
 	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
 	$: step2Criteria = selectedLocation == 'empty' || selectedClassroom == 'empty' || !courseSaved;
 	$: locationSaved = false;
+	$: bookingReadyForPreview = false;
 
 	let teachers = [];
 	$: courses = [];
@@ -43,10 +45,11 @@
 	let bookings = [];
 	$: checkedBookings = [];
 	let courseStartDate;
+	$: weekNumber = 0;
+	$: newDateAndTime = '';
 
 	let step1Data = {};
 	let step2Data = {};
-	let step3Data = {};
 
 	$: {
 		if (courseSaved) {
@@ -57,12 +60,14 @@
 			) {
 				courseSaved = false;
 				locationSaved = false;
+				bookingReadyForPreview = false;
 			}
 		}
 
 		if (locationSaved) {
 			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom) {
 				locationSaved = false;
+				bookingReadyForPreview = false;
 			}
 		}
 	}
@@ -148,6 +153,7 @@
 					//open next formular
 					courseSaved = true;
 					locationSaved = false;
+					bookingReadyForPreview = false;
 				}
 			} catch (error) {
 				console.error(error);
@@ -170,6 +176,7 @@
 				if (response.ok) {
 					courseSaved = true;
 					locationSaved = false;
+					bookingReadyForPreview = false;
 					form1Data.course_name = title;
 					form1Data.description = description;
 					form1Data.teacher_id = selectedTeacher;
@@ -185,6 +192,7 @@
 
 	function saveLocation() {
 		locationSaved = true;
+		bookingReadyForPreview = false;
 		step2Data.location_id = selectedLocation;
 		step2Data.room_id = selectedClassroom;
 	}
@@ -200,10 +208,7 @@
 	}));
 
 	async function saveBooking() {
-
 		checkedBookings = checkedBookings.map(({ conflict, ...rest }) => rest);
-		console.log(checkedBookings);
-		
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings`, {
 				credentials: 'include',
@@ -214,12 +219,20 @@
 				body: JSON.stringify(checkedBookings)
 			});
 			const result = await response.json();
+			if (response.ok) {
+				toast.success(
+					`Booking oprettet på ${title} med ${checkedBookings.length} datoer over ${weeks} ${
+						weeks > 1 ? 'uger' : 'uge'
+					}`,
+					{ duration: 7000 }
+				);
 
-			console.log(result);
+				//reset all the data
+				initializeData();
+			}
 		} catch (error) {
 			console.error('Error saving booking:', error);
 		}
-		
 	}
 
 	async function checkBookingDates() {
@@ -265,6 +278,7 @@
 					...booking,
 					date: new Date(booking.date)
 				}));
+				bookingReadyForPreview = true;
 			}
 		} catch (error) {
 			console.error('Error saving booking:', error);
@@ -281,6 +295,7 @@
 			days = days;
 			selectedDays = selectedDays.filter((d) => d.name !== day.name);
 		}
+		bookingReadyForPreview = false;
 	}
 
 	function updateStartTime(day, event) {
@@ -299,6 +314,8 @@
 	}
 
 	function updateStartDates(event) {
+		weekNumber = getWeekNumber(new Date(event.target.value));
+
 		courseStartDate = new Date(event.target.value);
 
 		// Get the day of the week (0 for Sunday, 1 for Monday, etc.)
@@ -333,6 +350,37 @@
 		AllInfoIsGiven = allInfo;
 	} else {
 		AllInfoIsGiven = false;
+	}
+
+	function initializeData() {
+		checkedBookings = [];
+		bookingReadyForPreview = false;
+		locationSaved = false;
+		courseSaved = false;
+		title = '';
+		description = '';
+		selectedTeacher = 'empty';
+		selectedCourse = 'empty';
+		selectedLocation = 'empty';
+		selectedClassroom = 'empty';
+		selectedBooking = 'empty';
+		weeks = 1;
+		courses = [];
+		locations = [];
+		classrooms = [];
+		filteredClassrooms = [];
+		bookings = [];
+		step1Data = {};
+		step2Data = {};
+	}
+
+	// Copied from Copilot
+	function getWeekNumber(d) {
+		let date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+		date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+		let yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+		let weekNumber = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
+		return weekNumber;
 	}
 </script>
 
@@ -411,7 +459,7 @@
 	<p><strong>Trin 3</strong></p>
 	<form on:submit|preventDefault={checkBookingDates}>
 		<div class="mb-3">
-			<label for="weeks" class="form-label">Antal gange:</label>
+			<label for="weeks" class="form-label">Antal uger:</label>
 			<input type="number" id="weeks" name="weeks" class="form-control" bind:value={weeks} />
 		</div>
 		<div class="mb-3">
@@ -425,7 +473,12 @@
 				on:change={updateStartDates}
 			/>
 		</div>
-		<p>`Du har valgt uge: x (ugedage xx/xx/xxxx - xx/xx/xxxx)`</p>
+
+		{#if weekNumber > 0}
+			<p>
+				Du har valgt <b>uge {weekNumber}</b> som startuge. Vælg en ny dato for at ændre startugen.
+			</p>
+		{/if}
 		<table class="table">
 			<thead>
 				<tr>
@@ -480,7 +533,11 @@
 				{/each}
 			</tbody>
 		</table>
-		<button type="submit" class="btn btn-primary" disabled={!AllInfoIsGiven}>Anmod booking</button>
+		<button
+			type="submit"
+			class="btn {bookingReadyForPreview ? 'btn-success' : 'btn-primary'}"
+			disabled={!AllInfoIsGiven}>{bookingReadyForPreview ? 'Ok' : 'Anmod booking'}</button
+		>
 	</form>
 </div>
 <div class="border border-2 p-3 m-3">
@@ -488,10 +545,11 @@
 	<table class="table">
 		<thead>
 			<tr>
-				<th scope="col">Date</th>
-				<th scope="col">Start Time</th>
-				<th scope="col">End Time</th>
+				<th scope="col">Dato</th>
+				<th scope="col">Starttidspunkt</th>
+				<th scope="col">Sluttidspunkt</th>
 				<th scope="col">Status</th>
+				<th scope="col">Ny tid</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -504,10 +562,39 @@
 					>
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
-					<td>{booking.conflict === true ? booking.bookingConflicts[0] : 'No Conflict'}</td>
+					<td>
+						{booking.conflict === true
+							? 'Ikke ledig: ' +
+								booking.bookingConflicts
+									.map((conflict) => {
+										const [startHour, startMinute] = conflict.start_time.split(':');
+										const [endHour, endMinute] = conflict.end_time.split(':');
+										return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
+									})
+									.join(', ')
+							: 'Ledig'}
+					</td>
+					<td>
+						{#if booking.conflict}
+							<input
+								type="datetime-local"
+								id="newTime{booking.id}"
+								name="newTime{booking.id}"
+								bind:value={newDateAndTime}
+							/>
+							<button class="btn btn-primary" on:click={null}/>
+						{/if}
+					</td>
 				</tr>
 			{/each}
 		</tbody>
 	</table>
-	<button class="btn btn-primary" on:click={saveBooking} disabled={false}>Færdiggør booking</button>
+	<button
+		class="btn btn-primary"
+		on:click={saveBooking}
+		disabled={!bookingReadyForPreview || !checkedBookings.every((booking) => !booking.conflict)}
+		>Færdiggør booking</button
+	>
 </div>
+
+<Toaster />

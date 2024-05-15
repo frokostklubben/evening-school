@@ -27,7 +27,7 @@ router.post('/api/bookings', async (req, res) => {
 
     try {
         await Booking.bulkCreate(bookings);
-        res.send({ data: 'Bookings were created', bookings });
+        res.send({ data: bookings });
     } catch (error) {
         res.status(500).send({ error: 'Failed to create bookings' });
     }
