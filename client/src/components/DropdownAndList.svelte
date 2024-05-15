@@ -17,6 +17,7 @@
 	export let label;
 	export let modalTitle;
 	export let optionName;
+	export let showCoursesButton;
 
 	let options = [];
 	let hasSelected = false;
@@ -124,7 +125,7 @@
 	</div>
 
 	{#if $itemList.length > 0}
-		<ListItems idKey={listIdKey} collection={listCollection} />
+		<ListItems idKey={listIdKey} collection={listCollection} {showCoursesButton} />
 	{:else if hasSelected}
 		<div>Ingen brugere fundet</div>
 	{/if}

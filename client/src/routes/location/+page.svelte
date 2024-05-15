@@ -19,4 +19,5 @@
 	label={'Aftenskole'}
 	modalTitle={'afdeling'}
 	optionName={'name'}
+	showCoursesButton={true}
 />
