@@ -3,6 +3,7 @@ import User from '../database/models/user.js'
 import Course from '../database/models/course.js'
 import Location from '../database/models/location.js'
 import School from '../database/models/school.js'
+import Holiday from '../database/models/holiday.js'
 import Classroom from '../database/models/classroom.js'
 import Booking from '../database/models/booking.js'
 import Inventory from '../database/models/inventory.js'
@@ -29,6 +30,9 @@ router.get('/api/headerKey/:modelname', async (req, res) => {
         break
       case 'schools':
         columnNames = Object.keys(School.getAttributes())
+        break
+      case 'holidays':
+        columnNames = Object.keys(Holiday.getAttributes())
         break
       case 'classrooms':
         columnNames = Object.keys(Classroom.getAttributes())

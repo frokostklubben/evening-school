@@ -16,6 +16,7 @@
 		}
 	}
 
+
 	// TODO: move to service - ts problems
 	function validateEmail(email) {
 		const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -51,10 +52,11 @@
 
 				showEditModal.set(false);
 			} else {
-				throw new Error(result.message || 'Failed to update item');
+				toast.error('Fejl ved opdatering:', error.message);
+
+				// throw new Error(result.message || 'Failed to update item');
 			}
 		} catch (error) {
-			console.error('Error updating item:', error);
 			toast.error('Fejl ved opdatering:', error.message);
 		}
 	}
@@ -89,6 +91,15 @@
 									id={key}
 									bind:value={$selectedItem[key]}
 									required
+								/>
+							{:else if key === 'start_date' || key === 'end_date'}
+							<input
+								type="date"
+								class="form-control"
+								id={key}
+								bind:value={$selectedItem[key]}
+								min={new Date().toISOString().split('T')[0]}
+								required
 								/>
 							{:else}
 								<input
