@@ -5,6 +5,10 @@
 	import { optionId } from '../../../stores/modalStore.js';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { itemList } from '../../../stores/itemListStore.js';
+	import { locationStore } from '../../../stores/locationStore.js';
+
+	let selectedLocation = '';
+	let selectedSchoolName = '';
 
 	displayNames.set({
 		course_name: 'Kursusnavn',
@@ -28,14 +32,14 @@
 		}
 	}
 
-	// Ændre denne til at gemme afdelingsnavnet
 	/* 	$: {
 		const id = $optionId;
-		selectedLocation = $location.find((room) => room.id === id)?.name;
+		const selectedLocationObject = $locationStore.find((location) => location.id === id);
+		selectedLocation = selectedLocationObject?.name;
+		selectedSchoolName = selectedLocationObject?.school_name;
 	} */
 </script>
 
-<!-- TODO sette ind navnet til afd. -->
-<h2>Oversigt over en afdelings hold</h2>
+<h2>Hold hos {selectedLocation} på {selectedSchoolName}</h2>
 
 <ListItems idKey={'course_id'} collection={'courses'} showButtons={false} />

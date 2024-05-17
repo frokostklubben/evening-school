@@ -4,6 +4,7 @@
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import { user } from '../../../stores/userStore.js';
 	import { itemList } from '../../../stores/itemListStore';
+	import { locationStore } from '../../../stores/locationStore.js';
 
 	displayNames.set({
 		school_name: 'Skole',
@@ -26,7 +27,9 @@
 		if (response.ok) {
 			const result = await response.json();
 			itemList.set(result.data);
-			// save locationStore here
+			console.log('itemList:', $itemList);
+			locationStore.set(result.data);
+			console.log('locationStore:', $locationStore);
 		} else {
 			console.error(`Failed to fetch locations`);
 		}
