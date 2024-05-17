@@ -47,7 +47,9 @@
 	$: checkedBookings = [];
 	let courseStartDate;
 	$: weekNumber = 0;
-	$: newDateAndTime = '';
+	$: newDate = '';
+	$: newStartTime = '';
+	$: newEndTime = '';
 
 	let step1Data = {};
 	let step2Data = {};
@@ -286,8 +288,6 @@
 	}
 
 	function checkNewDateAndTime(bookingToCheck) {
-		//console.log('<<<<<<<<<<< NEW DATE AND TIME', newDateAndTime);
-
 		bookingDates = bookingDates.map((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
@@ -295,17 +295,13 @@
 				booking.startTime === bookingToCheck.startTime &&
 				booking.endTime === bookingToCheck.endTime
 			) {
-				// Update the date of the booking to the new date and time
-				console.log('<<<<<<<<<<< ORIGINAL BOOKING DATE:', booking.date);
-				booking.date = new Date(newDateAndTime);
-				console.log('<<<<<<<<<<< UPDATED BOOKING DATE:', booking.date);
+				booking.date = new Date(newDate);
+				booking.startTime = newStartTime;
+				booking.endTime = newEndTime;
 			}
 			return booking;
 		});
-
-		console.log('>>>>>>>>>>>> BOOKING DATE ORG bd=bd', bookingDates);
 		bookingDates = bookingDates;
-		console.log('>>>>>>>>>>>> BOOKING DATES UPD bd=bd', bookingDates);
 		checkBookingDates(false);
 	}
 
@@ -490,6 +486,7 @@
 			<label for="startdate" class="form-label">Vælg en dato fra startugen:</label>
 			<input
 				type="date"
+				min="{new Date().toISOString().split('T')[0]}"
 				id="startdate"
 				name="startdate"
 				class="form-control"
@@ -514,13 +511,12 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each days as day (day.name)}
+				{#each days as day}
+				{#if day.startDate >= new Date().toISOString().split('T')[0]}
 					<tr>
 						<td
 							><input
 								type="checkbox"
-								id={day.name}
-								name={day.name}
 								bind:checked={day.selected}
 								on:change={() => toggleDay(day)}
 							/></td
@@ -529,8 +525,6 @@
 						<td
 							><input
 								type="time"
-								id={`start-${day.name}`}
-								name={`start-${day.name}`}
 								bind:value={day.startTime}
 								on:change={(event) => updateStartTime(day, event)}
 							/></td
@@ -538,8 +532,6 @@
 						<td
 							><input
 								type="time"
-								id={`end-${day.name}`}
-								name={`end-${day.name}`}
 								bind:value={day.endTime}
 								on:change={(event) => updateEndTime(day, event)}
 							/></td
@@ -547,13 +539,13 @@
 						<td
 							><input
 								type="date"
-								id={`date-${day.name}`}
-								name={`date-${day.name}`}
+								min="{new Date().toISOString().split('T')[0]}"
 								bind:value={day.startDate}
 								on:change={(event) => updateStartDate(day, event)}
 							/></td
 						>
 					</tr>
+					{/if}
 				{/each}
 			</tbody>
 		</table>
@@ -601,10 +593,17 @@
 					<td>
 						{#if booking.conflict}
 							<input
-								type="datetime-local"
-								id="newTime{booking.id}"
-								name="newTime{booking.id}"
-								bind:value={newDateAndTime}
+								type="date"
+								min="{new Date().toISOString().split('T')[0]}"
+								bind:value={newDate}
+							/>
+							<input
+								type="time"
+								bind:value={newStartTime}
+							/>
+							<input
+								type="time"
+								bind:value={newEndTime}
 							/>
 							<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
 								>Tjek</button
