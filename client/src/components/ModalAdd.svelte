@@ -52,6 +52,13 @@
 			const result = await response.json();
 
 			if (response.ok) {
+
+				// specific for dates
+				if (result.data.start_date && result.data.end_date) {
+					result.data.end_date = new Date(result.data.end_date).toISOString().split('T')[0];
+					result.data.start_date = new Date(result.data.start_date).toISOString().split('T')[0];
+				}
+					
 				toast.success('Oprettelse vellykket!');
 				itemList.update((currentItems) => {
 					return [...currentItems, result.data];
@@ -62,8 +69,7 @@
 				throw new Error(result.message || 'Oprettelse mislykkedes');
 			}
 		} catch (error) {
-			console.error('Error updating item:', error);
-			toast.error('Fejl ved opdatering:', error.message);
+			toast.error('Fejl ved oprettelse:', error.message);
 		}
 	}
 
@@ -96,6 +102,15 @@
 									class="form-control"
 									id={key}
 									bind:value={formData[key]}
+									required
+								/>
+							{:else if key === 'start_date' || key === 'end_date'}
+								<input
+									type="date"
+									class="form-control"
+									id={key}
+									bind:value={formData[key]}
+									min={new Date().toISOString().split('T')[0]}
 									required
 								/>
 							{:else}

@@ -27,6 +27,7 @@ import Classroom from './models/classroom.js'
 import Teacher from './models/teacher.js'
 import Course from './models/course.js'
 import Inventory from './models/inventory.js'
+import Holiday from './models/holiday.js'
 
 // DO NOT DELETE THE FOLLOWING IMPORTS - EVEN THOUGH THEY ARE NOT ACTIVELY USED
 import Booking from './models/booking.js'
@@ -104,3 +105,11 @@ await inventory[3].addClassroom(classrooms[2])
 await inventory[2].addClassroom(classrooms[2])
 await inventory[1].addClassroom(classrooms[3])
 await inventory[3].addClassroom(classrooms[3])
+
+await Holiday.bulkCreate([
+//someholidays
+{ name: 'Juleaften',  school_id:"1", start_date: '2024-12-24', end_date: '2024-12-24' },
+{ name: 'Sommerferie', school_id:"2" , start_date: '2024-06-01', end_date: '2024-08-01' },
+
+
+])

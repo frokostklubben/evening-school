@@ -64,7 +64,7 @@
 							class="nav-link"
 							class:active={$page.url.pathname === '/users'}
 							data-sveltekit-preload-data
-							href={$user.email ? '/users' : '/'}>Kontoransatte</a
+							href={$user.email ? '/users/admin' : '/'}>Kontoransatte</a
 						>
 						<a
 							class="nav-link"
@@ -94,6 +94,18 @@
 							class:active={$page.url.pathname === '/courses'}
 							data-sveltekit-preload-data
 							href="/courses">Hold</a
+						>
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/your-employees'}
+							data-sveltekit-preload-data
+							href="/users/user">Medarbejdere</a
+						>
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/holiday'}
+							data-sveltekit-preload-data
+							href="/holiday">Helligdage</a
 						>
 					{/if}
 				</div>

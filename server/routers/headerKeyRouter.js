@@ -3,6 +3,7 @@ import User from '../database/models/user.js'
 import Course from '../database/models/course.js'
 import Location from '../database/models/location.js'
 import School from '../database/models/school.js'
+import Holiday from '../database/models/holiday.js'
 
 const router = Router()
 
@@ -23,6 +24,9 @@ router.get('/api/headerKey/:modelname', async (req, res) => {
         break
       case 'schools':
         columnNames = Object.keys(School.getAttributes())
+        break
+      case 'holidays':
+        columnNames = Object.keys(Holiday.getAttributes())
         break
       default:
         throw new Error('Invalid model name')
