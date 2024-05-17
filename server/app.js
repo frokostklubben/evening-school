@@ -54,9 +54,11 @@ app.use(bookingsRouter)
 import headerKeyRouter from './routers/headerKeyRouter.js'
 app.use(headerKeyRouter)
 
-import holidaysReouter from './routers/holidaysRouter.js'
-app.use(holidaysReouter)
+import holidaysRouter from './routers/holidaysRouter.js'
+app.use(holidaysRouter)
 
+import classroomsRouter from './routers/classroomsRouter.js'
+app.use(classroomsRouter)
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, error => {

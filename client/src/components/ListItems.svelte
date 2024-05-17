@@ -1,8 +1,9 @@
 <script>
 	import ModalDelete from './ModalDelete.svelte';
 	import ModalEdit from './ModalEdit.svelte';
+	import { derived } from 'svelte/store';
 	import { headerKeys, headerKeysDanish, itemList } from '../stores/itemListStore.js';
-	import { selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
+	import { optionId, selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import { goto } from '$app/navigation';
 	import { user } from '../stores/userStore';
@@ -11,7 +12,26 @@
 
 	export let collection;
 	export let idKey;
-	export let showCoursesButton = false;
+	export let buttons = [];
+	export let showButtons = false;
+
+	// Derived function made with chatgpt! (Marcus)
+	// Her defineres en "afledt store" derivedHeaderKeys. Den afhænger af itemList og udfører en funktion, hver gang itemList ændrer sig. Funktionen tager itemList som argument og returnerer en array af nøglerne (keys) af det første element i itemList, hvis itemList ikke er tom. Hvis itemList er tom, returnerer funktionen en tom array.
+
+	// The derived store ensures that whenever itemList changes, the headerKeys are recalculated and updated automatically
+
+	const derivedHeaderKeys = derived(itemList, ($itemList) => {
+		if ($itemList.length > 0) {
+			return Object.keys($itemList[0]);
+		}
+		return [];
+	});
+
+	derivedHeaderKeys.subscribe((keys) => {
+		if (keys.length > 0) {
+			setHeaderKeys(keys);
+		}
+	});
 
 	onMount(() => {
 		fetchHeaderKeys();
@@ -20,7 +40,7 @@
 	function setHeaderKeys(data) {
 		const excludeKeys = ['_id', 'hashed_password'];
 
-		// Made in cooperation with chatgpt (Marcus)
+		// 	Made in cooperation with chatgpt (Marcus)
 		const filteredKeys = data.filter(
 			(key) => !excludeKeys.some((excludeKey) => key.endsWith(excludeKey) || key === excludeKey)
 		);
@@ -36,16 +56,14 @@
 		if (response.ok) {
 			const result = await response.json();
 			setHeaderKeys(result.data);
-
-			// headerKeysDanish.set(result.data.map((key) => displayNames[key] || key));
 		} else {
 			console.error('Failed to fetch header keys from the server');
 		}
 	}
 
-
-
-
+	function formatInventory(inventory) {
+		return Array.isArray(inventory) ? inventory.join(', ') : inventory;
+	}
 </script>
 
 <div class="container mt-5">
@@ -65,11 +83,15 @@
 							{#each $itemList as listItem, index}
 								<tr class="hover-row">
 									{#each $headerKeys as key (key)}
-										{#if key === 'start_date' || key === 'end_date'}
-											<td>{new Date(listItem[key]).toLocaleDateString()}</td>
-										{:else}
-											<td>{listItem[key]}</td>
-										{/if}
+										<td>
+											{#if key === 'inventories'}
+												{formatInventory(listItem[key])}
+											{:else if key === 'start_date' || key === 'end_date'}
+												{new Date(formatInventory(listItem[key])).toLocaleDateString()}
+											{:else}
+												{listItem[key]}
+											{/if}
+										</td>
 									{/each}
 									<td>
 										<button
@@ -95,16 +117,21 @@
 											<i class="bi bi-trash-fill"></i>
 										</button></td
 									>
-									{#if showCoursesButton}
-										<td
-											><button
-												class="btn"
-												on:click={() => {
-													selectedItem.set(listItem);
-													goto('/courses');
-												}}>Se hold</button
-											></td
-										>
+									{#if showButtons}
+										{#each buttons as button}
+											<td>
+												<button
+													class="btn"
+													on:click={() => {
+														selectedItem.set(listItem);
+														optionId.set(listItem[button.key]);
+														goto(button.url);
+													}}
+												>
+													{button.text}
+												</button>
+											</td>
+										{/each}
 									{/if}
 								</tr>
 							{/each}

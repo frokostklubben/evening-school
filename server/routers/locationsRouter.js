@@ -14,7 +14,6 @@ router.get('/api/locations/:schoolId', async (req, res) => {
 
     if (req.session.user.roleId === 2) {
       schoolId = req.session.user.schoolId
-      console.log('schoolId:', schoolId)
     }
 
     const locations = await Location.findAll({

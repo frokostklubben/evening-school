@@ -18,5 +18,5 @@
 	label={'Aftenskole'}
 	modalTitle={'kontormedarbejder'}
 	optionName={'name'}
-	showCoursesButton={false}
+	showButtons={false}
 />

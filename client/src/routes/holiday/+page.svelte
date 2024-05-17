@@ -9,6 +9,9 @@
     import { Button } from 'flowbite-svelte';
 
     onMount(async () => {
+
+        itemList.set([])
+
         const response = await fetch(`${$BASE_URL}/holidays`, {
             credentials: 'include',
         })

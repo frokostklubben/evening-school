@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import ListItems from './ListItems.svelte';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
-	// import { headerKeys, headerKeysDanish } from '../stores/itemListStore';
 	import { itemList } from '../stores/itemListStore';
 	import { optionId, showAddModal } from '../stores/modalStore';
 	import ModalAdd from '../components/ModalAdd.svelte';
@@ -18,7 +17,8 @@
 	export let label;
 	export let modalTitle;
 	export let optionName;
-	export let showCoursesButton;
+	export let showButtons;
+	export let buttons = [];
 
 	let options = [];
 	let hasSelected = false;
@@ -39,7 +39,6 @@
 
 		if (response.ok) {
 			const result = await response.json();
-
 			options = result.data;
 		} else {
 			console.error(`Failed to fetch ${optionsCollection}`);
@@ -60,9 +59,7 @@
 
 			if (response.ok) {
 				const result = await response.json();
-
 				itemList.set(result.data);
-
 				hasSelected = true;
 			} else {
 				console.error(`Failed to fetch ${listCollection} on ${optionsCollection}`);
@@ -93,9 +90,9 @@
 	</div>
 
 	{#if $itemList.length > 0}
-		<ListItems idKey={listIdKey} collection={listCollection} {showCoursesButton} />
+		<ListItems idKey={listIdKey} collection={listCollection} {showButtons} {buttons} />
 	{:else if hasSelected}
-		<div>Ingen brugere fundet</div>
+		<div>Ingen data fundet</div>
 	{/if}
 </div>
 
