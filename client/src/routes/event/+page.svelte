@@ -43,6 +43,7 @@
 	let classrooms = [];
 	$: filteredClassrooms = [];
 	let bookings = [];
+	let bookingDates = [];
 	$: checkedBookings = [];
 	let courseStartDate;
 	$: weekNumber = 0;
@@ -226,7 +227,6 @@
 					}`,
 					{ duration: 7000 }
 				);
-
 				//reset all the data
 				initializeData();
 			}
@@ -235,32 +235,32 @@
 		}
 	}
 
-	async function checkBookingDates() {
-		let bookingDates = [];
-
+	async function checkBookingDates(includeDays) {
 		if (weeks < 1) {
 			weeks = 1;
 		}
 		//filter the selected days off and then map all the selected days * weeks into potential booking dates
-		bookingDates = days
-			.filter((day) => day.selected)
-			.map((day) => {
-				let bookings = [];
-				let startDate = new Date(day.startDate);
-				for (let i = 0; i < weeks; i++) {
-					let booking = {
-						course_id: step1Data.course_id,
-						room_id: step2Data.room_id,
-						startTime: day.startTime,
-						endTime: day.endTime,
-						date: new Date(startDate)
-					};
-					startDate.setDate(startDate.getDate() + 7);
-					bookings.push(booking);
-				}
-				return bookings;
-			})
-			.flat();
+		if (includeDays) {
+			bookingDates = days
+				.filter((day) => day.selected)
+				.map((day) => {
+					let bookings = [];
+					let startDate = new Date(day.startDate);
+					for (let i = 0; i < weeks; i++) {
+						let booking = {
+							course_id: step1Data.course_id,
+							room_id: step2Data.room_id,
+							startTime: day.startTime,
+							endTime: day.endTime,
+							date: new Date(startDate)
+						};
+						startDate.setDate(startDate.getDate() + 7);
+						bookings.push(booking);
+					}
+					return bookings;
+				})
+				.flat();
+		}
 
 		try {
 			const response = await fetch(`${$BASE_URL}/check-booking-dates`, {
@@ -283,6 +283,30 @@
 		} catch (error) {
 			console.error('Error saving booking:', error);
 		}
+	}
+
+	function checkNewDateAndTime(bookingToCheck) {
+		//console.log('<<<<<<<<<<< NEW DATE AND TIME', newDateAndTime);
+
+		bookingDates = bookingDates.map((booking) => {
+			// Check if the booking date and time matches the bookingToCheck date and time
+			if (
+				booking.date.toISOString() === bookingToCheck.date.toISOString() &&
+				booking.startTime === bookingToCheck.startTime &&
+				booking.endTime === bookingToCheck.endTime
+			) {
+				// Update the date of the booking to the new date and time
+				console.log('<<<<<<<<<<< ORIGINAL BOOKING DATE:', booking.date);
+				booking.date = new Date(newDateAndTime);
+				console.log('<<<<<<<<<<< UPDATED BOOKING DATE:', booking.date);
+			}
+			return booking;
+		});
+
+		console.log('>>>>>>>>>>>> BOOKING DATE ORG bd=bd', bookingDates);
+		bookingDates = bookingDates;
+		console.log('>>>>>>>>>>>> BOOKING DATES UPD bd=bd', bookingDates);
+		checkBookingDates(false);
 	}
 
 	function toggleDay(day) {
@@ -457,7 +481,7 @@
 
 <div class="border border-2 p-3 m-3">
 	<p><strong>Trin 3</strong></p>
-	<form on:submit|preventDefault={checkBookingDates}>
+	<form on:submit|preventDefault={() => checkBookingDates(true)}>
 		<div class="mb-3">
 			<label for="weeks" class="form-label">Antal uger:</label>
 			<input type="number" id="weeks" name="weeks" class="form-control" bind:value={weeks} />
@@ -582,7 +606,9 @@
 								name="newTime{booking.id}"
 								bind:value={newDateAndTime}
 							/>
-							<button class="btn btn-primary" on:click={null}/>
+							<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
+								>Tjek</button
+							>
 						{/if}
 					</td>
 				</tr>
