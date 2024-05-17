@@ -7,7 +7,7 @@
 		zip_code: 'Postnummer',
 		city: 'By',
 		street_name: 'Vejnavn',
-		street_number: 'nr.'
+		street_number: 'Nr.'
 	});
 </script>
 

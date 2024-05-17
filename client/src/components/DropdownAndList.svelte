@@ -7,8 +7,6 @@
 	import ModalAdd from '../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
 	import { BASE_URL } from '../stores/apiConfig.js';
-	import { displayNames } from '../stores/dictionaryStore.js';
-	import { user } from '../stores/userStore.js';
 
 	export let listIdKey; // f.eks. user_id, hvis resultatet er users
 	export let listCollection;

@@ -41,14 +41,6 @@
 					{#if $user.roleId === 1}
 						<a
 							class="nav-link"
-							aria-current="page"
-							class:active={$page.url.pathname === '/booking'}
-							data-sveltekit-preload-data
-							href="/booking">Booking</a
-						>
-
-						<a
-							class="nav-link"
 							class:active={$page.url.pathname === '/classrooms/admin'}
 							data-sveltekit-preload-data
 							href={$user.roleId === 1 ? '/classrooms/admin' : '/'}>Lokaler</a
@@ -72,24 +64,11 @@
 					{:else if $user.roleId === 2}
 						<a
 							class="nav-link"
-							aria-current="page"
 							class:active={$page.url.pathname === '/booking'}
 							data-sveltekit-preload-data
 							href="/booking">Booking</a
 						>
-
-						<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/event'}
-							data-sveltekit-preload-data
-							href="/event">Event</a
-						>
-						<!-- 	<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/courses'}
-							data-sveltekit-preload-data
-							href="/courses">Hold</a
-						> -->
+					
 						<a
 							class="nav-link"
 							class:active={$page.url.pathname === '/afdelinger'}

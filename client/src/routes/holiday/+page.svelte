@@ -35,9 +35,9 @@
         }
     
         displayNames.set({
-            name: 'navn',
-            start_date: 'startdato',
-            end_date: 'slutdato'
+            name: 'Navn',
+            start_date: 'Startdato',
+            end_date: 'Slutdato'
         })
 
         //bruges i modalen, men har her ingen effekt
