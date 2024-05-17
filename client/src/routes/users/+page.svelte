@@ -18,4 +18,5 @@
 	label={'Aftenskole'}
 	modalTitle={'kontormedarbejder'}
 	optionName={'name'}
+	showButtons={false}
 />

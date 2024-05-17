@@ -365,9 +365,7 @@
 				allInfo = false;
 			}
 		}
-
-		console.log('checking info');
-		AllInfoIsGiven = allInfo;
+		AllInfoIsGiven = allInfo
 	} else {
 		AllInfoIsGiven = false;
 	}

@@ -11,6 +11,10 @@ const Classroom = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    room_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     location_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

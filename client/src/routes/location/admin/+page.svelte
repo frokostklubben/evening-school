@@ -1,6 +1,6 @@
 <script>
-	import DropdownAndList from '../../components/DropdownAndList.svelte';
-	import { displayNames } from '../../stores/dictionaryStore.js';
+	import DropdownAndList from '../../../components/DropdownAndList.svelte';
+	import { displayNames } from '../../../stores/dictionaryStore.js';
 
 	displayNames.set({
 		school_name: 'Skole',
@@ -19,4 +19,5 @@
 	label={'Aftenskole'}
 	modalTitle={'afdeling'}
 	optionName={'name'}
+	showButtons={false}
 />
