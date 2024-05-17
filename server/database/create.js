@@ -42,7 +42,7 @@ await Role.bulkCreate([{ role: 'admin' }, { role: 'office_employee' }])
 await User.bulkCreate([
   { school_id: 1, first_name: 'admin', last_name: 'jensen', email: 'admin@jensen.dk', role_id: 1, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
   { school_id: 1, first_name: 'Kurt', last_name: 'Konthorsen', email: 'kurt@konthorsen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
-  { school_id: 2, first_name: 'Lars', last_name: 'Mortensen', email: 'lars@mortensen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
+  { school_id: 1, first_name: 'Lars', last_name: 'Mortensen', email: 'lars@mortensen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
 ])
 
 await Location.bulkCreate([
@@ -85,14 +85,12 @@ await Course.bulkCreate([
 ])
 
 await Booking.bulkCreate([
-  { course_id: 1, room_id: 1, start_time: "16:30:00", end_time: "19:30:00", date: "2024-05-22" },
-  { course_id: 2, room_id: 2, start_time: '12:00:00', end_time: "14:00:00", date: "2024-05-24" },
+  { course_id: 1, room_id: 1, start_time: '16:30:00', end_time: '19:30:00', date: '2024-05-22' },
+  { course_id: 2, room_id: 2, start_time: '12:00:00', end_time: '14:00:00', date: '2024-05-24' },
 ])
-
 
 // Inventory
 const inventory = await Inventory.bulkCreate([{ item_name: 'Borde' }, { item_name: 'Instrumenter' }, { item_name: 'Computere' }, { item_name: 'Spanskrør' }])
-
 
 await inventory[0].addClassroom(classrooms[0])
 await inventory[1].addClassroom(classrooms[0])

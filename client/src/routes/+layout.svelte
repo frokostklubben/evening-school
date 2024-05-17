@@ -46,18 +46,12 @@
 							data-sveltekit-preload-data
 							href="/booking">Booking</a
 						>
-						<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/courses'}
-							data-sveltekit-preload-data
-							href="/courses">Hold</a
-						>
 
 						<a
 							class="nav-link"
-							class:active={$page.url.pathname === '/classrooms'}
+							class:active={$page.url.pathname === '/classrooms/admin'}
 							data-sveltekit-preload-data
-							href="/classrooms">Lokaler</a
+							href={$user.roleId === 1 ? '/classrooms/admin' : '/'}>Lokaler</a
 						>
 
 						<a
@@ -66,11 +60,12 @@
 							data-sveltekit-preload-data
 							href={$user.email ? '/users' : '/'}>Kontoransatte</a
 						>
+
 						<a
 							class="nav-link"
 							class:active={$page.url.pathname === '/afdelinger'}
 							data-sveltekit-preload-data
-							href={$user.email ? '/location' : '/'}>Afdelinger</a
+							href={$user.email ? '/location/admin' : '/'}>Afdelinger</a
 						>
 
 						<!-- navbar showing for office employees -->
@@ -89,11 +84,17 @@
 							data-sveltekit-preload-data
 							href="/event">Event</a
 						>
-						<a
+						<!-- 	<a
 							class="nav-link"
 							class:active={$page.url.pathname === '/courses'}
 							data-sveltekit-preload-data
 							href="/courses">Hold</a
+						> -->
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/afdelinger'}
+							data-sveltekit-preload-data
+							href={$user.email ? '/location/user' : '/'}>Afdelinger</a
 						>
 					{/if}
 				</div>

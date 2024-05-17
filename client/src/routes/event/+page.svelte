@@ -218,8 +218,6 @@
 			});
 			const result = await response.json()
 
-			console.log(result);
-
 		} catch(error) {
 			console.error('Error saving booking:', error);
 		}
@@ -262,8 +260,6 @@
 				body: JSON.stringify(bookingDates)
 			});
 			const result = await response.json()
-
-			console.log(result);
 
 		} catch(error) {
 			console.error('Error saving booking:', error);
@@ -331,8 +327,6 @@
 				allInfo = false;
 			}
 		}
-
-		console.log("checking info");
 		AllInfoIsGiven = allInfo
 	} else {
 		AllInfoIsGiven = false

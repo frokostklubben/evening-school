@@ -20,19 +20,6 @@
 	async function addItem() {
 		formData[idKey] = $optionId;
 
-		// Example validation: ensure all required fields are filled
-		// if (fields.some((field) => field.required && !data[field.name])) {
-		// 	toast.error('Please fill all required fields.');
-		// 	return;
-		// }
-
-		// if (formData.email) {
-		// 	if (!validateEmail(formData.email)) {
-		// 		toast.error('Indtast en gyldig email-adresse.');
-		// 		return;
-		// 	}
-		// }
-
 		let url = `${$BASE_URL}/${collection}`;
 
 		if (collection === 'users') {
