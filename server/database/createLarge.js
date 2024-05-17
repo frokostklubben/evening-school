@@ -90,7 +90,7 @@ const classrooms = await Classroom.bulkCreate([
   { room_name: 'B105', location_id: 2, purpose_id: 2, capacity: 30 }, // Softwareudviklingsrum i location 2
   { room_name: 'A106', location_id: 3, purpose_id: 4, capacity: 10 }, // Kunst og designværksted i location 3
   { room_name: 'A107', location_id: 3, purpose_id: 5, capacity: 40 }, // Lokale for digitale præsentationer i location 3
-  { room_name: 'A108', location_id: 3, purpose_id: 3, capacity: 15 }, // Maker-space for fabrikation i location 3
+  { room_name: 'A108', location_id: 3, purpose_id: null, capacity: 15 }, // Maker-space for fabrikation i location 3
   { room_name: 'B109', location_id: 4, purpose_id: 6, capacity: 18 }, // Makerspace for robotteknologi i location 4
   { room_name: 'B110', location_id: 4, purpose_id: 7, capacity: 12 }, // Mediestudie for indholdsproduktion i location 4
   { room_name: 'B111', location_id: 4, purpose_id: 8, capacity: 8 }, // Drone og fototeknikstudie i location 4
@@ -111,8 +111,6 @@ await Teacher.bulkCreate([
   { school_id: 6, first_name: 'Karen', last_name: 'Larsen', email: 'karen@dof.dk', is_active: 1 },
 ])
 
-// Get all the teachers to ensure correct IDs
-// const teachers = await Teacher.findAll();
 
 await Course.bulkCreate([
   { teacher_id: 1, course_name: 'Grundlæggende Python', description: 'Lær Python-programmering fra bunden og byg dine egne dataapplikationer.' },
@@ -130,10 +128,6 @@ await Course.bulkCreate([
   { teacher_id: 5, course_name: 'Data Science og Big Data Analyse', description: 'Teknikker til håndtering og analyse af store datamængder.' },
 ])
 
-// await Booking.bulkCreate([
-//   { course_id: 1, room_id: 1, start_time: '16:30:00', end_time: '19:30:00', date: '2024-05-22' },
-//   { course_id: 2, room_id: 2, start_time: '12:00:00', end_time: '14:00:00', date: '2024-05-24' },
-// ])
 
 await Booking.bulkCreate([
   { course_id: 1, room_id: 1, start_time: '16:30:00', end_time: '19:30:00', date: '2024-05-22' },

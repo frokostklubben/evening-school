@@ -39,7 +39,6 @@
 
 		if (response.ok) {
 			const result = await response.json();
-
 			options = result.data;
 		} else {
 			console.error(`Failed to fetch ${optionsCollection}`);
@@ -60,9 +59,7 @@
 
 			if (response.ok) {
 				const result = await response.json();
-
 				itemList.set(result.data);
-
 				hasSelected = true;
 			} else {
 				console.error(`Failed to fetch ${listCollection} on ${optionsCollection}`);
@@ -95,7 +92,7 @@
 	{#if $itemList.length > 0}
 		<ListItems idKey={listIdKey} collection={listCollection} {showButtons} {buttons} />
 	{:else if hasSelected}
-		<div>Ingen brugere fundet</div>
+		<div>Ingen data fundet</div>
 	{/if}
 </div>
 

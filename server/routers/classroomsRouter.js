@@ -97,6 +97,7 @@ router.get('/api/classrooms/purposes/:locationId', async (req, res) => {
       where: { purpose_id: { [Op.in]: purposeIds } },
     })
 
+    // TODO: Forklare kode
     const purposeMap = purposes.reduce((map, purpose) => {
       map[purpose.purpose_id] = purpose.purpose
       return map
@@ -114,6 +115,7 @@ router.get('/api/classrooms/purposes/:locationId', async (req, res) => {
       where: { inventory_id: { [Op.in]: inventoryIds } },
     })
 
+    // TODO: Forklare kode
     const inventoryMap = classroomInventories.reduce((map, ci) => {
       if (!map[ci.room_id]) {
         map[ci.room_id] = []

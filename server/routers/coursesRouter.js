@@ -19,8 +19,6 @@ router.get('/api/courses/:locationId', async (req, res) => {
       where: { location_id: locationId },
     })
 
-    console.log('classrooms:', classrooms)
-
     let roomIds = classrooms.map(classroom => classroom.room_id)
 
     const bookings = await Booking.findAll({
@@ -43,16 +41,10 @@ router.get('/api/courses/:locationId', async (req, res) => {
   }
 })
 
+// TODO: fjerne locationId
 router.get('/api/courses/:locationId/:roomId', async (req, res) => {
   try {
-    const locationId = req.params.locationId
     const roomId = req.params.roomId
-
-    const classrooms = await Classroom.findAll({
-      where: { location_id: locationId },
-    })
-
-    let roomIds = classrooms.map(classroom => classroom.room_id)
 
     const bookings = await Booking.findAll({
       where: { room_id: roomId },
@@ -63,9 +55,6 @@ router.get('/api/courses/:locationId/:roomId', async (req, res) => {
     const courses = await Course.findAll({
       where: { course_id: { [Op.in]: courseIds } },
     })
-
-    // Filter unique courses by course_name to avoid duplicates
-    // const uniqueCourses = Array.from(new Map(courses.map(course => [course['course_name'], course])).values())
 
     res.send({ data: courses })
   } catch (error) {

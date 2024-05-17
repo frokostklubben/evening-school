@@ -30,8 +30,6 @@ app.use(sessionMiddleware)
 
 app.use(checkAuth)
 
-// import './database/models/associations.js'
-
 import customRouter from './routers/customRouter.js'
 app.use(customRouter)
 

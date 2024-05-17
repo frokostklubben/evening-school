@@ -33,14 +33,6 @@
 		}
 	});
 
-	// onMount(() => {
-	// 	if ($itemList.length === 0) {
-	// 		fetchHeaderKeys();
-	// 	} else {
-	// 		setHeaderKeys(Object.keys($itemList[0]));
-	// 	}
-	// });
-
 	onMount(() => {
 		fetchHeaderKeys();
 	});
@@ -64,7 +56,6 @@
 		if (response.ok) {
 			const result = await response.json();
 			setHeaderKeys(result.data);
-			console.log('displayNames:', $displayNames);
 		} else {
 			console.error('Failed to fetch header keys from the server');
 		}
@@ -125,15 +116,13 @@
 										</button></td
 									>
 									{#if showButtons}
-										{#each buttons as button (button.id)}
+										{#each buttons as button}
 											<td>
 												<button
 													class="btn"
 													on:click={() => {
 														selectedItem.set(listItem);
 														optionId.set(listItem[button.key]);
-														console.log('optionId:', $optionId);
-
 														goto(button.url);
 													}}
 												>

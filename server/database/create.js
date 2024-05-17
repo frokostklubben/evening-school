@@ -58,7 +58,7 @@ await Classroom_purpose.bulkCreate([{ purpose: 'Musik' }, { purpose: 'EDB' }, { 
 
 const classrooms = await Classroom.bulkCreate([
   { location_id: 1, purpose_id: 1, capacity: 32 },
-  { location_id: 1, purpose_id: 2, capacity: 15 },
+  { location_id: 1, purpose_id: null, capacity: 15 },
   { location_id: 2, purpose_id: 2, capacity: 28 },
   { location_id: 3, purpose_id: 3, capacity: 16 },
   { location_id: 4, purpose_id: 4, capacity: 16 },

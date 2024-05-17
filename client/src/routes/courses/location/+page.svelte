@@ -23,13 +23,19 @@
 		if (response.ok) {
 			const result = await response.json();
 			itemList.set(result.data);
-			console.log($itemList);
 		} else {
 			console.error('Failed to load courses');
 		}
 	}
+
+	// Ændre denne til at gemme afdelingsnavnet
+	/* 	$: {
+		const id = $optionId;
+		selectedLocation = $location.find((room) => room.id === id)?.name;
+	} */
 </script>
 
+<!-- TODO sette ind navnet til afd. -->
 <h2>Oversigt over en afdelings hold</h2>
 
 <ListItems idKey={'course_id'} collection={'courses'} showButtons={false} />

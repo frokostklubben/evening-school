@@ -10,7 +10,7 @@
 		zip_code: 'Postnummer',
 		city: 'By',
 		street_name: 'Vejnavn',
-		street_number: 'nr.'
+		street_number: 'Nr.'
 	});
 
 	onMount(() => {
@@ -26,7 +26,7 @@
 		if (response.ok) {
 			const result = await response.json();
 			itemList.set(result.data);
-			console.log($itemList);
+			// save locationStore here
 		} else {
 			console.error(`Failed to fetch locations`);
 		}
