@@ -54,6 +54,9 @@ app.use(bookingsRouter)
 import headerKeyRouter from './routers/headerKeyRouter.js'
 app.use(headerKeyRouter)
 
+import holidaysRouter from './routers/holidaysRouter.js'
+app.use(holidaysRouter)
+
 import classroomsRouter from './routers/classroomsRouter.js'
 app.use(classroomsRouter)
 

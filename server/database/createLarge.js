@@ -27,6 +27,7 @@ import Classroom from './models/classroom.js'
 import Teacher from './models/teacher.js'
 import Course from './models/course.js'
 import Inventory from './models/inventory.js'
+import Holiday from './models/holiday.js'
 
 // DO NOT DELETE THE FOLLOWING IMPORTS - EVEN THOUGH THEY ARE NOT ACTIVELY USED
 import Booking from './models/booking.js'
@@ -178,3 +179,11 @@ await inventory[10].addClassroom(classrooms[5]) // Malergrej til Kunst og design
 await inventory[11].addClassroom(classrooms[11]) // Droneudstyr til Drone og fototeknikstudie
 await inventory[12].addClassroom(classrooms[4]) // Skriveartikler til Softwareudviklingsrum
 await inventory[13].addClassroom(classrooms[4]) // Lydisoleringspaneler til Softwareudviklingsrum
+
+await Holiday.bulkCreate([
+  //someholidays
+  { name: 'Juleaften',  school_id:"1", start_date: '2024-12-24', end_date: '2024-12-24' },
+  { name: 'Sommerferie', school_id:"2" , start_date: '2024-06-01', end_date: '2024-08-01' },
+  
+  
+  ])
