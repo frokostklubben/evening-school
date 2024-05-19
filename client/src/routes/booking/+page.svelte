@@ -47,9 +47,6 @@
 	$: checkedBookings = [];
 	let courseStartDate;
 	$: weekNumber = 0;
-	$: newDate = '';
-	$: newStartTime = '';
-	$: newEndTime = '';
 
 	let step1Data = {};
 	let step2Data = {};
@@ -211,7 +208,7 @@
 	}));
 
 	async function saveBooking() {
-		checkedBookings = checkedBookings.map(({ conflict, ...rest }) => rest);
+		checkedBookings = checkedBookings.map(({ conflict, newDate, newStartTime, newEndTime, ...rest }) => rest);
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings`, {
 				credentials: 'include',
@@ -295,9 +292,9 @@
 				booking.startTime === bookingToCheck.startTime &&
 				booking.endTime === bookingToCheck.endTime
 			) {
-				booking.date = new Date(newDate);
-				booking.startTime = newStartTime;
-				booking.endTime = newEndTime;
+				booking.date = new Date(bookingToCheck.newDate);
+				booking.startTime = bookingToCheck.newStartTime;
+				booking.endTime = bookingToCheck.newEndTime;
 			}
 			return booking;
 		});
@@ -577,36 +574,36 @@
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
 					<td>
-						{booking.conflict === true
-							? 'Ikke ledig: ' +
-								booking.bookingConflicts
+						{#if booking.conflict === true}
+							<span class="text-danger">Ikke ledig: </span>
+								{booking.bookingConflicts
 									.map((conflict) => {
 										const [startHour, startMinute] = conflict.start_time.split(':');
 										const [endHour, endMinute] = conflict.end_time.split(':');
 										return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
 									})
-									.join(', ')
-							: 'Ledig'}
+									.join(', ')}
+							{:else}
+							<span class="text-success">Ledig</span>
+							{/if}
 					</td>
 					<td>
-						{#if booking.conflict}
 							<input
 								type="date"
 								min="{new Date().toISOString().split('T')[0]}"
-								bind:value={newDate}
+								bind:value={booking.newDate}
 							/>
 							<input
 								type="time"
-								bind:value={newStartTime}
+								bind:value={booking.newStartTime}
 							/>
 							<input
 								type="time"
-								bind:value={newEndTime}
+								bind:value={booking.newEndTime}
 							/>
 							<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
 								>Tjek</button
 							>
-						{/if}
 					</td>
 				</tr>
 			{/each}
