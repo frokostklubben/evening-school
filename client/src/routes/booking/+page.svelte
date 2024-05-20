@@ -281,6 +281,7 @@
 					date: new Date(booking.date)
 				}));
 				bookingReadyForPreview = true;
+				console.log(checkedBookings)
 			}
 		} catch (error) {
 			console.error('Error saving booking:', error);
@@ -577,8 +578,14 @@
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
 					<td>
-						{booking.conflict === true
-							? 'Ikke ledig: ' +
+						{#if booking.holidayConflict}
+							<div>
+								Lukket - {booking.holidayConflict.name}, 
+								{new Date(booking.holidayConflict.start_date).toLocaleDateString()} - 
+								{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
+							</div>						
+						{:else if booking.conflicts }
+							{'Ikke ledig: ' +
 								booking.bookingConflicts
 									.map((conflict) => {
 										const [startHour, startMinute] = conflict.start_time.split(':');
@@ -586,10 +593,13 @@
 										return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
 									})
 									.join(', ')
-							: 'Ledig'}
+							}
+						{:else}
+							<div> Ledig </div>
+						{/if}						
+
 					</td>
 					<td>
-						{#if booking.conflict}
 							<input
 								type="date"
 								min="{new Date().toISOString().split('T')[0]}"
@@ -606,7 +616,6 @@
 							<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
 								>Tjek</button
 							>
-						{/if}
 					</td>
 				</tr>
 			{/each}
