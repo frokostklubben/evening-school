@@ -93,9 +93,11 @@ router.post("/api/check-booking-dates", async (req, res) => {
       }
     }
 
+    /*
     bookingdates.sort((a, b) => {
       return new Date(a.date) - new Date(b.date);
     });
+    */
 
     res.status(200).send({ data: bookingdates });
 

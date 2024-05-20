@@ -44,7 +44,8 @@
 	$: filteredClassrooms = [];
 	let bookings = [];
 	let bookingDates = [];
-	$: checkedBookings = [];
+	let checkedBookings = [];
+
 	let courseStartDate;
 	$: weekNumber = 0;
 
@@ -208,7 +209,9 @@
 	}));
 
 	async function saveBooking() {
-		checkedBookings = checkedBookings.map(({ conflict, newDate, newStartTime, newEndTime, ...rest }) => rest);
+		checkedBookings = checkedBookings.map(
+			({ conflict, newDate, newStartTime, newEndTime, ...rest }) => rest
+		);
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings`, {
 				credentials: 'include',
@@ -259,6 +262,10 @@
 					return bookings;
 				})
 				.flat();
+		} else {
+			console.log(">>>>>>>>>>>>>> before",checkedBookings);
+			checkedBookings = bookingDates
+			console.log(">>>>>>>>>>>>>> after",checkedBookings);
 		}
 
 		try {
@@ -277,6 +284,9 @@
 					...booking,
 					date: new Date(booking.date)
 				}));
+
+				//checkedBookings = checkedBookings;
+
 				bookingReadyForPreview = true;
 			}
 		} catch (error) {
@@ -285,6 +295,7 @@
 	}
 
 	function checkNewDateAndTime(bookingToCheck) {
+
 		bookingDates = bookingDates.map((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
@@ -295,10 +306,14 @@
 				booking.date = new Date(bookingToCheck.newDate);
 				booking.startTime = bookingToCheck.newStartTime;
 				booking.endTime = bookingToCheck.newEndTime;
+				booking.checkedAndAvailable = true
+			} else {
+				booking.checkedAndAvailable = false
 			}
+
 			return booking;
 		});
-		bookingDates = bookingDates;
+		//bookingDates = bookingDates;
 		checkBookingDates(false);
 	}
 
@@ -362,7 +377,7 @@
 				allInfo = false;
 			}
 		}
-		AllInfoIsGiven = allInfo
+		AllInfoIsGiven = allInfo;
 	} else {
 		AllInfoIsGiven = false;
 	}
@@ -481,7 +496,7 @@
 			<label for="startdate" class="form-label">Vælg en dato fra startugen:</label>
 			<input
 				type="date"
-				min="{new Date().toISOString().split('T')[0]}"
+				min={new Date().toISOString().split('T')[0]}
 				id="startdate"
 				name="startdate"
 				class="form-control"
@@ -507,39 +522,39 @@
 			</thead>
 			<tbody>
 				{#each days as day}
-				{#if day.startDate >= new Date().toISOString().split('T')[0]}
-					<tr>
-						<td
-							><input
-								type="checkbox"
-								bind:checked={day.selected}
-								on:change={() => toggleDay(day)}
-							/></td
-						>
-						<td>{day.name}</td>
-						<td
-							><input
-								type="time"
-								bind:value={day.startTime}
-								on:change={(event) => updateStartTime(day, event)}
-							/></td
-						>
-						<td
-							><input
-								type="time"
-								bind:value={day.endTime}
-								on:change={(event) => updateEndTime(day, event)}
-							/></td
-						>
-						<td
-							><input
-								type="date"
-								min="{new Date().toISOString().split('T')[0]}"
-								bind:value={day.startDate}
-								on:change={(event) => updateStartDate(day, event)}
-							/></td
-						>
-					</tr>
+					{#if day.startDate >= new Date().toISOString().split('T')[0]}
+						<tr>
+							<td
+								><input
+									type="checkbox"
+									bind:checked={day.selected}
+									on:change={() => toggleDay(day)}
+								/></td
+							>
+							<td>{day.name}</td>
+							<td
+								><input
+									type="time"
+									bind:value={day.startTime}
+									on:change={(event) => updateStartTime(day, event)}
+								/></td
+							>
+							<td
+								><input
+									type="time"
+									bind:value={day.endTime}
+									on:change={(event) => updateEndTime(day, event)}
+								/></td
+							>
+							<td
+								><input
+									type="date"
+									min={new Date().toISOString().split('T')[0]}
+									bind:value={day.startDate}
+									on:change={(event) => updateStartDate(day, event)}
+								/></td
+							>
+						</tr>
 					{/if}
 				{/each}
 			</tbody>
@@ -576,34 +591,61 @@
 					<td>
 						{#if booking.conflict === true}
 							<span class="text-danger">Ikke ledig: </span>
-								{booking.bookingConflicts
-									.map((conflict) => {
-										const [startHour, startMinute] = conflict.start_time.split(':');
-										const [endHour, endMinute] = conflict.end_time.split(':');
-										return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
-									})
-									.join(', ')}
-							{:else}
+							{booking.bookingConflicts
+								.map((conflict) => {
+									const [startHour, startMinute] = conflict.start_time.split(':');
+									const [endHour, endMinute] = conflict.end_time.split(':');
+									return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
+								})
+								.join(', ')}
+						{:else}
 							<span class="text-success">Ledig</span>
-							{/if}
+						{/if}
 					</td>
 					<td>
-							<input
-								type="date"
-								min="{new Date().toISOString().split('T')[0]}"
-								bind:value={booking.newDate}
-							/>
-							<input
-								type="time"
-								bind:value={booking.newStartTime}
-							/>
-							<input
-								type="time"
-								bind:value={booking.newEndTime}
-							/>
+						<input
+							type="date"
+							min={new Date().toISOString().split('T')[0]}
+							bind:value={booking.newDate}
+							on:input={() => (booking.checkedAndAvailable = false)}
+						/>
+						<input
+							type="time"
+							bind:value={booking.newStartTime}
+							on:input={() => (booking.checkedAndAvailable = false)}
+						/>
+						<input
+							type="time"
+							bind:value={booking.newEndTime}
+							on:input={() => (booking.checkedAndAvailable = false)}
+						/>
+						{#if booking.conflict !== true && booking.checkedAndAvailable}
+							<button
+								class="btn btn-success"
+								on:click={() => {
+									checkedBookings.sort((a, b) => {
+										return new Date(a.date) - new Date(b.date);
+									});
+									booking.checkedAndAvailable = false;
+									checkedBookings = [...checkedBookings];
+								}}>Gem</button
+							>
+						{:else if booking.newDate && booking.newStartTime && booking.newEndTime}
 							<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
 								>Tjek</button
 							>
+						{/if}
+						<!--
+						<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
+							>Tjek</button
+						>
+						{#if booking.conflict !== true && booking.checkedAndAvailable}
+							<button
+								class="btn btn-primary"
+								on:click={() => console.log('Gemmer booking....', booking)}>Gem</button
+							>
+						{/if}
+						-->
 					</td>
 				</tr>
 			{/each}
