@@ -5,7 +5,7 @@
 	import { optionId } from '../../../stores/modalStore.js';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { itemList } from '../../../stores/itemListStore.js';
-	import { locationStore } from '../../../stores/locationStore.js';
+	import { buttonStoreValue } from '../../../stores/buttonStore.js';
 
 	let selectedLocation = '';
 	let selectedSchoolName = '';
@@ -31,15 +31,19 @@
 			console.error('Failed to load courses');
 		}
 	}
-
-	/* 	$: {
-		const id = $optionId;
-		const selectedLocationObject = $locationStore.find((location) => location.id === id);
-		selectedLocation = selectedLocationObject?.name;
-		selectedSchoolName = selectedLocationObject?.school_name;
-	} */
 </script>
 
-<h2>Hold hos {selectedLocation} på {selectedSchoolName}</h2>
+<div>
+	<h2 class="pt-3 text-center">Hold hos {$buttonStoreValue}</h2>
+</div>
 
-<ListItems idKey={'course_id'} collection={'courses'} showButtons={false} />
+<ListItems
+	idKey={'course_id'}
+	collection={'courses'}
+	showButtons={true}
+	showEditButton={true}
+	showDeleteButton={true}
+	buttons={[
+		{ id: 1, key: 'course_id', url: '/location-history', text: 'Historik', store: 'course_name' }
+	]}
+/>

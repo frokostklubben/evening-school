@@ -9,11 +9,14 @@
 	import { user } from '../stores/userStore';
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { onMount } from 'svelte';
+	import { buttonStoreValue } from '../stores/buttonStore.js';
 
 	export let collection;
 	export let idKey;
 	export let buttons = [];
 	export let showButtons = false;
+	export let showEditButton = false;
+	export let showDeleteButton = false;
 
 	// Derived function made with chatgpt! (Marcus)
 	// Her defineres en "afledt store" derivedHeaderKeys. Den afhænger af itemList og udfører en funktion, hver gang itemList ændrer sig. Funktionen tager itemList som argument og returnerer en array af nøglerne (keys) af det første element i itemList, hvis itemList ikke er tom. Hvis itemList er tom, returnerer funktionen en tom array.
@@ -91,30 +94,34 @@
 											{/if}
 										</td>
 									{/each}
-									<td>
-										<button
-											class="btn"
-											on:click={() => {
-												selectedItem.set(listItem);
-												showEditModal.set(true);
-											}}
-											title="Rediger"
-										>
-											<i class="bi bi-pencil-square"></i>
-										</button></td
-									>
-									<td
-										><button
-											class="btn"
-											on:click={() => {
-												selectedItem.set(listItem);
-												showDeleteModal.set(true);
-											}}
-											title="Slet"
-										>
-											<i class="bi bi-trash-fill"></i>
-										</button></td
-									>
+									{#if showEditButton}
+										<td>
+											<button
+												class="btn"
+												on:click={() => {
+													selectedItem.set(listItem);
+													showEditModal.set(true);
+												}}
+												title="Rediger"
+											>
+												<i class="bi bi-pencil-square"></i>
+											</button>
+										</td>
+									{/if}
+									{#if showDeleteButton}
+										<td>
+											<button
+												class="btn"
+												on:click={() => {
+													selectedItem.set(listItem);
+													showDeleteModal.set(true);
+												}}
+												title="Slet"
+											>
+												<i class="bi bi-trash-fill"></i>
+											</button>
+										</td>
+									{/if}
 									{#if showButtons}
 										{#each buttons as button}
 											<td>
@@ -123,6 +130,9 @@
 													on:click={() => {
 														selectedItem.set(listItem);
 														optionId.set(listItem[button.key]);
+														console.log('optionId:', optionId);
+														buttonStoreValue.set(listItem[button.store]);
+
 														goto(button.url);
 													}}
 												>

@@ -84,12 +84,7 @@
 							data-sveltekit-preload-data
 							href="/event">Event</a
 						>
-						<!-- 	<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/courses'}
-							data-sveltekit-preload-data
-							href="/courses">Hold</a
-						> -->
+
 						<a
 							class="nav-link"
 							class:active={$page.url.pathname === '/afdelinger'}
@@ -131,9 +126,9 @@
 	</nav>
 
 	<main class="container">
-		{#if $user.email}
-			<slot />
-		{/if}
+		<!-- {#if $user.email} -->
+		<slot />
+		<!-- {/if} -->
 	</main>
 {:else}
 	<!-- Show spinner while loading -->

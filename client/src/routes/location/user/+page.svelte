@@ -4,7 +4,6 @@
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import { user } from '../../../stores/userStore.js';
 	import { itemList } from '../../../stores/itemListStore';
-	import { locationStore } from '../../../stores/locationStore.js';
 
 	displayNames.set({
 		school_name: 'Skole',
@@ -27,9 +26,6 @@
 		if (response.ok) {
 			const result = await response.json();
 			itemList.set(result.data);
-			console.log('itemList:', $itemList);
-			locationStore.set(result.data);
-			console.log('locationStore:', $locationStore);
 		} else {
 			console.error(`Failed to fetch locations`);
 		}
@@ -40,8 +36,10 @@
 	idKey={$user.schoolId}
 	collection={'locations'}
 	showButtons={true}
+	showEditButton={true}
+	showDeleteButton={false}
 	buttons={[
-		{ id: 1, key: 'location_id', url: '/courses/location', text: 'Se hold' },
-		{ id: 2, key: 'location_id', url: '/classrooms/user', text: 'Se lokaler' }
+		{ id: 1, key: 'location_id', url: '/classrooms/user', text: 'Lokaler', store: 'school_name' },
+		{ id: 2, key: 'location_id', url: '/courses/location', text: 'Hold', store: 'school_name' }
 	]}
 />
