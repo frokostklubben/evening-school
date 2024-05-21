@@ -89,6 +89,8 @@
 										<td>
 											{#if key === 'inventories'}
 												{formatInventory(listItem[key])}
+											{:else if key === 'start_date' || key === 'end_date'}
+												{new Date(formatInventory(listItem[key])).toLocaleDateString()}
 											{:else}
 												{listItem[key]}
 											{/if}

@@ -41,14 +41,6 @@
 					{#if $user.roleId === 1}
 						<a
 							class="nav-link"
-							aria-current="page"
-							class:active={$page.url.pathname === '/booking'}
-							data-sveltekit-preload-data
-							href="/booking">Booking</a
-						>
-
-						<a
-							class="nav-link"
 							class:active={$page.url.pathname === '/classrooms/admin'}
 							data-sveltekit-preload-data
 							href={$user.roleId === 1 ? '/classrooms/admin' : '/'}>Lokaler</a
@@ -58,7 +50,7 @@
 							class="nav-link"
 							class:active={$page.url.pathname === '/users'}
 							data-sveltekit-preload-data
-							href={$user.email ? '/users' : '/'}>Kontoransatte</a
+							href={$user.email ? '/users/admin' : '/'}>Kontoransatte</a
 						>
 
 						<a
@@ -72,7 +64,6 @@
 					{:else if $user.roleId === 2}
 						<a
 							class="nav-link"
-							aria-current="page"
 							class:active={$page.url.pathname === '/booking'}
 							data-sveltekit-preload-data
 							href="/booking">Booking</a
@@ -80,16 +71,27 @@
 
 						<a
 							class="nav-link"
-							class:active={$page.url.pathname === '/event'}
-							data-sveltekit-preload-data
-							href="/event">Event</a
-						>
-
-						<a
-							class="nav-link"
 							class:active={$page.url.pathname === '/afdelinger'}
 							data-sveltekit-preload-data
 							href={$user.email ? '/location/user' : '/'}>Afdelinger</a
+						>
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/your-employees'}
+							data-sveltekit-preload-data
+							href="/users/user">Medarbejdere</a
+						>
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/users'}
+							data-sveltekit-preload-data
+							href={$user.email ? '/users/admin' : '/'}>Kontoransatte</a
+						>
+						<a
+							class="nav-link"
+							class:active={$page.url.pathname === '/holiday'}
+							data-sveltekit-preload-data
+							href="/holiday">Helligdage</a
 						>
 					{/if}
 				</div>
