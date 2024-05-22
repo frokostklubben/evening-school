@@ -33,6 +33,42 @@ router.get('/api/classrooms', adminCheck, async (req, res) => {
 // })
 
 // TODO: admincheck?
+/* router.get('/api/classrooms/:locationId', async (req, res) => {
+  try {
+    const locationId = req.params.locationId
+
+    const classrooms = await Classroom.findAll({
+      where: { location_id: locationId },
+      include: [
+        {
+          model: Classroom_purpose,
+          as: 'classroom_purpose',
+        },
+        {
+          model: Inventory,
+          as: 'inventories',
+          through: { attributes: [] }, // exclude attributes of the join table
+        },
+      ],
+    })
+
+    const classroomsWithInventoryAndPurpose = classrooms.map(classroom => ({
+      ...classroom.dataValues,
+      purpose: classroom.purpose.purpose,
+      inventories: classroom.inventories.map(inventory => inventory.item_name),
+    }))
+
+    res.send({ data: classroomsWithInventoryAndPurpose })
+  } catch (error) {
+    console.error('Error fetching classrooms for location:', error)
+    res.status(500).send({ error: 'Failed to fetch classrooms' })
+  }
+}) 
+
+*/
+
+// Uden include:
+
 router.get('/api/classrooms/:locationId', async (req, res) => {
   try {
     const locationId = req.params.locationId
@@ -159,11 +195,12 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       const newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
       await newClassroom.setClassroom_purpose(newPurpose, { transaction })
     }
+    let inventoriesList = [...inventories]
 
     if (inventories) {
-      for (let item of inventories) {
+      for (let item of inventoriesList) {
         const newInventory = await Inventory.create({ item_name: item }, { transaction })
-        await newClassroom.addInventory(newInventory, { transaction })
+        await newClassroom.addInventories(newInventory, { transaction })
       }
     }
 
