@@ -7,7 +7,6 @@ import Holiday from '../database/models/holiday.js'
 import Classroom from '../database/models/classroom.js'
 import Booking from '../database/models/booking.js'
 import Inventory from '../database/models/inventory.js'
-import Classroom_inventory from '../database/models/classroomInventory.js'
 import Classroom_purpose from '../database/models/classroomPurpose.js'
 import Teacher from '../database/models/teacher.js'
 
@@ -34,20 +33,19 @@ router.get('/api/headerKey/:modelname', async (req, res) => {
       case 'holidays':
         columnNames = Object.keys(Holiday.getAttributes())
         break
-      case 'classrooms':
-        columnNames = Object.keys(Classroom.getAttributes())
-        break
       case 'bookings':
         columnNames = Object.keys(Booking.getAttributes())
         break
       case 'inventories':
         columnNames = Object.keys(Inventory.getAttributes())
         break
-      case 'classroom_inventories':
-        columnNames = Object.keys(Classroom_inventory.getAttributes())
-        break
-      case 'classroom_purposes':
-        columnNames = Object.keys(Classroom_purpose.getAttributes())
+      case 'classrooms':
+        const classroomAttributes = Object.keys(Classroom.getAttributes())
+        const classroomPurposeAttributes = Object.keys(Classroom_purpose.getAttributes())
+        const inventories = Object.keys(Inventory.getAttributes())
+
+        columnNames = [...classroomAttributes, ...classroomPurposeAttributes, ...inventories]
+
         break
       case 'teachers':
         columnNames = Object.keys(Teacher.getAttributes())

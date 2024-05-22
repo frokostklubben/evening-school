@@ -41,7 +41,6 @@
 
 		if (response.ok) {
 			const result = await response.json();
-			console.log(result.data);
 
 			formattedData = result.data.map((item) => {
 				item.date = formatDate(item.date);
@@ -50,7 +49,6 @@
 				return item;
 			});
 			itemList.set(formattedData);
-			console.log('Formatted data:', formattedData);
 		} else {
 			console.error(`Failed to fetch bookings`);
 		}

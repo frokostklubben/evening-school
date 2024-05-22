@@ -16,6 +16,8 @@
 	export let modalTitle;
 	export let optionName;
 	export let showButtons;
+	export let showEditButton;
+	export let showDeleteButton;
 	export let buttons = [];
 
 	let options = [];
@@ -81,14 +83,21 @@
 		{#if $optionId}
 			<div class="text-center">
 				<Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}
-					>Ny {modalTitle}</Button
+					>{modalTitle}</Button
 				>
 			</div>
 		{/if}
 	</div>
 
 	{#if $itemList.length > 0}
-		<ListItems idKey={listIdKey} collection={listCollection} {showButtons} {buttons} />
+		<ListItems
+			idKey={listIdKey}
+			collection={listCollection}
+			{showButtons}
+			{buttons}
+			{showEditButton}
+			{showDeleteButton}
+		/>
 	{:else if hasSelected}
 		<div>Ingen data fundet</div>
 	{/if}

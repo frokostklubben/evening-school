@@ -19,6 +19,7 @@
 
 	async function addItem() {
 		formData[idKey] = $optionId;
+		console.log('formData:', formData);
 
 		let url = `${$BASE_URL}/${collection}`;
 
@@ -39,13 +40,12 @@
 			const result = await response.json();
 
 			if (response.ok) {
-
 				// specific for dates
 				if (result.data.start_date && result.data.end_date) {
 					result.data.end_date = new Date(result.data.end_date).toISOString().split('T')[0];
 					result.data.start_date = new Date(result.data.start_date).toISOString().split('T')[0];
 				}
-					
+
 				toast.success('Oprettelse vellykket!');
 				itemList.update((currentItems) => {
 					return [...currentItems, result.data];
@@ -66,7 +66,7 @@
 	}
 </script>
 
-<Modal title="Læg til ny {modalTitle}" bind:open={$showAddModal} autoclose>
+<Modal title={modalTitle} bind:open={$showAddModal} autoclose>
 	<div class="container-fluid mt-3">
 		<div class="row justify-content-center">
 			<div class="col-md-8">

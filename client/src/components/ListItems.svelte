@@ -18,12 +18,14 @@
 	export let showEditButton = false;
 	export let showDeleteButton = false;
 
+	let headerKeysloaded = false;
+
 	// Derived function made with chatgpt! (Marcus)
 	// Her defineres en "afledt store" derivedHeaderKeys. Den afhænger af itemList og udfører en funktion, hver gang itemList ændrer sig. Funktionen tager itemList som argument og returnerer en array af nøglerne (keys) af det første element i itemList, hvis itemList ikke er tom. Hvis itemList er tom, returnerer funktionen en tom array.
 
 	// The derived store ensures that whenever itemList changes, the headerKeys are recalculated and updated automatically
 
-	const derivedHeaderKeys = derived(itemList, ($itemList) => {
+	/* 	const derivedHeaderKeys = derived(itemList, ($itemList) => {
 		if ($itemList.length > 0) {
 			return Object.keys($itemList[0]);
 		}
@@ -34,10 +36,24 @@
 		if (keys.length > 0) {
 			setHeaderKeys(keys);
 		}
-	});
+	}); */
 
 	onMount(() => {
-		fetchHeaderKeys();
+		fetchHeaderKeys().then(() => {
+			const derivedHeaderKeys = derived(itemList, ($itemList) => {
+				if ($itemList.length > 0) {
+					return Object.keys($itemList[0]);
+				}
+				return [];
+			});
+
+			derivedHeaderKeys.subscribe((keys) => {
+				if (keys.length > 0) {
+					setHeaderKeys(keys);
+				}
+			});
+		});
+		
 	});
 
 	function setHeaderKeys(data) {
@@ -52,6 +68,7 @@
 	}
 
 	async function fetchHeaderKeys() {
+
 		const response = await fetch(`${$BASE_URL}/headerKey/${collection}`, {
 			credentials: 'include'
 		});
@@ -132,7 +149,6 @@
 													on:click={() => {
 														selectedItem.set(listItem);
 														optionId.set(listItem[button.key]);
-														console.log('optionId:', optionId);
 														buttonStoreValue.set(listItem[button.store]);
 
 														goto(button.url);

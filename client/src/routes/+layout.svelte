@@ -79,13 +79,7 @@
 							class="nav-link"
 							class:active={$page.url.pathname === '/your-employees'}
 							data-sveltekit-preload-data
-							href="/users/user">Medarbejdere</a
-						>
-						<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/users'}
-							data-sveltekit-preload-data
-							href={$user.email ? '/users/admin' : '/'}>Kontoransatte</a
+							href={$user.email ? '/users/user' : '/'}>Medarbejdere</a
 						>
 						<a
 							class="nav-link"
