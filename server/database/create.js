@@ -184,3 +184,15 @@ await Holiday.bulkCreate([
   { name: 'Juleaften', school_id: '1', start_date: '2024-12-24', end_date: '2024-12-24' },
   { name: 'Sommerferie', school_id: '2', start_date: '2024-06-01', end_date: '2024-08-01' },
 ])
+
+// Get a classroom instance
+const classroom = await Classroom.findOne();
+
+// Get the prototype of the classroom instance
+const prototype = Object.getPrototypeOf(classroom);
+
+// Get the names of the properties of the prototype
+const propertyNames = Object.getOwnPropertyNames(prototype);
+
+// Print the property names
+console.log(propertyNames);

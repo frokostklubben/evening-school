@@ -33,41 +33,6 @@ router.get('/api/classrooms', adminCheck, async (req, res) => {
 // })
 
 // TODO: admincheck?
-/* router.get('/api/classrooms/:locationId', async (req, res) => {
-  try {
-    const locationId = req.params.locationId
-
-    const classrooms = await Classroom.findAll({
-      where: { location_id: locationId },
-      include: [
-        {
-          model: Classroom_purpose,
-          as: 'classroom_purpose',
-        },
-        {
-          model: Inventory,
-          as: 'inventories',
-          through: { attributes: [] }, // exclude attributes of the join table
-        },
-      ],
-    })
-
-    const classroomsWithInventoryAndPurpose = classrooms.map(classroom => ({
-      ...classroom.dataValues,
-      purpose: classroom.purpose.purpose,
-      inventories: classroom.inventories.map(inventory => inventory.item_name),
-    }))
-
-    res.send({ data: classroomsWithInventoryAndPurpose })
-  } catch (error) {
-    console.error('Error fetching classrooms for location:', error)
-    res.status(500).send({ error: 'Failed to fetch classrooms' })
-  }
-}) 
-
-*/
-
-// Uden include:
 
 router.get('/api/classrooms/:locationId', async (req, res) => {
   try {
@@ -78,20 +43,20 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
     })
 
     //  Collects purpose_id from each classroom
-    let purposeIds = classrooms.map(classroom => classroom.purpose_id)
+    // let purposeIds = classrooms.map(classroom => classroom.purpose_id)
 
     // Fetches all corresponding purposes from the Classroom_purpose model
     // Op.in operator: checks if the purpose_id of each record in the Classroom_purpose table is one of the values listed in the purposeIds array.
-    const purposes = await Classroom_purpose.findAll({
-      where: { purpose_id: { [Op.in]: purposeIds } },
-    })
+    // const purposes = await Classroom_purpose.findAll({
+    //   where: { purpose_id: { [Op.in]: purposeIds } },
+    // })
 
     // Uses the reduce method to create an object (purposeMap) where each key is a purpose_id and each value is the purpose
     // This mapping will make it easier to quickly find the purpose description by purpose_id.
-    const purposeMap = purposes.reduce((map, purpose) => {
-      map[purpose.purpose_id] = purpose.purpose
-      return map
-    }, {})
+    // const purposeMap = purposes.reduce((map, purpose) => {
+    //   map[purpose.purpose_id] = purpose.purpose
+    //   return map
+    // }, {})
 
     // Retrieves inventory details for each classroom by collecting room_ids
     let roomIds = classrooms.map(classroom => classroom.room_id)
@@ -99,40 +64,60 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
 
     const classroomInventories = await Classroom.findAll({
       where: { room_id: { [Op.in]: roomIds } },
-      include: Inventory,
+      include: [
+        { model: Inventory },
+        {
+          model: Classroom_purpose,
+          attributes: ['purpose'], // specify the attributes you want to include
+        },
+      ],
+    })
+
+    let formattedClassrooms = classroomInventories.map(classroom => {
+      return {
+        room_id: classroom.room_id,
+        room_name: classroom.room_name,
+        location_id: classroom.location_id,
+        capacity: classroom.capacity,
+        purpose: classroom.classroom_purpose.purpose, // directly assign the purpose value
+        inventories: classroom.Inventories.map(inventory => {
+          return inventory.item_name
+        }),
+      }
     })
 
     // Collects inventory_id from each classroom inventory record
-    let inventoryIds = classroomInventories.map(ci => ci.inventory_id)
-    // Fetches the corresponding inventory items
-    const inventories = await Inventory.findAll({
-      where: { inventory_id: { [Op.in]: inventoryIds } },
-    })
+    // let inventoryIds = classroomInventories.map(ci => ci.inventory_id)
+    // // Fetches the corresponding inventory items
+    // const inventories = await Inventory.findAll({
+    //   where: { inventory_id: { [Op.in]: inventoryIds } },
+    // })
 
     // Constructs an inventory map linking each room to its list of inventory items.
     // Uses reduce to create an object (inventoryMap) where each key is a room_id and the value is a list of inventory items associated with that room.
-    const inventoryMap = classroomInventories.reduce((map, inventoryItem) => {
-      // Check if the current room_id already has an initialized list in the map.
-      if (!map[inventoryItem.room_id]) {
-        map[inventoryItem.room_id] = [] // If not, initialize an empty list for this room_id.
-      }
-      // Find the corresponding inventory item using the inventory_id from classroomInventories
-      const inventory = inventories.find(inv => inv.inventory_id === inventoryItem.inventory_id)
-      // If a corresponding inventory item is found, add its name to the list associated with the room_id.
-      if (inventory) {
-        map[inventoryItem.room_id].push(inventory.item_name)
-      }
-      return map
-    }, {})
+    // const inventoryMap = classroomInventories.reduce((map, inventoryItem) => {
+    // Check if the current room_id already has an initialized list in the map.
+    //   if (!map[inventoryItem.room_id]) {
+    //     map[inventoryItem.room_id] = [] // If not, initialize an empty list for this room_id.
+    //   }
+    //   // Find the corresponding inventory item using the inventory_id from classroomInventories
+    //   const inventory = inventories.find(inv => inv.inventory_id === inventoryItem.inventory_id)
+    //   // If a corresponding inventory item is found, add its name to the list associated with the room_id.
+    //   if (inventory) {
+    //     map[inventoryItem.room_id].push(inventory.item_name)
+    //   }
+    //   return map
+    // }, {})
 
     // Add purpose and inventory details to each classroom
-    const classroomsWithInventoryAndPurpose = classrooms.map(classroom => ({
-      ...classroom.dataValues,
-      purpose: purposeMap[classroom.purpose_id],
-      inventories: inventoryMap[classroom.room_id] || [],
-    }))
+    // const classroomsWithInventoryAndPurpose = classrooms.map(classroom => ({
+    //   ...classroom.dataValues,
+    //   purpose: purposeMap[classroom.purpose_id],
+    //   inventories: inventoryMap[classroom.room_id] || [],
+    // }))
 
-    res.send({ data: classroomsWithInventoryAndPurpose })
+    // res.send({ data: classroomsWithInventoryAndPurpose })
+    res.send({ data: formattedClassrooms })
   } catch (error) {
     console.error('Error fetching classrooms for location:', error)
     res.status(500).send({ error: 'Failed to fetch classrooms' })
@@ -176,8 +161,6 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
 // endpoint with transaction:
 router.post('/api/classrooms', adminCheck, async (req, res) => {
   const { location_id, purpose, capacity, inventories, room_name } = req.body
-
-  console.log('inventory', inventories)
 
   const transaction = await connection.transaction()
 
