@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
-// import Classroom from './classroom.js'
 
 const Inventory = sequelize.define(
   'Inventory',
@@ -20,7 +19,5 @@ const Inventory = sequelize.define(
     tableName: 'inventory',
   },
 )
-
-// Inventory.belongsToMany(Classroom, { through: ClassroomInventory, foreignKey: 'inventory_id' })
 
 export default Inventory

@@ -186,13 +186,13 @@ await Holiday.bulkCreate([
 ])
 
 // Get a classroom instance
-const classroom = await Classroom.findOne();
+const classroom = await Classroom.findOne()
 
 // Get the prototype of the classroom instance
-const prototype = Object.getPrototypeOf(classroom);
+const prototype = Object.getPrototypeOf(classroom)
 
 // Get the names of the properties of the prototype
-const propertyNames = Object.getOwnPropertyNames(prototype);
+const propertyNames = Object.getOwnPropertyNames(prototype)
 
 // Print the property names
-console.log(propertyNames);
+console.log(propertyNames)

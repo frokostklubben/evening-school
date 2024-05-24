@@ -49,8 +49,6 @@ Inventory.belongsToMany(Classroom, {
   through: 'ClassroomInventory',
   foreignKey: 'inventory_id',
   timestamps: false,
-}) 
-
-
+})
 
 export default Classroom

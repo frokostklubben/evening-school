@@ -12,28 +12,6 @@ router.get('/api/classrooms', adminCheck, async (req, res) => {
   res.send({ data: classrooms })
 })
 
-// TODO: BRUGER NOGEN DENNE ROUTE?? Bruger user den?
-// router.get('/api/classrooms/:locationId', async (req, res) => {
-//   try {
-//     const locationId = req.params.locationId
-
-//     const classrooms = await Classroom.findAll({
-//       where: { location_id: locationId },
-//     })
-
-//     if (classrooms && classrooms.length > 0) {
-//       res.send({ data: classrooms })
-//     } else {
-//       res.status(404).send({ error: 'Classroom not found' })
-//     }
-//   } catch (error) {
-//     console.error('Error fetching classrooms:', error)
-//     res.status(500).send({ error: 'Failed to fetch classrooms' })
-//   }
-// })
-
-// TODO: admincheck?
-
 router.get('/api/classrooms/:locationId', async (req, res) => {
   try {
     const locationId = req.params.locationId
@@ -41,22 +19,6 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
     const classrooms = await Classroom.findAll({
       where: { location_id: locationId },
     })
-
-    //  Collects purpose_id from each classroom
-    // let purposeIds = classrooms.map(classroom => classroom.purpose_id)
-
-    // Fetches all corresponding purposes from the Classroom_purpose model
-    // Op.in operator: checks if the purpose_id of each record in the Classroom_purpose table is one of the values listed in the purposeIds array.
-    // const purposes = await Classroom_purpose.findAll({
-    //   where: { purpose_id: { [Op.in]: purposeIds } },
-    // })
-
-    // Uses the reduce method to create an object (purposeMap) where each key is a purpose_id and each value is the purpose
-    // This mapping will make it easier to quickly find the purpose description by purpose_id.
-    // const purposeMap = purposes.reduce((map, purpose) => {
-    //   map[purpose.purpose_id] = purpose.purpose
-    //   return map
-    // }, {})
 
     // Retrieves inventory details for each classroom by collecting room_ids
     let roomIds = classrooms.map(classroom => classroom.room_id)
@@ -68,10 +30,12 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
         { model: Inventory },
         {
           model: Classroom_purpose,
-          attributes: ['purpose'], // specify the attributes you want to include
+          attributes: ['purpose'],
         },
       ],
     })
+
+    // TODO: både formål og inventar skal kunne være null! Cannot read properties of null (reading 'purpose')
 
     let formattedClassrooms = classroomInventories.map(classroom => {
       return {
@@ -79,44 +43,13 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
         room_name: classroom.room_name,
         location_id: classroom.location_id,
         capacity: classroom.capacity,
-        purpose: classroom.classroom_purpose.purpose, // directly assign the purpose value
+        purpose: classroom.classroom_purpose.purpose,
         inventories: classroom.Inventories.map(inventory => {
           return inventory.item_name
         }),
       }
     })
 
-    // Collects inventory_id from each classroom inventory record
-    // let inventoryIds = classroomInventories.map(ci => ci.inventory_id)
-    // // Fetches the corresponding inventory items
-    // const inventories = await Inventory.findAll({
-    //   where: { inventory_id: { [Op.in]: inventoryIds } },
-    // })
-
-    // Constructs an inventory map linking each room to its list of inventory items.
-    // Uses reduce to create an object (inventoryMap) where each key is a room_id and the value is a list of inventory items associated with that room.
-    // const inventoryMap = classroomInventories.reduce((map, inventoryItem) => {
-    // Check if the current room_id already has an initialized list in the map.
-    //   if (!map[inventoryItem.room_id]) {
-    //     map[inventoryItem.room_id] = [] // If not, initialize an empty list for this room_id.
-    //   }
-    //   // Find the corresponding inventory item using the inventory_id from classroomInventories
-    //   const inventory = inventories.find(inv => inv.inventory_id === inventoryItem.inventory_id)
-    //   // If a corresponding inventory item is found, add its name to the list associated with the room_id.
-    //   if (inventory) {
-    //     map[inventoryItem.room_id].push(inventory.item_name)
-    //   }
-    //   return map
-    // }, {})
-
-    // Add purpose and inventory details to each classroom
-    // const classroomsWithInventoryAndPurpose = classrooms.map(classroom => ({
-    //   ...classroom.dataValues,
-    //   purpose: purposeMap[classroom.purpose_id],
-    //   inventories: inventoryMap[classroom.room_id] || [],
-    // }))
-
-    // res.send({ data: classroomsWithInventoryAndPurpose })
     res.send({ data: formattedClassrooms })
   } catch (error) {
     console.error('Error fetching classrooms for location:', error)
@@ -124,41 +57,6 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
   }
 })
 
-/* router.post('/api/classrooms', adminCheck, async (req, res) => {
-  console.log('api/classrooms POST request received')
-
-  const { location_id, purpose, capacity, inventory, room_name } = req.body
-
-  try {
-    const newClassroom = await Classroom.create({
-      location_id: location_id,
-      capacity: capacity,
-      room_name: room_name,
-    })
-
-    // If a purpose is provided, create it and associate it with the Classroom
-    if (purpose) {
-      const newPurpose = await Classroom_purpose.create(purpose)
-      console.log('<<<<<<<<<<<<<<<< newPurpose: ', newPurpose)
-
-      await newClassroom.setPurpose(newPurpose)
-    }
-
-    // For each inventory item, create it and associate it with the Classroom
-    // TODO: Check if this works with multiple inventory items separated by commas!
-    // What about Classroom_inventory?
-    for (let item of inventory) {
-      const newInventory = await Inventory.create(item)
-      await newClassroom.addInventory(newInventory)
-    }
-
-    res.status(200).send({ data: newClassroom })
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to create classroom' })
-  }
-}) */
-
-// endpoint with transaction:
 router.post('/api/classrooms', adminCheck, async (req, res) => {
   const { location_id, purpose, capacity, inventories, room_name } = req.body
 
@@ -174,21 +72,44 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       { transaction },
     )
 
+    let newPurpose
     if (purpose) {
-      const newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
+      newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
       await newClassroom.setClassroom_purpose(newPurpose, { transaction })
     }
-    let inventoriesList = [...inventories]
 
+    // Oprette alle inventarobjekterne i en batch-operation, hvilket kan reducere overhead og forbedre ydeevnen:
+    let newInventories = []
     if (inventories) {
-      for (let item of inventoriesList) {
-        const newInventory = await Inventory.create({ item_name: item }, { transaction })
-        await newClassroom.addInventories(newInventory, { transaction })
-      }
+      const inventoryItems = inventories.split(',').map(item => ({
+        item_name: item.trim(),
+      }))
+      newInventories = await Inventory.bulkCreate(inventoryItems, { transaction })
+      await newClassroom.addInventories(newInventories, { transaction })
     }
 
     await transaction.commit()
-    res.status(200).send({ data: newClassroom })
+
+    // This approach ensures the classroom and all associated data are fetched together once the transaction is committed.
+    const completeClassroom = await Classroom.findByPk(newClassroom.room_id, {
+      include: [
+        { model: Classroom_purpose, attributes: ['purpose'] },
+        { model: Inventory, attributes: ['item_name'] },
+      ],
+    })
+
+    let classroom = {
+      room_id: completeClassroom.room_id,
+      room_name: completeClassroom.room_name,
+      location_id: completeClassroom.location_id,
+      capacity: completeClassroom.capacity,
+      purpose: completeClassroom.classroom_purpose.purpose, // directly assign the purpose value
+      inventories: completeClassroom.Inventories.map(inventory => {
+        return inventory.item_name
+      }),
+    }
+
+    res.status(200).send({ data: classroom })
   } catch (error) {
     await transaction.rollback()
     res.status(500).send({ error: 'Failed to create classroom', details: error.message })
@@ -217,17 +138,37 @@ router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
 router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   const { roomId } = req.params
 
+  const transaction = await connection.transaction()
+
   try {
-    const classroom = await Classroom.findByPk(roomId)
+    const classroom = await Classroom.findByPk(roomId, { transaction })
     if (classroom) {
-      await classroom.destroy()
-      res.send({ message: 'Classroom deleted successfully.' })
+      const purpose = await Classroom_purpose.findOne({ where: { classroom_id: roomId }, transaction })
+      const inventories = await Inventory.findAll({ where: { classroom_id: roomId }, transaction })
+
+      if (purpose) {
+        await purpose.destroy({ transaction })
+      }
+
+      if (inventories && inventories.length > 0) {
+        for (let inventory of inventories) {
+          await inventory.destroy({ transaction })
+        }
+      }
+
+      await classroom.destroy({ transaction })
+
+      await transaction.commit()
+
+      res.send({ message: 'Classroom, its purpose and inventories deleted successfully.' })
     } else {
+      await transaction.rollback()
       res.status(404).send({ message: 'Classroom not found.' })
     }
   } catch (error) {
+    await transaction.rollback()
     console.error('Server Error:', error)
-    res.status(500).send({ message: 'Server error while deleting classroom.' })
+    res.status(500).send({ message: 'Server error while deleting classroom, its purpose and inventories.' })
   }
 })
 

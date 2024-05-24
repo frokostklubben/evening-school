@@ -89,18 +89,14 @@
 		{/if}
 	</div>
 
-	{#if $itemList.length > 0}
-		<ListItems
-			idKey={listIdKey}
-			collection={listCollection}
-			{showButtons}
-			{buttons}
-			{showEditButton}
-			{showDeleteButton}
-		/>
-	{:else if hasSelected}
-		<div>Ingen data fundet</div>
-	{/if}
+	<ListItems
+		idKey={listIdKey}
+		collection={listCollection}
+		{showButtons}
+		{buttons}
+		{showEditButton}
+		{showDeleteButton}
+	/>
 </div>
 
 {#if showAddModal}

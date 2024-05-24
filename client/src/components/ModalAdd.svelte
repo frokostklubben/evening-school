@@ -4,7 +4,7 @@
 	import { BASE_URL, AUTH_URL } from '../stores/apiConfig.js';
 	import { showAddModal, optionId } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
-	import { itemList, headerKeys } from '../stores/itemListStore.js';
+	import { headerKeys, itemList } from '../stores/itemListStore.js';
 
 	export let idKey;
 	export let collection = '';
@@ -19,7 +19,6 @@
 
 	async function addItem() {
 		formData[idKey] = $optionId;
-		console.log('formData:', formData);
 
 		let url = `${$BASE_URL}/${collection}`;
 
@@ -46,20 +45,19 @@
 					result.data.start_date = new Date(result.data.start_date).toISOString().split('T')[0];
 				}
 
-				toast.success('Oprettelse vellykket!');
 				itemList.update((currentItems) => {
 					return [...currentItems, result.data];
 				});
 
+				toast.success('Oprettelse vellykket!');
 				showAddModal.set(false);
 			} else {
-				throw new Error(result.message || 'Oprettelse mislykkedes');
+				console.error(`Fejl ved oprettelse: ${result.message || 'Oprettelse mislykkedes'}`);
 			}
 		} catch (error) {
-			toast.error('Fejl ved oprettelse:', error.message);
+			console.error('Fejl ved oprettelse:', error.message);
 		}
 	}
-
 	function isEmail(value) {
 		const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 		return emailPattern.test(value);
@@ -75,7 +73,7 @@
 						<div class="mb-3">
 							<label for={key} class="form-label">{$displayNames[key]}</label>
 
-							{#if typeof formData[key] === 'number'}
+							{#if typeof formData[key] === 'number' || key === 'capacity'}
 								<input
 									type="number"
 									class="form-control"

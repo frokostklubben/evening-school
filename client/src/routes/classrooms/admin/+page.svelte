@@ -8,21 +8,10 @@
 	import { Button } from 'flowbite-svelte';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { displayNames } from '../../../stores/dictionaryStore.js';
-	import { headerKeys } from '../../../stores/itemListStore.js';
+	import '../../../components/dropdownAndList.css';
 
-	let listIdKey; // f.eks. user_id, hvis resultatet er users
-	let listCollection;
-	let optionsCollection;
-	let optionsIdKey;
-	let label;
 	let modalTitle = 'Nyt lokale';
-	let optionName;
-	let showButtons;
-	let showEditButton;
-	let showDeleteButton;
-	let buttons = [];
 	let locations = [];
-
 	let options = [];
 	$: selectedSchool = '';
 	let hasSelected = false;
@@ -30,8 +19,8 @@
 	displayNames.set({
 		room_name: 'Lokale',
 		purpose: 'Formål',
-		inventories: 'Inventar',
-		capacity: 'Kapacitet'
+		capacity: 'Kapacitet',
+		inventories: 'Inventar'
 	});
 
 	onMount(() => {
@@ -88,28 +77,12 @@
 		showAddModal.set(true);
 	}
 
-	/* async function fetchOptions() {
-		const response = await fetch(`${$BASE_URL}/${optionsCollection}`, {
-			credentials: 'include'
-		});
-
-		if (response.ok) {
-			const result = await response.json();
-			options = result.data;
-		} else {
-			console.error(`Failed to fetch ${optionsCollection}`);
-		}
-	}
- */
 	function handleOptionChange(event) {
-		//fetchResultOnOption(event.target.value);
 		optionId.set(event.target.value);
 		console.log('optionId:', $optionId);
 		hasSelected = false;
 		fetchClassrooms();
 	}
-
-	import '../../../components/dropdownAndList.css';
 </script>
 
 <div id="options-container">
@@ -140,18 +113,14 @@
 		{/if}
 	</div>
 
-	{#if $itemList.length > 0}
-		<ListItems
-			idKey={'location_id'}
-			collection={'locations'}
-			showButtons={false}
-			buttons={[]}
-			showEditButton={true}
-			showDeleteButton={true}
-		/>
-	{:else if hasSelected}
-		<div>Ingen data fundet</div>
-	{/if}
+	<ListItems
+		idKey={'location_id'}
+		collection={'classrooms'}
+		showButtons={false}
+		buttons={[]}
+		showEditButton={true}
+		showDeleteButton={true}
+	/>
 </div>
 
 {#if showAddModal}
