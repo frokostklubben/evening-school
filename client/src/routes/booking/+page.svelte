@@ -423,6 +423,18 @@
 		bookings = [];
 		step1Data = {};
 		step2Data = {};
+		ignoreSetupTime = false;
+		sortOrderDate = 'asc';
+		sortOrderStatus = 'asc';
+		selectedDays = [];
+		days = days.map((day) => ({
+			...day,
+			startTime: '',
+			endTime: '',
+			selected: false,
+			startDate: ''
+		}));
+		
 	}
 
 	// Copied from Copilot
@@ -545,22 +557,22 @@
 				id="startdate"
 				name="startdate"
 				class="form-control"
-				value="2024-05-20"
+				value={new Date().toISOString().split('T')[0]}
 				on:change={updateStartDates}
 			/>
 		</div>
 		<div class="mb-3">
 			<div class="d-flex align-content-center gap-2">
-			<label for="setup-time" class="form-label">Ignorér klargøringstid (15 minutter):</label>
-			<div class="form-check form-check-inline">
-				<input
-					class="form-check-input border-3 p-2 rounded"
-					type="checkbox"
-					id={'setup-time'}
-					bind:checked={ignoreSetupTime}
-				/>
+				<label for="setup-time" class="form-label">Ignorér klargøringstid (15 minutter):</label>
+				<div class="form-check form-check-inline">
+					<input
+						class="form-check-input border-3 p-2 rounded"
+						type="checkbox"
+						id={'setup-time'}
+						bind:checked={ignoreSetupTime}
+					/>
+				</div>
 			</div>
-		</div>
 
 			{#if weekNumber > 0}
 				<p>
