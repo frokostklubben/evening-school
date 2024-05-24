@@ -2,7 +2,7 @@
 	import ModalDelete from './ModalDelete.svelte';
 	import ModalEdit from './ModalEdit.svelte';
 	import { derived } from 'svelte/store';
-	import { headerKeys, headerKeysDanish, itemList, dataLoaded } from '../stores/itemListStore.js';
+	import { headerKeys, headerKeysDanish, itemList } from '../stores/itemListStore.js';
 	import { optionId, selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import { goto } from '$app/navigation';
