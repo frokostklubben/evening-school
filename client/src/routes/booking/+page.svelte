@@ -550,15 +550,17 @@
 			/>
 		</div>
 		<div class="mb-3">
+			<div class="d-flex align-content-center gap-2">
 			<label for="setup-time" class="form-label">Ignorér klargøringstid (15 minutter):</label>
 			<div class="form-check form-check-inline">
 				<input
-					class="form-check-input"
+					class="form-check-input border-3 p-2 rounded"
 					type="checkbox"
 					id={'setup-time'}
 					bind:checked={ignoreSetupTime}
 				/>
 			</div>
+		</div>
 
 			{#if weekNumber > 0}
 				<p>
