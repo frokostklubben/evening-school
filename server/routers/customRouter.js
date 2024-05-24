@@ -60,21 +60,27 @@ router.get("/api/booking-form-info", async (req, res) => {
 
 router.post("/api/check-booking-dates", async (req, res) => {
   try {
-    let bookingdates = req.body;
+    let { bookingDates, ignoreSetupTime } = req.body;
 
-    //der skal ligges et kvarter til sluttiden
-
-    // check if booking dates are available, it has startTime and endTime and date
-    for (let i = 0; i < bookingdates.length; i++) {
+    for (let i = 0; i < bookingDates.length; i++) {
       let bookingConflicts = await booking.findAll({
         where: {
           [Op.and]: [
-            { date: bookingdates[i].date },
-            { room_id: bookingdates[i].room_id },
+            { date: bookingDates[i].date },
+            { room_id: bookingDates[i].room_id },
             {
               [Op.or]: [
-                { start_time: { [Op.between]: [bookingdates[i].startTime, bookingdates[i].endTime] } },
-                { end_time: { [Op.between]: [bookingdates[i].startTime, bookingdates[i].endTime] } }
+                {
+                  start_time: ignoreSetupTime ? { [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime] } : {
+                    [Op.between]: [bookingDates[i].startTime,
+                    new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() + 15 * 60000).toTimeString().substring(0, 5)]
+                  }
+                },
+                {
+                  end_time: ignoreSetupTime ? {
+                    [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime] } : {
+                    [Op.between]: [new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5), bookingDates[i].endTime] }
+                }
               ]
             }
           ]
@@ -82,24 +88,17 @@ router.post("/api/check-booking-dates", async (req, res) => {
       });
 
       if (bookingConflicts.length > 0) {
-        bookingdates[i].conflict = true;
+        bookingDates[i].conflict = true;
 
-        // add bookingConflicts found to the bookingdates array
-        bookingdates[i].bookingConflicts = bookingConflicts;
+        bookingDates[i].bookingConflicts = bookingConflicts;
 
 
       } else {
-        bookingdates[i].conflict = false;
+        bookingDates[i].conflict = false;
       }
     }
 
-    /*
-    bookingdates.sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
-    });
-    */
-
-    res.status(200).send({ data: bookingdates });
+    res.status(200).send({ data: bookingDates });
 
   } catch (err) {
     console.log(err);

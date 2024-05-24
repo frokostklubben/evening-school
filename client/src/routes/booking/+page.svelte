@@ -45,6 +45,10 @@
 	let bookings = [];
 	let bookingDates = [];
 	let checkedBookings = [];
+	let bookingDate = [];
+	$: ignoreSetupTime = false;
+	$: sortOrderDate = 'asc';
+	$: sortOrderStatus = 'asc';
 
 	let courseStartDate;
 	$: weekNumber = 0;
@@ -93,7 +97,7 @@
 	}
 
 	function handleTeacherChange(event) {
-		selectedTeacher = event.target.value;
+		selectedTeacher = Number(event.target.value);
 	}
 
 	function handleLocationChange(event) {
@@ -145,10 +149,7 @@
 					course.course_name = title;
 					course.description = description;
 					course.teacher_id = selectedTeacher;
-
 					step1Data = course;
-
-					//this makes the list updated in the selectbox
 					courses = courses;
 
 					//open next formular
@@ -221,7 +222,6 @@
 				},
 				body: JSON.stringify(checkedBookings)
 			});
-			const result = await response.json();
 			if (response.ok) {
 				toast.success(
 					`Booking oprettet på ${title} med ${checkedBookings.length} datoer over ${weeks} ${
@@ -229,7 +229,6 @@
 					}`,
 					{ duration: 7000 }
 				);
-				//reset all the data
 				initializeData();
 			}
 		} catch (error) {
@@ -262,10 +261,6 @@
 					return bookings;
 				})
 				.flat();
-		} else {
-			console.log(">>>>>>>>>>>>>> before",checkedBookings);
-			checkedBookings = bookingDates
-			console.log(">>>>>>>>>>>>>> after",checkedBookings);
 		}
 
 		try {
@@ -275,7 +270,7 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify(bookingDates)
+				body: JSON.stringify({ bookingDates, ignoreSetupTime })
 			});
 
 			if (response.ok) {
@@ -284,9 +279,6 @@
 					...booking,
 					date: new Date(booking.date)
 				}));
-
-				//checkedBookings = checkedBookings;
-
 				bookingReadyForPreview = true;
 			}
 		} catch (error) {
@@ -294,9 +286,8 @@
 		}
 	}
 
-	function checkNewDateAndTime(bookingToCheck) {
-
-		bookingDates = bookingDates.map((booking) => {
+	async function checkNewDateAndTime(bookingToCheck) {
+		let booking = bookingDates.find((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
 				booking.date.toISOString() === bookingToCheck.date.toISOString() &&
@@ -306,15 +297,46 @@
 				booking.date = new Date(bookingToCheck.newDate);
 				booking.startTime = bookingToCheck.newStartTime;
 				booking.endTime = bookingToCheck.newEndTime;
-				booking.checkedAndAvailable = true
-			} else {
-				booking.checkedAndAvailable = false
 			}
 
 			return booking;
 		});
-		//bookingDates = bookingDates;
-		checkBookingDates(false);
+
+		bookingDate = [booking];
+
+		try {
+			const response = await fetch(`${$BASE_URL}/check-booking-dates`, {
+				credentials: 'include',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ bookingDates: bookingDate, ignoreSetupTime })
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+				bookingDate = result.data.map((booking) => ({
+					...booking,
+					date: new Date(booking.date),
+					changed: true
+				}));
+
+				checkedBookings = checkedBookings.map((checkedBooking) => {
+					if (
+						checkedBooking.date.toISOString() === bookingToCheck.date.toISOString() &&
+						checkedBooking.startTime === bookingToCheck.startTime &&
+						checkedBooking.endTime === bookingToCheck.endTime
+					) {
+						return bookingDate[0];
+					} else {
+						return checkedBooking;
+					}
+				});
+			}
+		} catch (error) {
+			console.error('Error saving booking:', error);
+		}
 	}
 
 	function toggleDay(day) {
@@ -364,7 +386,6 @@
 			day.startDate = date;
 			courseStartDate.setDate(courseStartDate.getDate() + 1);
 		});
-		//update days
 		days = days;
 	}
 
@@ -411,6 +432,30 @@
 		let yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
 		let weekNumber = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
 		return weekNumber;
+	}
+
+	function sortCheckedBookingByConflict() {
+		checkedBookings = checkedBookings.sort((a, b) => {
+			if (a.conflict && !b.conflict) return sortOrderStatus === 'asc' ? -1 : 1;
+			if (b.conflict && !a.conflict) return sortOrderStatus === 'asc' ? 1 : -1;
+
+			let dateA = new Date(a.date),
+				dateB = new Date(b.date);
+			return sortOrderStatus === 'asc' ? dateA - dateB : dateB - dateA;
+		});
+
+		sortOrderStatus = sortOrderStatus === 'asc' ? 'desc' : 'asc';
+		checkedBookings = checkedBookings;
+	}
+
+	function sortCheckedBookingByDate() {
+		checkedBookings = checkedBookings.sort((a, b) => {
+			let dateA = new Date(a.date),
+				dateB = new Date(b.date);
+			return sortOrderDate === 'asc' ? dateA - dateB : dateB - dateA;
+		});
+		sortOrderDate = sortOrderDate === 'asc' ? 'desc' : 'asc';
+		checkedBookings = checkedBookings;
 	}
 </script>
 
@@ -504,66 +549,79 @@
 				on:change={updateStartDates}
 			/>
 		</div>
+		<div class="mb-3">
+			<label for="setup-time" class="form-label">Ignorér klargøringstid (15 minutter):</label>
+			<div class="form-check form-check-inline">
+				<input
+					class="form-check-input"
+					type="checkbox"
+					id={'setup-time'}
+					bind:checked={ignoreSetupTime}
+				/>
+			</div>
 
-		{#if weekNumber > 0}
-			<p>
-				Du har valgt <b>uge {weekNumber}</b> som startuge. Vælg en ny dato for at ændre startugen.
-			</p>
-		{/if}
-		<table class="table">
-			<thead>
-				<tr>
-					<th scope="col">Vælg</th>
-					<th scope="col">Dag</th>
-					<th scope="col">Start Time</th>
-					<th scope="col">End Time</th>
-					<th scope="col">Start dato </th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each days as day}
-					{#if day.startDate >= new Date().toISOString().split('T')[0]}
-						<tr>
-							<td
-								><input
-									type="checkbox"
-									bind:checked={day.selected}
-									on:change={() => toggleDay(day)}
-								/></td
-							>
-							<td>{day.name}</td>
-							<td
-								><input
-									type="time"
-									bind:value={day.startTime}
-									on:change={(event) => updateStartTime(day, event)}
-								/></td
-							>
-							<td
-								><input
-									type="time"
-									bind:value={day.endTime}
-									on:change={(event) => updateEndTime(day, event)}
-								/></td
-							>
-							<td
-								><input
-									type="date"
-									min={new Date().toISOString().split('T')[0]}
-									bind:value={day.startDate}
-									on:change={(event) => updateStartDate(day, event)}
-								/></td
-							>
-						</tr>
-					{/if}
-				{/each}
-			</tbody>
-		</table>
-		<button
-			type="submit"
-			class="btn {bookingReadyForPreview ? 'btn-success' : 'btn-primary'}"
-			disabled={!AllInfoIsGiven}>{bookingReadyForPreview ? 'Ok' : 'Anmod booking'}</button
-		>
+			{#if weekNumber > 0}
+				<p>
+					Du har valgt <b>uge {weekNumber}</b> som startuge. Vælg en ny dato for at ændre startugen.
+				</p>
+			{/if}
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">Vælg</th>
+						<th scope="col">Dag</th>
+						<th scope="col">Start Time</th>
+						<th scope="col">End Time</th>
+						<th scope="col">Start dato </th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each days as day}
+						{#if day.startDate >= new Date().toISOString().split('T')[0]}
+							<tr>
+								<td
+									><input
+										type="checkbox"
+										bind:checked={day.selected}
+										on:change={() => toggleDay(day)}
+									/></td
+								>
+								<td>{day.name}</td>
+								<td
+									><input
+										type="time"
+										step="900"
+										bind:value={day.startTime}
+										on:change={(event) => updateStartTime(day, event)}
+									/></td
+								>
+								<td
+									><input
+										type="time"
+										step="900"
+										bind:value={day.endTime}
+										on:change={(event) => updateEndTime(day, event)}
+									/></td
+								>
+								<td
+									><input
+										type="date"
+										min={new Date().toISOString().split('T')[0]}
+										bind:value={day.startDate}
+										on:change={(event) => updateStartDate(day, event)}
+									/></td
+								>
+							</tr>
+						{/if}
+					{/each}
+				</tbody>
+			</table>
+			<button
+				type="submit"
+				class="btn {bookingReadyForPreview ? 'btn-success' : 'btn-primary'}"
+				disabled={!AllInfoIsGiven}>{bookingReadyForPreview ? 'Ok' : 'Anmod booking'}</button
+			>
+		</div>
 	</form>
 </div>
 <div class="border border-2 p-3 m-3">
@@ -571,11 +629,16 @@
 	<table class="table">
 		<thead>
 			<tr>
-				<th scope="col">Dato</th>
+				<th scope="col" class="sortable" on:click={sortCheckedBookingByDate}>
+					Dato {sortOrderDate === 'asc' ? '▲' : '▼'}
+				</th>
 				<th scope="col">Starttidspunkt</th>
 				<th scope="col">Sluttidspunkt</th>
-				<th scope="col">Status</th>
+				<th scope="col" class="sortable" on:click={sortCheckedBookingByConflict}>
+					Status {sortOrderStatus === 'asc' ? '▲' : '▼'}
+				</th>
 				<th scope="col">Ny tid</th>
+				<th scope="col"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -584,7 +647,7 @@
 					<td
 						>{booking.date.toLocaleDateString('da-DK', { weekday: 'long' })[0].toUpperCase() +
 							booking.date.toLocaleDateString('da-DK', { weekday: 'long' }).slice(1).toLowerCase()}
-						{booking.date.getDate()}/{booking.date.getMonth()}/{booking.date.getFullYear()}</td
+						{booking.date.getDate()}/{booking.date.getMonth() + 1}/{booking.date.getFullYear()}</td
 					>
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
@@ -607,45 +670,21 @@
 							type="date"
 							min={new Date().toISOString().split('T')[0]}
 							bind:value={booking.newDate}
-							on:input={() => (booking.checkedAndAvailable = false)}
 						/>
-						<input
-							type="time"
-							bind:value={booking.newStartTime}
-							on:input={() => (booking.checkedAndAvailable = false)}
-						/>
-						<input
-							type="time"
-							bind:value={booking.newEndTime}
-							on:input={() => (booking.checkedAndAvailable = false)}
-						/>
-						{#if booking.conflict !== true && booking.checkedAndAvailable}
-							<button
-								class="btn btn-success"
-								on:click={() => {
-									checkedBookings.sort((a, b) => {
-										return new Date(a.date) - new Date(b.date);
-									});
-									booking.checkedAndAvailable = false;
-									checkedBookings = [...checkedBookings];
-								}}>Gem</button
-							>
-						{:else if booking.newDate && booking.newStartTime && booking.newEndTime}
-							<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
-								>Tjek</button
-							>
-						{/if}
-						<!--
-						<button class="btn btn-primary" on:click={() => checkNewDateAndTime(booking)}
+						<input type="time" bind:value={booking.newStartTime} step="900" />
+						<input type="time" bind:value={booking.newEndTime} step="900" />
+
+						<button
+							class="btn btn-primary"
+							on:click={() => {
+								checkNewDateAndTime(booking);
+							}}
+							disabled={!booking.newDate || !booking.newStartTime || !booking.newEndTime}
 							>Tjek</button
 						>
-						{#if booking.conflict !== true && booking.checkedAndAvailable}
-							<button
-								class="btn btn-primary"
-								on:click={() => console.log('Gemmer booking....', booking)}>Gem</button
-							>
-						{/if}
-						-->
+					</td>
+					<td>
+						{booking.changed ? 'Ændret tidspunkt' : ''}
 					</td>
 				</tr>
 			{/each}
@@ -660,3 +699,9 @@
 </div>
 
 <Toaster />
+
+<style>
+	.sortable:hover {
+		cursor: pointer;
+	}
+</style>
