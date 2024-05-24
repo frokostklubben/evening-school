@@ -16,7 +16,9 @@
 	optionsCollection={'schools'}
 	optionsIdKey={'school_id'}
 	label={'Aftenskole'}
-	modalTitle={'kontormedarbejder'}
+	modalTitle={'Ny kontormedarbejder'}
 	optionName={'name'}
 	showButtons={false}
+	showEditButton={true}
+	showDeleteButton={true}
 />
