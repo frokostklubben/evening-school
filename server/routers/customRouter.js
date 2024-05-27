@@ -26,18 +26,10 @@ router.get("/api/booking-form-info", async (req, res) => {
           [Op.in]: locationIds
         }
       },
-    });
-
-        // find every Classroom_purpose that is included in classrooms
-        let classroomPurposeIds = classrooms.map(classroom => classroom.classroom_purpose_id);
-        let classroomPurposes = await Classroom_purpose.findAll({
-          where: {
-            classroom_purpose_id: {
-              [Op.in]: classroomPurposeIds
-            }
-          }
-        });
-
+      include: [{
+        model: Classroom_purpose,
+      }]
+    })
 
 
     let teachers = await teacher.findAll({
@@ -63,10 +55,10 @@ router.get("/api/booking-form-info", async (req, res) => {
       }
     });
 
-    
 
 
-    
+
+
 
     //filter ther bookings to only one of each course_id
     let filteredBookings = []
@@ -120,8 +112,10 @@ router.post("/api/check-booking-dates", async (req, res) => {
                 },
                 {
                   end_time: ignoreSetupTime ? {
-                    [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime] } : {
-                    [Op.between]: [new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5), bookingDates[i].endTime] }
+                    [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime]
+                  } : {
+                    [Op.between]: [new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5), bookingDates[i].endTime]
+                  }
                 }
               ]
             }

@@ -20,11 +20,21 @@
 				//previousBookings is where the course is included in the previous bookings course_id
 				allCourses = result.data.courses;
 				let filteredBookings = result.data.filteredBookings;
-				previousBookings = allCourses.filter(course => { 
-					return filteredBookings.some(booking => Number(booking.course_id) === Number(course.course_id));
+				previousBookings = allCourses.filter((course) => {
+					return filteredBookings.some(
+						(booking) => Number(booking.course_id) === Number(course.course_id)
+					);
 				});
 
+				purposes = classrooms
+					.map((classroom) => classroom.classroom_purpose)
+					.filter((classroom) => classroom !== null);
 
+				let purposeMap = new Map();
+				purposes.forEach((obj) => {
+					purposeMap.set(obj.purpose, obj);
+				});
+				purposes = Array.from(purposeMap.values());
 			}
 		} catch (error) {
 			console.error(error);
@@ -53,6 +63,8 @@
 	let purposes = [];
 	let classrooms = [];
 	$: filteredClassrooms = [];
+	$: filteredPurposes = [];
+	let uniquePurpose = [];
 	let bookings = [];
 	let bookingDates = [];
 	let checkedBookings = [];
@@ -105,7 +117,6 @@
 			selectedTeacher = course.teacher_id;
 			selectedCourse = Number(event.target.value);
 		}
-
 	}
 
 	function handlePurposeChange(event) {
@@ -137,11 +148,19 @@
 		if (event.target.value === 'empty') {
 			selectedLocation = 'empty';
 			selectedClassroom = 'empty';
+			selectedPurpose = 'empty';
 		} else {
 			selectedLocation = Number(event.target.value);
 			filteredClassrooms = classrooms.filter(
 				(classroom) => classroom.location_id == selectedLocation
 			);
+
+			filteredPurposes = purposes.filter((purpose) =>
+				filteredClassrooms.some(
+					(classroom) => classroom.classroom_purpose && classroom.classroom_purpose.purpose_id == purpose.purpose_id
+				)
+			);
+			
 		}
 	}
 
@@ -154,7 +173,7 @@
 	}
 
 	async function saveDraft() {
-		if (selectedCourse !== 'empty' && courses.some((c) => c.course_id == selectedCourse)){
+		if (selectedCourse !== 'empty' && courses.some((c) => c.course_id == selectedCourse)) {
 			try {
 				const response = await fetch(`${$BASE_URL}/courses/${selectedCourse}`, {
 					credentials: 'include',
@@ -470,7 +489,6 @@
 			selected: false,
 			startDate: ''
 		}));
-		
 	}
 
 	// Copied from Copilot
@@ -561,14 +579,14 @@
 		onOptionChange={handleLocationChange}
 	/>
 
-    <SelectBoxOptions
-        label={'Vælg formål'}
-        selected={selectedPurpose}
-        idKey={'purpose_id'}
-        optionName={'purpose_name'}
-        options={purposes}
-        onOptionChange={handlePurposeChange}
-    />
+	<SelectBoxOptions
+		label={'Vælg formål'}
+		selected={selectedPurpose}
+		idKey={'purpose_id'}
+		optionName={'purpose'}
+		options={filteredPurposes}
+		onOptionChange={handlePurposeChange}
+	/>
 
 	<SelectBoxOptions
 		label={'Vælg lokale'}
