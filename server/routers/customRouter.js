@@ -4,9 +4,6 @@ import location from '../database/models/location.js'
 import classroom from '../database/models/classroom.js'
 import course from '../database/models/course.js'
 import booking from '../database/models/booking.js'
-import { Op } from 'sequelize'
-import Booking from '../database/models/booking.js'
-import Classroom_purpose from '../database/models/classroomPurpose.js'
 import Holiday from '../database/models/holiday.js'
 import { Op } from 'sequelize'
 import Booking from '../database/models/booking.js'
@@ -83,7 +80,7 @@ router.get('/api/booking-form-info', async (req, res) => {
       },
     })
   } catch (err) {
-    console.error(err)
+    console.log(err)
     res.status(500).send({ error: 'Failed to get form info' })
   }
 })
@@ -151,7 +148,9 @@ router.post('/api/check-booking-dates', async (req, res) => {
 
     res.status(200).send({ data: bookingDates })
   } catch (err) {
-    console.error(err)
+    console.log(err)
     res.status(500).send({ error: 'Failed to check booking dates' })
   }
 })
+
+export default router
