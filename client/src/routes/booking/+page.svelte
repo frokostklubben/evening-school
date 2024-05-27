@@ -53,7 +53,7 @@
 
 	$: courseSaved = false;
 	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
-	$: step2Criteria = selectedLocation == 'empty' || selectedClassroom == 'empty' || !courseSaved;
+	$: step2Criteria = selectedLocation == 'empty' || selectedPurpose == 'empty' || selectedClassroom == 'empty' || !courseSaved;
 	$: locationSaved = false;
 	$: bookingReadyForPreview = false;
 
@@ -95,7 +95,7 @@
 		}
 
 		if (locationSaved) {
-			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom) {
+			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom | step2Data.purpose_id != selectedPurpose) {
 				locationSaved = false;
 				bookingReadyForPreview = false;
 			}
@@ -120,7 +120,19 @@
 	}
 
 	function handlePurposeChange(event) {
-		selectedPurpose = Number(event.target.value);
+		resetFilteredClassrooms();
+
+		if (event.target.value !== 'empty') {
+			selectedPurpose = Number(event.target.value);
+			filteredClassrooms = filteredClassrooms.filter(
+				(classroom) =>
+					classroom.classroom_purpose && classroom.classroom_purpose.purpose_id === selectedPurpose
+			);
+		} else {
+			selectedClassroom = 'empty';
+		}
+
+		console.log('>>>>>>>', filteredClassrooms);
 	}
 
 	function handleDraftChange(event) {
@@ -149,19 +161,26 @@
 			selectedLocation = 'empty';
 			selectedClassroom = 'empty';
 			selectedPurpose = 'empty';
+			filteredPurposes = [];
 		} else {
 			selectedLocation = Number(event.target.value);
-			filteredClassrooms = classrooms.filter(
-				(classroom) => classroom.location_id == selectedLocation
-			);
-
+			resetFilteredClassrooms();
 			filteredPurposes = purposes.filter((purpose) =>
 				filteredClassrooms.some(
-					(classroom) => classroom.classroom_purpose && classroom.classroom_purpose.purpose_id == purpose.purpose_id
+					(classroom) =>
+						classroom.classroom_purpose &&
+						classroom.classroom_purpose.purpose_id == purpose.purpose_id
 				)
 			);
-			
+			selectedClassroom = 'empty';
+			selectedClassroom = 'empty';
 		}
+	}
+
+	function resetFilteredClassrooms() {
+		filteredClassrooms = classrooms.filter(
+			(classroom) => classroom.location_id == selectedLocation
+		);
 	}
 
 	function handleClassroomChange(event) {
@@ -252,6 +271,7 @@
 		bookingReadyForPreview = false;
 		step2Data.location_id = selectedLocation;
 		step2Data.room_id = selectedClassroom;
+		step2Data.purpose_id = selectedPurpose;
 	}
 
 	$: selectedDays = [];
