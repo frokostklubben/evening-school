@@ -26,7 +26,6 @@
 		if (response.ok) {
 			const result = await response.json();
 			itemList.set(result.data);
-			// save locationStore here
 		} else {
 			console.error(`Failed to fetch locations`);
 		}
@@ -37,8 +36,10 @@
 	idKey={$user.schoolId}
 	collection={'locations'}
 	showButtons={true}
+	showEditButton={true}
+	showDeleteButton={false}
 	buttons={[
-		{ id: 1, key: 'location_id', url: '/courses/location', text: 'Se hold' },
-		{ id: 2, key: 'location_id', url: '/classrooms/user', text: 'Se lokaler' }
+		{ id: 1, key: 'location_id', url: '/classrooms/user', text: 'Lokaler', store: 'school_name' },
+		{ id: 2, key: 'location_id', url: '/courses/location', text: 'Hold', store: 'school_name' }
 	]}
 />

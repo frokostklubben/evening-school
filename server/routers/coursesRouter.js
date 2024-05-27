@@ -41,7 +41,7 @@ router.get('/api/courses/:locationId', async (req, res) => {
   }
 })
 
-// TODO: fjerne locationId
+// TODO: fjerne locationId??
 router.get('/api/courses/:locationId/:roomId', async (req, res) => {
   try {
     const roomId = req.params.roomId
@@ -85,13 +85,13 @@ router.post('/api/courses', async (req, res) => {
   const { course_name, description, teacher_id } = req.body
 
   try {
-    await Course.create({
+    let newCourse = await Course.create({
       course_name,
       description,
       teacher_id,
     })
 
-    res.status(200).send({ data: 'Course was created' })
+    res.status(200).send({ data: newCourse })
   } catch (error) {
     res.status(500).send({ data: 'course could not be created' })
   }

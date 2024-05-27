@@ -7,6 +7,7 @@ import booking from '../database/models/booking.js'
 import Holiday from '../database/models/holiday.js';
 import { Op } from 'sequelize';
 import Booking from '../database/models/booking.js';
+import Classroom_purpose from '../database/models/classroomPurpose.js';
 
 const router = Router();
 
@@ -26,7 +27,11 @@ router.get("/api/booking-form-info", async (req, res) => {
           [Op.in]: locationIds
         }
       },
-    });
+      include: [{
+        model: Classroom_purpose,
+      }]
+    })
+
 
     let teachers = await teacher.findAll({
       where: { school_id: school_id },
@@ -42,12 +47,41 @@ router.get("/api/booking-form-info", async (req, res) => {
       }
     });
 
+
+    let bookings = await booking.findAll({
+      where: {
+        course_id: {
+          [Op.in]: courses.map(course => course.course_id)
+        }
+      }
+    });
+
+
+
+
+
+
+    //filter ther bookings to only one of each course_id
+    let filteredBookings = []
+    for (let i = 0; i < bookings.length; i++) {
+      if (!filteredBookings.some(booking => booking.course_id === bookings[i].course_id)) {
+        filteredBookings.push(bookings[i]);
+      }
+    }
+
+
+    // finding all the courses that dont have a booking
+    let coursesWithoutBooking = courses.filter(course => { return !bookings.some(booking => booking.course_id === course.course_id) });
+
+
     res.status(200).send({
       data: {
         locations,
         classrooms,
         courses,
         teachers,
+        coursesWithoutBooking,
+        filteredBookings
       }
     })
 
@@ -61,27 +95,27 @@ router.get("/api/booking-form-info", async (req, res) => {
 
 router.post("/api/check-booking-dates", async (req, res) => {
   try {
-    let bookingdates = req.body;
+    let { bookingDates, ignoreSetupTime } = req.body;
     let school_id = req.session.user.schoolId;
 
     // loop thought each booking date and check for conflicts
-    for (let i = 0; i < bookingdates.length; i++) {
+    for (let i = 0; i < bookingDates.length; i++) {
 
       //see if any holidays conflict with the booking date
       let holidayConflict = await Holiday.findOne({
         where: {
           [Op.and]: [
             { school_id: school_id },
-            { start_date: { [Op.lte]: bookingdates[i].date } },
-            { end_date: { [Op.gte]: bookingdates[i].date } }
+            { start_date: { [Op.lte]: bookingDates[i].date } },
+            { end_date: { [Op.gte]: bookingDates[i].date } }
           ]
         }
       });
 
       //no need to run the booking time conflict check if there is a holiday conflict
       if (holidayConflict !== null) {
-        bookingdates[i].holidayConflict = holidayConflict;
-        bookingdates[i].conflict = true;
+        bookingDates[i].holidayConflict = holidayConflict;
+        bookingDates[i].conflict = true;
         continue;
       }
 
@@ -89,12 +123,23 @@ router.post("/api/check-booking-dates", async (req, res) => {
       let bookingConflicts = await booking.findAll({
         where: {
           [Op.and]: [
-            { date: bookingdates[i].date },
-            { room_id: bookingdates[i].room_id },
+            { date: bookingDates[i].date },
+            { room_id: bookingDates[i].room_id },
             {
               [Op.or]: [
-                { start_time: { [Op.between]: [bookingdates[i].startTime, bookingdates[i].endTime] } },
-                { end_time: { [Op.between]: [bookingdates[i].startTime, bookingdates[i].endTime] } }
+                {
+                  start_time: ignoreSetupTime ? { [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime] } : {
+                    [Op.between]: [bookingDates[i].startTime,
+                    new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() + 15 * 60000).toTimeString().substring(0, 5)]
+                  }
+                },
+                {
+                  end_time: ignoreSetupTime ? {
+                    [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime]
+                  } : {
+                    [Op.between]: [new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5), bookingDates[i].endTime]
+                  }
+                }
               ]
             }
           ]
@@ -103,19 +148,17 @@ router.post("/api/check-booking-dates", async (req, res) => {
 
       //add a conflict bookings to the booking date object, if there is any conflicts
       if (bookingConflicts.length > 0) {
-        bookingdates[i].conflict = true;
-        bookingdates[i].bookingConflicts = bookingConflicts;
+        bookingDates[i].conflict = true;
+
+        bookingDates[i].bookingConflicts = bookingConflicts;
+
+
       } else {
-        bookingdates[i].conflict = false;
+        bookingDates[i].conflict = false;
       }
     }
 
-    //sort the booking dates by date
-    bookingdates.sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
-    });
-
-    res.status(200).send({ data: bookingdates });
+    res.status(200).send({ data: bookingDates });
 
   } catch (err) {
     console.log(err);

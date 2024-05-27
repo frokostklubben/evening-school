@@ -5,9 +5,7 @@
 	import { optionId } from '../../../stores/modalStore.js';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { itemList } from '../../../stores/itemListStore.js';
-	import { roomNames } from '../../../stores/roomStore.js';
-
-	let selectedRoomName;
+	import { buttonStoreValue } from '../../../stores/buttonStore.js';
 
 	displayNames.set({
 		course_name: 'Kursusnavn',
@@ -29,13 +27,16 @@
 			console.error('Failed to load courses');
 		}
 	}
-
-	$: {
-		const id = $optionId;
-		selectedRoomName = $roomNames.find((room) => room.id === id)?.name;
-	}
 </script>
 
-<h2>Oversigt over en hold i rum {selectedRoomName}</h2>
+<div>
+	<h2 class="pt-3 text-center">Oversigt over hold i lokale {$buttonStoreValue}</h2>
+</div>
 
-<ListItems idKey={'room_id'} collection={'courses'} showButtons={false} />
+<ListItems
+	idKey={'room_id'}
+	collection={'courses'}
+	showButtons={false}
+	showEditButton={true}
+	showDeleteButton={true}
+/>
