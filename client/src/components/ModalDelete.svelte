@@ -14,7 +14,12 @@
 				credentials: 'include',
 				method: 'DELETE'
 			});
-			if (!response.ok) throw new Error('Failed to delete item');
+
+			const result = await response.json(); // Parse the response body as JSON
+
+			if (!response.ok) {
+				throw new Error(result.message || 'Failed to delete item');
+			}
 
 			toast.success(`${collection}#${$selectedItem[idKey]} er slettet`);
 
@@ -24,6 +29,7 @@
 
 			return 'Deleted Successfully';
 		} catch (error) {
+			toast.error(`Fejl ved sletning: ${error.message}`);
 			console.error('Error deleting item:', error);
 		}
 	}

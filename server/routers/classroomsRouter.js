@@ -6,6 +6,7 @@ import Inventory from '../database/models/inventory.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
 import { Op } from 'sequelize'
 import connection from '../database/database.js'
+import Booking from '../database/models/booking.js'
 
 router.get('/api/classrooms', adminCheck, async (req, res) => {
   const classrooms = await Classroom.findAll()
@@ -118,13 +119,38 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
 
 router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   const { roomId } = req.params
-  const updates = req.body
+  const { location_id, purpose, capacity, inventories, room_name } = req.body
+
+  if (capacity === undefined || capacity === null) {
+    return res.status(400).send({ message: 'Kapacitet skal udfyldes' })
+  }
+
+  if (!room_name) {
+    return res.status(400).send({ message: 'Navn på lokalet skal defineres' })
+  }
 
   try {
     const classroom = await Classroom.findByPk(roomId)
 
     if (classroom) {
-      await classroom.update(updates)
+      await classroom.update({ location_id, capacity, room_name })
+
+      let classroomPurpose = await Classroom_purpose.findOne({ where: { purpose: purpose } })
+      if (!classroomPurpose) {
+        classroomPurpose = await Classroom_purpose.create({ purpose })
+      }
+
+      await classroom.setClassroom_purpose(classroomPurpose)
+
+      const oldInventories = await classroom.getInventories()
+      await classroom.removeInventories(oldInventories)
+
+      if (inventories && typeof inventories === 'string' && inventories.trim().length > 0) {
+        const inventoryItems = inventories.split(',').map(item => ({ item_name: item.trim() }))
+        const newInventories = await Inventory.bulkCreate(inventoryItems)
+        await classroom.addInventories(newInventories)
+      }
+
       res.send({ message: 'Classroom updated.', data: classroom })
     } else {
       res.status(404).send({ message: 'Classroom not found.' })
@@ -138,16 +164,31 @@ router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
 router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   const { roomId } = req.params
 
+  console.log('>>>>>>>>>>>>>>> Deleting classroom with id:', roomId, ' <<<<<<<<<<<<<<<<')
   const transaction = await connection.transaction()
 
   try {
     const classroom = await Classroom.findByPk(roomId, { transaction })
-    if (classroom) {
-      const purpose = await Classroom_purpose.findOne({ where: { classroom_id: roomId }, transaction })
-      const inventories = await Inventory.findAll({ where: { classroom_id: roomId }, transaction })
 
-      if (purpose) {
-        await purpose.destroy({ transaction })
+    if (classroom) {
+      // Check for active bookings
+      const activeBookings = await Booking.findAll({ where: { room_id: roomId }, transaction })
+      if (activeBookings && activeBookings.length > 0) {
+        await transaction.rollback()
+        console.log('>>>>>>>>>>>>>>> Cannot delete classroom with active bookings <<<<<<<<<<<<<<<<')
+        return res.status(400).send({ message: 'Cannot delete classroom with active bookings.' })
+      }
+
+      // Get the old inventories
+      const inventories = await classroom.getInventories({ transaction })
+
+      // Get the purpose associated with the classroom
+      const purpose = await classroom.getClassroom_purpose({ transaction })
+
+      if (purpose && purpose.length > 0) {
+        for (let p of purpose) {
+          await p.destroy({ transaction })
+        }
       }
 
       if (inventories && inventories.length > 0) {

@@ -114,7 +114,7 @@
 	</div>
 
 	<ListItems
-		idKey={'location_id'}
+		idKey={'room_id'}
 		collection={'classrooms'}
 		showButtons={false}
 		buttons={[]}
