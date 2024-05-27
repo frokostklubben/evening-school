@@ -79,7 +79,6 @@
 
 	function handleOptionChange(event) {
 		optionId.set(event.target.value);
-		console.log('optionId:', $optionId);
 		hasSelected = false;
 		fetchClassrooms();
 	}

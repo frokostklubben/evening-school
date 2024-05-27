@@ -61,5 +61,5 @@
         <ModalAdd collection={"holidays"} idKey={"holiday_id"} modalTitle={"Ferie eller helligdag" } />
     {/if}
 
-    <ListItems idKey={"holiday_id"} collection={"holidays"} showCoursesButton={false} />
+    <ListItems idKey={"holiday_id"} collection={"holidays"} showButtons={false} showDeleteButton={true} showEditButton={true}/>
 </div>

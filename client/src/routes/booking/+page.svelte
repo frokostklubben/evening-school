@@ -132,7 +132,6 @@
 			selectedClassroom = 'empty';
 		}
 
-		console.log('>>>>>>>', filteredClassrooms);
 	}
 
 	function handleDraftChange(event) {
@@ -748,18 +747,26 @@
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
 					<td>
-						{#if booking.conflict === true}
-							<span class="text-danger">Ikke ledig: </span>
-							{booking.bookingConflicts
-								.map((conflict) => {
-									const [startHour, startMinute] = conflict.start_time.split(':');
-									const [endHour, endMinute] = conflict.end_time.split(':');
-									return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
-								})
-								.join(', ')}
+						{#if booking.holidayConflict}
+							<div>
+								Lukket - {booking.holidayConflict.name}, 
+								{new Date(booking.holidayConflict.start_date).toLocaleDateString()} - 
+								{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
+							</div>						
+						{:else if booking.conflicts }
+						<span class="text-danger">Ikke ledig: </span>
+								{booking.bookingConflicts
+									.map((conflict) => {
+										const [startHour, startMinute] = conflict.start_time.split(':');
+										const [endHour, endMinute] = conflict.end_time.split(':');
+										return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
+									})
+									.join(', ')}
+							
 						{:else}
-							<span class="text-success">Ledig</span>
-						{/if}
+						<span class="text-success">Ledig</span>
+						{/if}						
+
 					</td>
 					<td>
 						<input

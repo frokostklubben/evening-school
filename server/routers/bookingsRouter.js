@@ -139,12 +139,7 @@ router.post('/api/bookings', async (req, res) => {
   } catch (error) {
     res.status(500).send({ error: 'Failed to create bookings' })
   }
-  try {
-    await Booking.bulkCreate(bookings)
-    res.send({ data: bookings })
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to create bookings' })
-  }
+
 })
 
 export default router
