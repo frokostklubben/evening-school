@@ -4,6 +4,7 @@ import Booking from '../database/models/booking.js'
 import Classroom from '../database/models/classroom.js'
 import Course from '../database/models/course.js'
 import Teacher from '../database/models/teacher.js'
+import { Op } from 'sequelize'
 
 router.get('/api/bookings', async (req, res) => {
   const bookings = await Booking.findAll()
@@ -15,9 +16,18 @@ router.get('/api/bookings/:roomId/room-history', async (req, res) => {
   try {
     let roomId = req.params.roomId
 
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
     let bookings = await Booking.findAll({
-      where: { room_id: roomId },
+      where: {
+        room_id: roomId,
+        date: {
+          [Op.lt]: today, // [Op.lt]: today part will filter out bookings where the booking date is less than (i.e., before) today's date.
+        },
+      },
     })
+
     // Add the classroom, course and teacher information to the bookings
     bookings = bookings.map(async booking => {
       booking = booking.toJSON()
@@ -46,15 +56,19 @@ router.get('/api/bookings/:roomId/room-history', async (req, res) => {
   }
 })
 
+// History for a course's bookings
 router.get('/api/bookings/:courseId/course-history', async (req, res) => {
   try {
     let courseId = req.params.courseId
 
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
     let bookings = await Booking.findAll({
       where: {
         course_id: courseId,
-        booking_date: {
-          [Op.It]: today, // [Op.lt]: today part will filter out bookings where the booking date is less than (i.e., before) today's date.
+        date: {
+          [Op.lt]: today, // [Op.lt]: today part will filter out bookings where the booking date is less than (i.e., before) today's date.
         },
       },
     })
