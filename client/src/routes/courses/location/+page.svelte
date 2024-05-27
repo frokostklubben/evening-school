@@ -1,11 +1,12 @@
 <script>
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import ListItems from '../../../components/ListItems.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { optionId } from '../../../stores/modalStore.js';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { itemList } from '../../../stores/itemListStore.js';
-	import { buttonStoreValue } from '../../../stores/buttonStore.js';
+	import { titleStore } from '../../../stores/titleStore.js';
+	import GoBackButton from '../../../components/GoBackButton.svelte';
 
 	let selectedLocation = '';
 	let selectedSchoolName = '';
@@ -33,8 +34,10 @@
 	}
 </script>
 
+<GoBackButton />
+
 <div>
-	<h2 class="pt-3 text-center">Hold hos {$buttonStoreValue}</h2>
+	<h2 class="pt-3 text-center">Hold hos {$titleStore}</h2>
 </div>
 
 <ListItems

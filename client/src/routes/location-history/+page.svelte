@@ -1,11 +1,12 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import ListItems from '../../components/ListItems.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
 	import { user } from '../../stores/userStore.js';
 	import { itemList } from '../../stores/itemListStore';
 	import { optionId } from '../../stores/modalStore.js';
-	import { buttonStoreValue } from '../../stores/buttonStore.js';
+	import { titleStore } from '../../stores/titleStore.js';
+	import GoBackButton from '../../components/GoBackButton.svelte';
 
 	displayNames.set({
 		room_name: 'Lokale',
@@ -53,8 +54,10 @@
 	}
 </script>
 
+<GoBackButton />
+
 <div>
-	<h2 class="pt-3 text-center">Historik lokaler for: {$buttonStoreValue}</h2>
+	<h2 class="pt-3 text-center">Historik lokaler for: {$titleStore}</h2>
 
 	<ListItems idKey={$user.schoolId} collection={'bookings'} showButtons={false} />
 </div>

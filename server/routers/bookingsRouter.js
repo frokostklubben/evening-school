@@ -46,15 +46,17 @@ router.get('/api/bookings/:roomId/room-history', async (req, res) => {
   }
 })
 
-// History for bookings to a course
-// bookings/${$optionId}/course-history
-
 router.get('/api/bookings/:courseId/course-history', async (req, res) => {
   try {
     let courseId = req.params.courseId
 
     let bookings = await Booking.findAll({
-      where: { course_id: courseId },
+      where: {
+        course_id: courseId,
+        booking_date: {
+          [Op.It]: today, // [Op.lt]: today part will filter out bookings where the booking date is less than (i.e., before) today's date.
+        },
+      },
     })
 
     // Map over the bookings to get the room ids

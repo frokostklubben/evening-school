@@ -1,11 +1,12 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import ListItems from '../../../components/ListItems.svelte';
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import { itemList } from '../../../stores/itemListStore';
 	import { optionId } from '../../../stores/modalStore';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
-	import { buttonStoreValue } from '../../../stores/buttonStore.js';
+	import { titleStore } from '../../../stores/titleStore.js';
+	import GoBackButton from '../../../components/GoBackButton.svelte';
 
 	displayNames.set({
 		room_name: 'Rum',
@@ -34,9 +35,10 @@
 	}
 </script>
 
-<!-- TODO: Hvis man går tilbage i browseren får man undefined! -->
+<GoBackButton />
+
 <div>
-	<h2 class="pt-3 text-center">Lokaler hos {$buttonStoreValue}</h2>
+	<h2 class="pt-3 text-center">Lokaler hos {$titleStore}</h2>
 </div>
 
 <ListItems

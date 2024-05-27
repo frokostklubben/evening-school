@@ -8,7 +8,7 @@
 	import { goto } from '$app/navigation';
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { onMount } from 'svelte';
-	import { buttonStoreValue } from '../stores/buttonStore.js';
+	import { titleStore } from '../stores/titleStore.js';
 
 	export let collection;
 	export let idKey;
@@ -132,9 +132,7 @@
 													on:click={() => {
 														selectedItem.set(listItem);
 														optionId.set(listItem[button.key]);
-
-														buttonStoreValue.set(listItem[button.store]);
-
+														titleStore.set(listItem[button.store]);
 														goto(button.url);
 													}}
 												>
