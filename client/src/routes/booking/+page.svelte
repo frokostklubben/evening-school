@@ -13,9 +13,18 @@
 			if (response.ok) {
 				const result = await response.json();
 				teachers = result.data.teachers;
-				courses = result.data.courses;
+				courses = result.data.coursesWithoutBooking;
 				locations = result.data.locations;
 				classrooms = result.data.classrooms;
+
+				//previousBookings is where the course is included in the previous bookings course_id
+				allCourses = result.data.courses;
+				let filteredBookings = result.data.filteredBookings;
+				previousBookings = allCourses.filter(course => { 
+					return filteredBookings.some(booking => Number(booking.course_id) === Number(course.course_id));
+				});
+
+
 			}
 		} catch (error) {
 			console.error(error);
@@ -46,6 +55,8 @@
 	let bookingDates = [];
 	let checkedBookings = [];
 	let bookingDate = [];
+	let previousBookings = [];
+	let allCourses = [];
 	$: ignoreSetupTime = false;
 	$: sortOrderDate = 'asc';
 	$: sortOrderStatus = 'asc';
@@ -77,7 +88,23 @@
 		}
 	}
 
-	function handleOptionChange() {}
+	function handlePreviousChange(event) {
+		if (event.target.value === 'empty') {
+			title = '';
+			description = '';
+			selectedTeacher = 'empty';
+			selectedCourse = 'empty';
+		} else {
+			let course = previousBookings.find((c) => {
+				return c.course_id == event.target.value;
+			});
+			title = course.course_name;
+			description = course.description;
+			selectedTeacher = course.teacher_id;
+			selectedCourse = Number(event.target.value);
+		}
+
+	}
 
 	function handleDraftChange(event) {
 		if (event.target.value === 'empty') {
@@ -87,7 +114,7 @@
 			selectedCourse = 'empty';
 		} else {
 			let course = courses.find((c) => {
-				return c.course_id == event.target.value;
+				return c.course_id == Number(event.target.value);
 			});
 			title = course.course_name;
 			description = course.description;
@@ -121,7 +148,7 @@
 	}
 
 	async function saveDraft() {
-		if (selectedCourse !== 'empty') {
+		if (selectedCourse !== 'empty' && courses.some((c) => c.course_id == selectedCourse)){
 			try {
 				const response = await fetch(`${$BASE_URL}/courses/${selectedCourse}`, {
 					credentials: 'include',
@@ -179,9 +206,12 @@
 					courseSaved = true;
 					locationSaved = false;
 					bookingReadyForPreview = false;
-					form1Data.course_name = title;
-					form1Data.description = description;
-					form1Data.teacher_id = selectedTeacher;
+					step1Data.course_name = title;
+					step1Data.description = description;
+					step1Data.teacher_id = selectedTeacher;
+					const result = await response.json();
+					courses = [...courses, result.data];
+					selectedCourse = result.data.course_id;
 				} else {
 					throw new Error(result.message || 'Oprettelse mislykkedes');
 				}
@@ -477,11 +507,11 @@
 	<p><strong>Trin 1</strong></p>
 	<SelectBoxOptions
 		label={'Kopier fra tidligere oprettet booking'}
-		selected={selectedBooking}
-		idKey={'booking_id'}
-		optionName={'course_id'}
-		options={bookings}
-		onOptionChange={handleOptionChange}
+		selected={selectedCourse}
+		idKey={'course_id'}
+		optionName={'course_name'}
+		options={previousBookings}
+		onOptionChange={handlePreviousChange}
 	/>
 	<SelectBoxOptions
 		label={'Fortsæt tidligere booking kladde (Kurser der ikke er blevet booket færdig)'}

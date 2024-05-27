@@ -115,6 +115,8 @@ await Teacher.bulkCreate([
 
 await Course.bulkCreate([
   { teacher_id: 1, course_name: 'Grundlæggende Python', description: 'Lær Python-programmering fra bunden og byg dine egne dataapplikationer.' },
+  { teacher_id: 1, course_name: 'Grundlæggende Javascript', description: 'Lær javascript-programmering fra bunden og byg dine egne dataapplikationer.' },
+  { teacher_id: 1, course_name: 'Grundlæggende Java', description: 'Lær Java-programmering fra bunden og byg dine egne dataapplikationer.' },
   { teacher_id: 2, course_name: 'Videoredigering med Premiere Pro', description: 'Lær avancerede redigeringsteknikker og visuelle effekter i Adobe Premiere Pro.' },
   { teacher_id: 3, course_name: 'Digital Fotografi', description: 'Dyk ned i professionel fotografering og lær at bruge DSLR-kameraer.' },
   { teacher_id: 4, course_name: 'Musikproduktion i Ableton Live', description: 'Lær at skabe musik og mixe spor med Ableton Live.' },

@@ -27,6 +27,7 @@ router.get("/api/booking-form-info", async (req, res) => {
       },
     });
 
+
     let teachers = await teacher.findAll({
       where: { school_id: school_id },
     });
@@ -41,12 +42,36 @@ router.get("/api/booking-form-info", async (req, res) => {
       }
     });
 
+
+    let bookings = await booking.findAll({
+      where: {
+        course_id: {
+          [Op.in]: courses.map(course => course.course_id)
+        }
+      }
+    });
+
+    //filter ther bookings to only one of each course_id
+    let filteredBookings = []
+    for (let i = 0; i < bookings.length; i++) {
+      if (!filteredBookings.some(booking => booking.course_id === bookings[i].course_id)) {
+        filteredBookings.push(bookings[i]);
+      }
+    }
+
+
+    // finding all the courses that dont have a booking
+    let coursesWithoutBooking = courses.filter(course => { return !bookings.some(booking => booking.course_id === course.course_id) });
+
+
     res.status(200).send({
       data: {
         locations,
         classrooms,
         courses,
         teachers,
+        coursesWithoutBooking,
+        filteredBookings
       }
     })
 
