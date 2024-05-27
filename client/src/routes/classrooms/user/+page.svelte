@@ -1,5 +1,5 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import ListItems from '../../../components/ListItems.svelte';
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import { itemList } from '../../../stores/itemListStore';
@@ -7,6 +7,7 @@
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { titleStore } from '../../../stores/titleStore.js';
 	import GoBackButton from '../../../components/GoBackButton.svelte';
+	import { isLoading } from '../../../stores/generalStore.js';
 
 	displayNames.set({
 		room_name: 'Rum',
@@ -26,7 +27,10 @@
 			credentials: 'include'
 		});
 
+		isLoading.set(true);
+
 		if (response.ok) {
+			isLoading.set(false);
 			const result = await response.json();
 			itemList.set(result.data);
 		} else {

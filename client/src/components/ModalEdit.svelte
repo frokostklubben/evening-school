@@ -5,6 +5,7 @@
 	import { selectedItem, showEditModal } from '../stores/modalStore.js';
 	import { itemList } from '../stores/itemListStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
+	import { isLoading } from '../stores/generalStore.js';
 
 	export let idKey;
 	export let collection = '';
@@ -40,11 +41,12 @@
 				body: JSON.stringify($selectedItem)
 			});
 
+			isLoading.set(true);
+
 			const result = await response.json();
 
-			let message = result.message;
-
 			if (response.ok) {
+				isLoading.set(false);
 				toast.success('Opdatering vellykket!');
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);

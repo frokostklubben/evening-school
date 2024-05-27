@@ -51,7 +51,7 @@ router.get('/api/bookings/:roomId/room-history', async (req, res) => {
       data: bookings,
     })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(500).send({ error: 'Failed to get room history' })
   }
 })
@@ -108,30 +108,10 @@ router.get('/api/bookings/:courseId/course-history', async (req, res) => {
       data: bookings,
     })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(500).send({ error: 'Failed to get room history' })
   }
 })
-
-// Endpoints for the history of a course's bookings with sequelize include:
-
-// router.get('/api/bookings/:courseId/room-history', async (req, res) => {
-//   try {
-//     let courseId = req.params.courseId
-
-//     let bookings = await Booking.findAll({
-//       where: { course_id: courseId },
-//       include: [Classroom],
-//     })
-
-//     res.status(200).send({
-//       data: bookings,
-//     })
-//   } catch (err) {
-//     console.log(err)
-//     res.status(500).send({ error: 'Failed to get room history' })
-//   }
-// })
 
 router.post('/api/bookings', async (req, res) => {
   const bookingData = req.body

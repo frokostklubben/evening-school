@@ -5,6 +5,7 @@
 	import { showAddModal, optionId } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import { headerKeys, itemList } from '../stores/itemListStore.js';
+	import { isLoading } from '../stores/generalStore.js';
 
 	export let idKey;
 	export let collection = '';
@@ -36,9 +37,12 @@
 				body: JSON.stringify(formData)
 			});
 
+			isLoading.set(true);
+
 			const result = await response.json();
 
 			if (response.ok) {
+				isLoading.set(false);
 				// specific for dates
 				if (result.data.start_date && result.data.end_date) {
 					result.data.end_date = new Date(result.data.end_date).toISOString().split('T')[0];

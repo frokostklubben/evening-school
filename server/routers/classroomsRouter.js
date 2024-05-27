@@ -36,8 +36,6 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
       ],
     })
 
-    // TODO: både formål og inventar skal kunne være null! Cannot read properties of null (reading 'purpose')
-
     let formattedClassrooms = classroomInventories.map(classroom => {
       return {
         room_id: classroom.room_id,
@@ -163,8 +161,6 @@ router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
 
 router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   const { roomId } = req.params
-
-  console.log('>>>>>>>>>>>>>>> Deleting classroom with id:', roomId, ' <<<<<<<<<<<<<<<<')
   const transaction = await connection.transaction()
 
   try {
@@ -175,14 +171,12 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
       const activeBookings = await Booking.findAll({ where: { room_id: roomId }, transaction })
       if (activeBookings && activeBookings.length > 0) {
         await transaction.rollback()
-        console.log('>>>>>>>>>>>>>>> Cannot delete classroom with active bookings <<<<<<<<<<<<<<<<')
+
         return res.status(400).send({ message: 'Cannot delete classroom with active bookings.' })
       }
 
-      // Get the old inventories
       const inventories = await classroom.getInventories({ transaction })
 
-      // Get the purpose associated with the classroom
       const purpose = await classroom.getClassroom_purpose({ transaction })
 
       if (purpose && purpose.length > 0) {

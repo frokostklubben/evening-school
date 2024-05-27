@@ -19,7 +19,7 @@ export async function randomPassword() {
   try {
     randomPassword = crypto.randomBytes(16).toString('hex');
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
   return randomPassword;
 }

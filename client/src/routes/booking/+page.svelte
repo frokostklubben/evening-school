@@ -53,7 +53,11 @@
 
 	$: courseSaved = false;
 	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
-	$: step2Criteria = selectedLocation == 'empty' || selectedPurpose == 'empty' || selectedClassroom == 'empty' || !courseSaved;
+	$: step2Criteria =
+		selectedLocation == 'empty' ||
+		selectedPurpose == 'empty' ||
+		selectedClassroom == 'empty' ||
+		!courseSaved;
 	$: locationSaved = false;
 	$: bookingReadyForPreview = false;
 
@@ -95,7 +99,10 @@
 		}
 
 		if (locationSaved) {
-			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom | step2Data.purpose_id != selectedPurpose) {
+			if (
+				step2Data.location_id != selectedLocation ||
+				(step2Data.room_id != selectedClassroom) | (step2Data.purpose_id != selectedPurpose)
+			) {
 				locationSaved = false;
 				bookingReadyForPreview = false;
 			}
@@ -131,8 +138,6 @@
 		} else {
 			selectedClassroom = 'empty';
 		}
-
-		console.log('>>>>>>>', filteredClassrooms);
 	}
 
 	function handleDraftChange(event) {

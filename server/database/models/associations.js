@@ -58,8 +58,6 @@ function applyAssociations() {
   // Course has many Bookings
   Course.hasMany(Booking, { foreignKey: 'course_id' })
   Booking.belongsTo(Course, { foreignKey: 'course_id' })
-
-  console.log('Associations between Classroom and Purpose:', Classroom.associations)
 }
 
 export { applyAssociations }

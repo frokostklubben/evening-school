@@ -1,5 +1,5 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import ListItems from '../../components/ListItems.svelte';
 	import { displayNames } from '../../stores/dictionaryStore.js';
 	import { user } from '../../stores/userStore.js';
@@ -7,6 +7,7 @@
 	import { optionId } from '../../stores/modalStore.js';
 	import { titleStore } from '../../stores/titleStore.js';
 	import GoBackButton from '../../components/GoBackButton.svelte';
+	import { isLoading } from '../../stores/generalStore.js';
 
 	displayNames.set({
 		course_name: 'Holdnavn',
@@ -31,8 +32,6 @@
 		return new Date(dateString).toLocaleDateString(undefined, options);
 	}
 
-	// Endpoint: api/bookings/:courseId/room-history
-
 	async function fetchBookings() {
 		let formattedData = [];
 
@@ -40,7 +39,10 @@
 			credentials: 'include'
 		});
 
+		isLoading.set(true);
+
 		if (response.ok) {
+			isLoading.set(false);
 			const result = await response.json();
 
 			formattedData = result.data.map((item) => {
