@@ -6,6 +6,7 @@ import course from '../database/models/course.js'
 import booking from '../database/models/booking.js'
 import { Op } from 'sequelize';
 import Booking from '../database/models/booking.js';
+import Classroom_purpose from '../database/models/classroomPurpose.js';
 
 const router = Router();
 
@@ -26,6 +27,17 @@ router.get("/api/booking-form-info", async (req, res) => {
         }
       },
     });
+
+        // find every Classroom_purpose that is included in classrooms
+        let classroomPurposeIds = classrooms.map(classroom => classroom.classroom_purpose_id);
+        let classroomPurposes = await Classroom_purpose.findAll({
+          where: {
+            classroom_purpose_id: {
+              [Op.in]: classroomPurposeIds
+            }
+          }
+        });
+
 
 
     let teachers = await teacher.findAll({
@@ -50,6 +62,11 @@ router.get("/api/booking-form-info", async (req, res) => {
         }
       }
     });
+
+    
+
+
+    
 
     //filter ther bookings to only one of each course_id
     let filteredBookings = []

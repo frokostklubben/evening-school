@@ -35,6 +35,7 @@
 	let selectedCourse = 'empty';
 	let selectedLocation = 'empty';
 	let selectedClassroom = 'empty';
+	let selectedPurpose = 'empty';
 	let selectedBooking = 'empty';
 	let title = '';
 	let description = '';
@@ -49,6 +50,7 @@
 	let teachers = [];
 	$: courses = [];
 	let locations = [];
+	let purposes = [];
 	let classrooms = [];
 	$: filteredClassrooms = [];
 	let bookings = [];
@@ -104,6 +106,10 @@
 			selectedCourse = Number(event.target.value);
 		}
 
+	}
+
+	function handlePurposeChange(event) {
+		selectedPurpose = Number(event.target.value);
 	}
 
 	function handleDraftChange(event) {
@@ -554,7 +560,15 @@
 		options={locations}
 		onOptionChange={handleLocationChange}
 	/>
-	<div class="mb-2">Formål?</div>
+
+    <SelectBoxOptions
+        label={'Vælg formål'}
+        selected={selectedPurpose}
+        idKey={'purpose_id'}
+        optionName={'purpose_name'}
+        options={purposes}
+        onOptionChange={handlePurposeChange}
+    />
 
 	<SelectBoxOptions
 		label={'Vælg lokale'}
