@@ -753,7 +753,13 @@
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
 					<td>
-						{#if booking.conflict === true}
+						{#if booking.holidayConflict}
+							<div>
+								Lukket - {booking.holidayConflict.name},
+								{new Date(booking.holidayConflict.start_date).toLocaleDateString()} -
+								{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
+							</div>
+						{:else if booking.conflicts}
 							<span class="text-danger">Ikke ledig: </span>
 							{booking.bookingConflicts
 								.map((conflict) => {

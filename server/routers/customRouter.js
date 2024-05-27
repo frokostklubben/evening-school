@@ -7,6 +7,10 @@ import booking from '../database/models/booking.js'
 import { Op } from 'sequelize'
 import Booking from '../database/models/booking.js'
 import Classroom_purpose from '../database/models/classroomPurpose.js'
+import Holiday from '../database/models/holiday.js'
+import { Op } from 'sequelize'
+import Booking from '../database/models/booking.js'
+import Classroom_purpose from '../database/models/classroomPurpose.js'
 
 const router = Router()
 
@@ -87,8 +91,25 @@ router.get('/api/booking-form-info', async (req, res) => {
 router.post('/api/check-booking-dates', async (req, res) => {
   try {
     let { bookingDates, ignoreSetupTime } = req.body
+    let school_id = req.session.user.schoolId
 
+    // loop thought each booking date and check for conflicts
     for (let i = 0; i < bookingDates.length; i++) {
+      //see if any holidays conflict with the booking date
+      let holidayConflict = await Holiday.findOne({
+        where: {
+          [Op.and]: [{ school_id: school_id }, { start_date: { [Op.lte]: bookingDates[i].date } }, { end_date: { [Op.gte]: bookingDates[i].date } }],
+        },
+      })
+
+      //no need to run the booking time conflict check if there is a holiday conflict
+      if (holidayConflict !== null) {
+        bookingDates[i].holidayConflict = holidayConflict
+        bookingDates[i].conflict = true
+        continue
+      }
+
+      //see if any bookings conflict with the booking date
       let bookingConflicts = await booking.findAll({
         where: {
           [Op.and]: [
@@ -118,6 +139,7 @@ router.post('/api/check-booking-dates', async (req, res) => {
         },
       })
 
+      //add a conflict bookings to the booking date object, if there is any conflicts
       if (bookingConflicts.length > 0) {
         bookingDates[i].conflict = true
 
@@ -133,5 +155,3 @@ router.post('/api/check-booking-dates', async (req, res) => {
     res.status(500).send({ error: 'Failed to check booking dates' })
   }
 })
-
-export default router
