@@ -5,6 +5,10 @@
 	import { optionId } from '../../../stores/modalStore.js';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { itemList } from '../../../stores/itemListStore.js';
+	import { buttonStoreValue } from '../../../stores/buttonStore.js';
+
+	let selectedLocation = '';
+	let selectedSchoolName = '';
 
 	displayNames.set({
 		course_name: 'Kursusnavn',
@@ -27,15 +31,19 @@
 			console.error('Failed to load courses');
 		}
 	}
-
-	// Ændre denne til at gemme afdelingsnavnet
-	/* 	$: {
-		const id = $optionId;
-		selectedLocation = $location.find((room) => room.id === id)?.name;
-	} */
 </script>
 
-<!-- TODO sette ind navnet til afd. -->
-<h2>Oversigt over en afdelings hold</h2>
+<div>
+	<h2 class="pt-3 text-center">Hold hos {$buttonStoreValue}</h2>
+</div>
 
-<ListItems idKey={'course_id'} collection={'courses'} showButtons={false} />
+<ListItems
+	idKey={'course_id'}
+	collection={'courses'}
+	showButtons={true}
+	showEditButton={true}
+	showDeleteButton={true}
+	buttons={[
+		{ id: 1, key: 'course_id', url: '/location-history', text: 'Historik', store: 'course_name' }
+	]}
+/>

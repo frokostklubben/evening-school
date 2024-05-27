@@ -24,6 +24,7 @@ import User from './models/user.js'
 import Location from './models/location.js'
 import Classroom_purpose from './models/classroomPurpose.js'
 import Classroom from './models/classroom.js'
+
 import Teacher from './models/teacher.js'
 import Course from './models/course.js'
 import Inventory from './models/inventory.js'
@@ -31,7 +32,7 @@ import Holiday from './models/holiday.js'
 
 // DO NOT DELETE THE FOLLOWING IMPORTS - EVEN THOUGH THEY ARE NOT ACTIVELY USED
 import Booking from './models/booking.js'
-import Classroom_inventory from './models/classroomInventory.js'
+// import Classroom_inventory from './models/classroomInventory.js'
 
 await connection.sync({ force: true })
 
@@ -41,7 +42,7 @@ await Role.bulkCreate([{ role: 'admin' }, { role: 'office_employee' }])
 
 // role_id 1 = admin, 2 = office_employee
 await User.bulkCreate([
-  { school_id: 1, first_name: 'admin', last_name: 'jensen', email: 'admin@jensen.dk', role_id: 1, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
+  { school_id: 2, first_name: 'admin', last_name: 'jensen', email: 'admin@jensen.dk', role_id: 1, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
   { school_id: 1, first_name: 'Kurt', last_name: 'Konthorsen', email: 'kurt@konthorsen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
   { school_id: 1, first_name: 'Lars', last_name: 'Mortensen', email: 'lars@mortensen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
 ])
@@ -112,7 +113,6 @@ await Teacher.bulkCreate([
   { school_id: 6, first_name: 'Karen', last_name: 'Larsen', email: 'karen@dof.dk', is_active: 1 },
 ])
 
-
 await Course.bulkCreate([
   { teacher_id: 1, course_name: 'Grundlæggende Python', description: 'Lær Python-programmering fra bunden og byg dine egne dataapplikationer.' },
   { teacher_id: 1, course_name: 'Grundlæggende Javascript', description: 'Lær javascript-programmering fra bunden og byg dine egne dataapplikationer.' },
@@ -130,7 +130,6 @@ await Course.bulkCreate([
   { teacher_id: 4, course_name: 'Lydteknik og Akustik', description: 'Principper i lydteknik og opsætning af lydstudier.' },
   { teacher_id: 5, course_name: 'Data Science og Big Data Analyse', description: 'Teknikker til håndtering og analyse af store datamængder.' },
 ])
-
 
 await Booking.bulkCreate([
   { course_id: 1, room_id: 1, start_time: '16:30:00', end_time: '19:30:00', date: '2024-05-22' },
@@ -184,8 +183,6 @@ await inventory[13].addClassroom(classrooms[4]) // Lydisoleringspaneler til Soft
 
 await Holiday.bulkCreate([
   //someholidays
-  { name: 'Juleaften',  school_id:"1", start_date: '2024-12-24', end_date: '2024-12-24' },
-  { name: 'Sommerferie', school_id:"2" , start_date: '2024-06-01', end_date: '2024-08-01' },
-  
-  
-  ])
+  { name: 'Juleaften', school_id: '1', start_date: '2024-12-24', end_date: '2024-12-24' },
+  { name: 'Sommerferie', school_id: '2', start_date: '2024-06-01', end_date: '2024-08-01' },
+])

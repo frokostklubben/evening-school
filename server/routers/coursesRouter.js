@@ -41,7 +41,7 @@ router.get('/api/courses/:locationId', async (req, res) => {
   }
 })
 
-// TODO: fjerne locationId
+// TODO: fjerne locationId??
 router.get('/api/courses/:locationId/:roomId', async (req, res) => {
   try {
     const roomId = req.params.roomId

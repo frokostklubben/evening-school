@@ -68,7 +68,7 @@
 							data-sveltekit-preload-data
 							href="/booking">Booking</a
 						>
-					
+
 						<a
 							class="nav-link"
 							class:active={$page.url.pathname === '/afdelinger'}
@@ -79,7 +79,7 @@
 							class="nav-link"
 							class:active={$page.url.pathname === '/your-employees'}
 							data-sveltekit-preload-data
-							href="/users/user">Medarbejdere</a
+							href={$user.email ? '/users/user' : '/'}>Medarbejdere</a
 						>
 						<a
 							class="nav-link"
@@ -122,9 +122,9 @@
 	</nav>
 
 	<main class="container">
-		{#if $user.email}
-			<slot />
-		{/if}
+		<!-- {#if $user.email} -->
+		<slot />
+		<!-- {/if} -->
 	</main>
 {:else}
 	<!-- Show spinner while loading -->

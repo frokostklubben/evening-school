@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
 import Location from './location.js'
 import Classroom_purpose from './classroomPurpose.js'
+import Inventory from './inventory.js'
 
 const Classroom = sequelize.define(
   'Classroom',
@@ -23,14 +24,7 @@ const Classroom = sequelize.define(
         key: 'location_id',
       },
     },
-    purpose_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: Classroom_purpose,
-        key: 'purpose_id',
-      },
-    },
+
     capacity: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -41,5 +35,20 @@ const Classroom = sequelize.define(
     tableName: 'classrooms',
   },
 )
+
+Classroom_purpose.hasMany(Classroom, { foreignKey: 'purpose_id' })
+Classroom.belongsTo(Classroom_purpose, { foreignKey: 'purpose_id' })
+
+Classroom.belongsToMany(Inventory, {
+  through: 'ClassroomInventory',
+  foreignKey: 'room_id',
+  timestamps: false,
+})
+
+Inventory.belongsToMany(Classroom, {
+  through: 'ClassroomInventory',
+  foreignKey: 'inventory_id',
+  timestamps: false,
+})
 
 export default Classroom
