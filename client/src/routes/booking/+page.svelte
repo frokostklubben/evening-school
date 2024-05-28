@@ -386,6 +386,16 @@
 	}
 
 	async function checkNewDateAndTime(bookingToCheck) {
+		if (bookingToCheck.newDate < new Date().toISOString().split('T')[0]) {
+			toast.error('Datoen kan ikke være før i dag', { duration: 5000 });
+			return;
+		}
+
+		if (bookingToCheck.newStartTime >= bookingToCheck.newEndTime) {
+			toast.error('Starttidspunkt skal være før sluttidspunkt', { duration: 5000 });
+			return;
+		}
+		
 		let booking = bookingDates.find((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
