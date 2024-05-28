@@ -53,7 +53,11 @@
 
 	$: courseSaved = false;
 	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
-	$: step2Criteria = selectedLocation == 'empty' || selectedPurpose == 'empty' || selectedClassroom == 'empty' || !courseSaved;
+	$: step2Criteria =
+		selectedLocation == 'empty' ||
+		selectedPurpose == 'empty' ||
+		selectedClassroom == 'empty' ||
+		!courseSaved;
 	$: locationSaved = false;
 	$: bookingReadyForPreview = false;
 
@@ -95,7 +99,10 @@
 		}
 
 		if (locationSaved) {
-			if (step2Data.location_id != selectedLocation || step2Data.room_id != selectedClassroom | step2Data.purpose_id != selectedPurpose) {
+			if (
+				step2Data.location_id != selectedLocation ||
+				(step2Data.room_id != selectedClassroom) | (step2Data.purpose_id != selectedPurpose)
+			) {
 				locationSaved = false;
 				bookingReadyForPreview = false;
 			}
@@ -131,7 +138,6 @@
 		} else {
 			selectedClassroom = 'empty';
 		}
-
 	}
 
 	function handleDraftChange(event) {
@@ -285,7 +291,7 @@
 
 	async function saveBooking() {
 		checkedBookings = checkedBookings.map(
-			({ conflict, newDate, newStartTime, newEndTime, ...rest }) => rest
+			({ conflict, newDate, newStartTime, newEndTime, ...rest }) => ({ ...rest, course_id: selectedCourse })
 		);
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings`, {
@@ -749,24 +755,22 @@
 					<td>
 						{#if booking.holidayConflict}
 							<div>
-								Lukket - {booking.holidayConflict.name}, 
-								{new Date(booking.holidayConflict.start_date).toLocaleDateString()} - 
+								Lukket - {booking.holidayConflict.name},
+								{new Date(booking.holidayConflict.start_date).toLocaleDateString()} -
 								{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
-							</div>						
-						{:else if booking.conflicts }
-						<span class="text-danger">Ikke ledig: </span>
-								{booking.bookingConflicts
-									.map((conflict) => {
-										const [startHour, startMinute] = conflict.start_time.split(':');
-										const [endHour, endMinute] = conflict.end_time.split(':');
-										return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
-									})
-									.join(', ')}
-							
+							</div>
+						{:else if booking.conflicts}
+							<span class="text-danger">Ikke ledig: </span>
+							{booking.bookingConflicts
+								.map((conflict) => {
+									const [startHour, startMinute] = conflict.start_time.split(':');
+									const [endHour, endMinute] = conflict.end_time.split(':');
+									return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
+								})
+								.join(', ')}
 						{:else}
-						<span class="text-success">Ledig</span>
-						{/if}						
-
+							<span class="text-success">Ledig</span>
+						{/if}
 					</td>
 					<td>
 						<input
