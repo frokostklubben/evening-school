@@ -21,7 +21,6 @@
 		fetchClassrooms();
 	});
 
-	// TODO: HVORFOR er denne kode nødvendig når det er samme kode i fetchResultOnOption i DropdownAndList.svelte?
 	async function fetchClassrooms() {
 		const response = await fetch(`${$BASE_URL}/classrooms/${$optionId}`, {
 			credentials: 'include'

@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { validateSession, login, logout } from '../utils/auth.js';
 	import { isLoading, loginLoading } from '../stores/generalStore.js';
+	import { Toaster } from 'svelte-french-toast';
 
 	let isOpen = false;
 	$: testUser = $newUser;
@@ -76,6 +77,12 @@
 					>
 					<a
 						class="nav-link"
+						class:active={$page.url.pathname === '/room-search'}
+						data-sveltekit-preload-data
+						href={$user.email ? '/room-search' : '/'}>Søg lokale</a
+					>
+					<a
+						class="nav-link"
 						class:active={$page.url.pathname === '/your-employees'}
 						data-sveltekit-preload-data
 						href={$user.email ? '/users/user' : '/'}>Medarbejdere</a
@@ -123,6 +130,7 @@
 <main class="container">
 	{#if !$isLoading}
 		<slot />
+		<Toaster />
 	{:else}
 		<!-- Show spinner while loading -->
 		<div

@@ -7,6 +7,7 @@ import { adminCheck } from '../middlewares/authMiddleware.js'
 import { Op } from 'sequelize'
 import connection from '../database/database.js'
 import Booking from '../database/models/booking.js'
+import Location from '../database/models/location.js'
 
 router.get('/api/classrooms', adminCheck, async (req, res) => {
   const classrooms = await Classroom.findAll()
@@ -204,6 +205,187 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
     await transaction.rollback()
     console.error('Server Error:', error)
     res.status(500).send({ message: 'Server error while deleting classroom, its purpose and inventories.' })
+  }
+})
+
+router.post('/api/classrooms/available/:school_id', async (req, res) => {
+  try {
+    const schoolId = req.params.school_id
+    let { startDate, endDate, startTime, endTime } = req.body
+
+    // Parse dates and times
+    startDate = new Date(startDate)
+    endDate = new Date(endDate)
+    startTime = new Date(startTime[0])
+    endTime = new Date(endTime[0])
+
+    // Create new dates with the date of startDate/endDate and the time of startTime/endTime
+    startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
+
+    endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+
+    // Convert to local time
+    startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset())
+    endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset())
+
+    // Extract time
+    startTime = startDate.toISOString().split('T')[1]
+    endTime = endDate.toISOString().split('T')[1]
+
+    const allClassrooms = await Classroom.findAll({
+      include: [
+        {
+          model: Location,
+          attributes: ['school_name'],
+          where: { school_id: schoolId },
+        },
+        {
+          model: Inventory,
+          attributes: ['item_name'],
+        },
+        {
+          model: Classroom_purpose,
+          as: 'classroom_purpose',
+          attributes: ['purpose'],
+        },
+      ],
+    })
+
+    const allBookings = await Booking.findAll({
+      where: {
+        date: {
+          [Op.between]: [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]],
+        },
+        [Op.and]: [
+          {
+            [Op.or]: [
+              {
+                start_time: {
+                  [Op.between]: [startTime, endTime],
+                },
+              },
+              {
+                end_time: {
+                  [Op.between]: [startTime, endTime],
+                },
+              },
+              {
+                [Op.and]: [{ start_time: { [Op.lte]: startTime } }, { end_time: { [Op.gte]: endTime } }],
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const bookingsByClassroom = allBookings.reduce((acc, booking) => {
+      const roomId = booking.room_id
+      if (!acc[roomId]) {
+        acc[roomId] = []
+      }
+      acc[roomId].push({
+        start_time: booking.start_time,
+        end_time: booking.end_time,
+        date: booking.date,
+      })
+      return acc
+    }, {})
+
+    const calculateFreeTimes = (bookings, openingHour, closingHour) => {
+      const intervals = []
+      const bookingsByDate = bookings.reduce((acc, booking) => {
+        const date = booking.date.toISOString().split('T')[0]
+        if (!acc[date]) {
+          acc[date] = []
+        }
+        acc[date].push(booking)
+        return acc
+      }, {})
+
+      const current = new Date(startDate)
+      const end = new Date(endDate)
+
+      while (current <= end) {
+        const dateStr = current.toISOString().split('T')[0]
+        const dayBookings = bookingsByDate[dateStr] || []
+
+        dayBookings.sort((a, b) => a.start_time.localeCompare(b.start_time))
+
+        let currentStart = openingHour
+        const dayIntervals = []
+
+        dayBookings.forEach(booking => {
+          if (currentStart < booking.start_time) {
+            dayIntervals.push({ start: currentStart, end: booking.start_time })
+          }
+          currentStart = booking.end_time
+        })
+
+        if (currentStart < closingHour) {
+          dayIntervals.push({ start: currentStart, end: closingHour })
+        }
+
+        intervals.push({ date: dateStr, times: dayIntervals })
+
+        current.setDate(current.getDate() + 1)
+      }
+
+      return intervals
+    }
+
+    const classroomsWithAvailability = allClassrooms.map(classroom => {
+      const roomId = classroom.room_id
+      const bookings = bookingsByClassroom[roomId] || []
+      let freeTimes
+
+      if (bookings.length === 0) {
+        freeTimes = []
+        const current = new Date(startDate)
+        while (current <= endDate) {
+          freeTimes.push({
+            date: current.toISOString().split('T')[0],
+            times: [{ start: startTime, end: endTime }],
+          })
+          current.setDate(current.getDate() + 1)
+        }
+      } else {
+        freeTimes = calculateFreeTimes(bookings, startTime, endTime)
+      }
+
+      return {
+        room_id: roomId,
+        room_name: classroom.room_name,
+        capacity: classroom.capacity,
+        school_name: classroom.Location.school_name,
+        inventory: classroom.Inventories.map(item => item.item_name),
+        purpose: classroom.classroom_purpose ? classroom.classroom_purpose.purpose : '',
+        freeTimes,
+      }
+    })
+
+    const allDatesInRange = []
+    let current = new Date(startDate)
+    while (current <= endDate) {
+      allDatesInRange.push(current.toISOString().split('T')[0])
+      current.setDate(current.getDate() + 1)
+    }
+
+    classroomsWithAvailability.forEach(classroom => {
+      allDatesInRange.forEach(date => {
+        if (!classroom.freeTimes.some(interval => interval.date === date)) {
+          classroom.freeTimes.push({
+            date,
+            times: [{ start: startTime, end: endTime }],
+          })
+        }
+      })
+      classroom.freeTimes.sort((a, b) => new Date(a.date) - new Date(b.date))
+    })
+
+    res.send({ data: classroomsWithAvailability })
+  } catch (error) {
+    console.error('Error fetching available classrooms:', error)
+    res.status(500).send({ error: 'Failed to fetch available classrooms' })
   }
 })
 

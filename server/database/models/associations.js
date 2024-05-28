@@ -41,6 +41,10 @@ function applyAssociations() {
     foreignKey: 'room_id',
     otherKey: 'inventory_id',
   })
+
+  Classroom.hasMany(Booking, { foreignKey: 'room_id' })
+  Booking.belongsTo(Classroom, { foreignKey: 'room_id' })
+
   Inventory.belongsToMany(Classroom, {
     through: Classroom_inventory,
     foreignKey: 'inventory_id',

@@ -50,6 +50,9 @@
 	}
 
 	async function fetchHeaderKeys() {
+		if (collection.includes('classrooms/available')) {
+			collection = 'classrooms/available';
+		}
 		const response = await fetch(`${$BASE_URL}/headerKey/${collection}`, {
 			credentials: 'include'
 		});
@@ -57,6 +60,7 @@
 		if (response.ok) {
 			const result = await response.json();
 			setHeaderKeys(result.data);
+			console.log($headerKeysDanish);
 			hasSelected = true;
 		} else {
 			console.error('Failed to fetch header keys from the server');

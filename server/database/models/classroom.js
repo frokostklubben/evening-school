@@ -1,8 +1,10 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
+import { Op } from 'sequelize'
 import Location from './location.js'
 import Classroom_purpose from './classroomPurpose.js'
 import Inventory from './inventory.js'
+import Booking from './booking.js'
 
 const Classroom = sequelize.define(
   'Classroom',
@@ -16,14 +18,14 @@ const Classroom = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    location_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Location,
-        key: 'location_id',
-      },
-    },
+    // location_id: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    //   references: {
+    //     model: Location,
+    //     key: 'location_id',
+    //   },
+    // },
 
     capacity: {
       type: DataTypes.INTEGER,
@@ -50,5 +52,11 @@ Inventory.belongsToMany(Classroom, {
   foreignKey: 'inventory_id',
   timestamps: false,
 })
+
+// In your Booking model, you have defined a foreign key relationship with Classroom
+// However, in your Classroom model, you haven't defined a corresponding relationship back to Booking.
+
+Classroom.hasMany(Booking, { foreignKey: 'room_id' })
+Booking.belongsTo(Classroom, { foreignKey: 'room_id' })
 
 export default Classroom

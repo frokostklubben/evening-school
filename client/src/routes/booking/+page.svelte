@@ -617,7 +617,7 @@
 		label={'Vælg lokale'}
 		selected={selectedClassroom}
 		idKey={'room_id'}
-		optionName={'room_id'}
+		optionName={'room_name'}
 		options={filteredClassrooms}
 		onOptionChange={handleClassroomChange}
 	/>
