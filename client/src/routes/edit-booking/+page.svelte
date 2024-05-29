@@ -207,7 +207,6 @@
 	
 		} else {
 			selectedCourseName = 'empty';
-			resetFilters()
 		}
 		filterList();
 	}
@@ -216,6 +215,10 @@
 		if (event.target.value !== 'empty') {
 			selectedCourseId = Number(event.target.value);
 	
+
+			//todo Når vi sætter en course id, skal både teacher og course name sættes til det rigtige
+
+
 			filteredCourseNames = $itemList
 				.filter((booking) => booking.course_id === selectedCourseId)
 				.map((booking) => {
