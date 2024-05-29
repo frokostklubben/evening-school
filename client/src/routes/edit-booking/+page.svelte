@@ -2,7 +2,12 @@
 	import ModalDelete from '../../components/ModalDelete.svelte';
 	import { derived } from 'svelte/store';
 	import { headerKeys, headerKeysDanish, itemList } from '../../stores/itemListStore.js';
-	import { optionId, selectedItem, showDeleteModal, showEditModal	} from '../../stores/modalStore.js';
+	import {
+		optionId,
+		selectedItem,
+		showDeleteModal,
+		showEditModal
+	} from '../../stores/modalStore.js';
 	import { displayNames } from '../../stores/dictionaryStore.js';
 	import { BASE_URL } from '../../stores/apiConfig.js';
 	import { onMount } from 'svelte';
@@ -12,11 +17,14 @@
 	let idKey = 'booking_id';
 	let selectedTeacher = 'empty';
 	let selectedCourseName = 'empty';
-	let	selectedCourseId = 'empty';
+	let selectedCourseId = 'empty';
 	let teachers = [];
 	let courseNames = [];
 	let courseIds = [];
 	$: filteredBookings = $itemList;
+	$: filteredTeachers = teachers;
+	$: filteredCourseIds = courseIds;
+	$: filteredCourseNames = courseNames;
 
 	onMount(async () => {
 		//vi skal sætte displaynames
@@ -51,7 +59,6 @@
 			teachers = removeDuplicates(teachers, 'teacher_id');
 			courseNames = removeDuplicates(courseNames, 'course_id');
 			courseIds = removeDuplicates(courseIds, 'course_id');
-
 		} else {
 			console.error('Failed to fetch bookings from the server');
 		}
@@ -84,8 +91,8 @@
 	*/
 
 	function removeDuplicates(array, prop) {
-		return array.filter((obj, index, self) =>
-			index === self.findIndex((t) => t[prop] === obj[prop])
+		return array.filter(
+			(obj, index, self) => index === self.findIndex((t) => t[prop] === obj[prop])
 		);
 	}
 
@@ -118,49 +125,134 @@
 		return Array.isArray(inventories) ? inventories.join(', ') : inventories;
 	}
 
-	function handleOptionChange(event) {
+	function filterList() {
+		filteredBookings = $itemList;
 
-		console.log(selectedCourseName);
-		if (selectedCourseName !== "empty") {
-			console.log(selectedCourseName);
-			filteredBookings = filteredBookings.filter((booking) => booking.Course.course_name == selectedCourseName);
-		} 
-
-		if (selectedTeacher !== "empty") {
-			console.log(selectedTeacher);
-			filteredBookings = filteredBookings.filter((booking) => booking.Course.Teacher.email == selectedTeacher);
+		if (selectedCourseName !== 'empty') {
+			filteredBookings = filteredBookings.filter(
+				(booking) => booking.Course.course_name == selectedCourseName
+			);
 		}
 
+		if (selectedTeacher !== 'empty') {
+			filteredBookings = filteredBookings.filter(
+				(booking) => booking.Course.Teacher.email == selectedTeacher
+			);
+		}
 
-
-
+		if (selectedCourseId !== 'empty') {
+			filteredBookings = filteredBookings.filter(
+				(booking) => booking.course_id == Number(selectedCourseId)
+			);
+		}
 	}
 
 	function handleCourseNameChange(event) {
-		
+		if (event.target.value !== 'empty') {
+			selectedCourseName = event.target.value;
+
+			filteredTeachers = $itemList
+				.filter((booking) => booking.Course.course_name === selectedCourseName)
+				.map((booking) => {
+					return {
+						teacher_id: booking.Course.Teacher.teacher_id,
+						email: booking.Course.Teacher.email
+					};
+				});
+			
+			filteredTeachers = removeDuplicates(filteredTeachers, 'teacher_id');
+
+			filteredCourseIds = $itemList
+				.filter((booking) => booking.Course.course_name === selectedCourseName)
+				.map((booking) => {
+					return {
+						course_id: booking.course_id
+					};
+				});
+
+			filteredCourseIds = removeDuplicates(filteredCourseIds, 'course_id');	
+			console.log(filteredCourseIds);
+
+		} else {
+			selectedCourseName = 'empty';
+			resetFilters()
+		}
+		filterList();
+	}
+
+	function handleTeacherChange(event) {
+		if (event.target.value !== 'empty') {
+			selectedTeacher = event.target.value;
+	
+			filteredCourseNames = $itemList
+				.filter((booking) => booking.Course.Teacher.email === selectedTeacher)
+				.map((booking) => {
+					return {
+						course_id: booking.Course.course_id,
+						course_name: booking.Course.course_name
+					};
+				});
+	
+			filteredCourseNames = removeDuplicates(filteredCourseNames, 'course_id');
+	
+			filteredCourseIds = $itemList
+				.filter((booking) => booking.Course.Teacher.email === selectedTeacher)
+				.map((booking) => {
+					return {
+						course_id: booking.course_id
+					};
+				});
+	
+			filteredCourseIds = removeDuplicates(filteredCourseIds, 'course_id');
+	
+		} else {
+			selectedCourseName = 'empty';
+			resetFilters()
+		}
+		filterList();
 	}
 	
-	function handleTeacherChange(event) {
-		console.log(e.target.value);
-
-		//when teacher changes, so does the course name selection
-	}
-
 	function handleCourseIdChange(event) {
-		
-		if (event.target.value !== "empty") {
-			console.log(selectedCourseId);
-			filteredBookings = filteredBookings.filter((booking) => booking.course_id == selectedCourseId);
-		}
-			//when teacher changes, so does the course name selection
-	}
+		if (event.target.value !== 'empty') {
+			selectedCourseId = Number(event.target.value);
+	
+			filteredCourseNames = $itemList
+				.filter((booking) => booking.course_id === selectedCourseId)
+				.map((booking) => {
+					return {
+						course_id: booking.Course.course_id,
+						course_name: booking.Course.course_name
+					};
+				});
+	
+			filteredCourseNames = removeDuplicates(filteredCourseNames, 'course_id');
+	
+			filteredTeachers = $itemList
+				.filter((booking) => booking.course_id === selectedCourseId)
+				.map((booking) => {
+					return {
+						teacher_id: booking.Course.Teacher.teacher_id,
+						email: booking.Course.Teacher.email
+					};
+				});
+	
+			filteredTeachers = removeDuplicates(filteredTeachers, 'teacher_id');
+	
+		} else {
+			selectedCourseId = 'empty';
 
+		}
+		filterList();
+	}
 
 	function resetFilters() {
 		selectedTeacher = 'empty';
 		selectedCourseName = 'empty';
+		selectedCourseId = 'empty';
+		filteredCourseNames = courseNames;
+		filteredTeachers = teachers;
+		filteredCourseIds = courseIds;
 	}
-
 </script>
 
 <div class="d-flex flex-column align-items-center mx-auto" style="max-width: 400px;">
@@ -168,10 +260,10 @@
 		<SelectBoxOptions
 			label={'Holdnavn'}
 			selected={selectedCourseName}
-			idKey={'course_id'}
+			idKey={'course_name'}
 			optionName={'course_name'}
-			options={courseNames}
-			onOptionChange={handleOptionChange}
+			options={filteredCourseNames}
+			onOptionChange={handleCourseNameChange}
 		/>
 	</div>
 
@@ -179,10 +271,10 @@
 		<SelectBoxOptions
 			label={'Underviser'}
 			selected={selectedTeacher}
-			idKey={'teacher_id'}
+			idKey={'email'}
 			optionName={'email'}
-			options={teachers}
-			onOptionChange={handleOptionChange}
+			options={filteredTeachers}
+			onOptionChange={handleTeacherChange}
 		/>
 	</div>
 
@@ -192,10 +284,15 @@
 			selected={selectedCourseId}
 			idKey={'course_id'}
 			optionName={'course_id'}
-			options={courseIds}
-			onOptionChange={handleOptionChange}
+			options={filteredCourseIds}
+			onOptionChange={handleCourseIdChange}
 		/>
 	</div>
+	<button
+		class="btn btn-primary btn-lg mt-3"
+		title="Nulstil filtre"
+		on:click={resetFilters}
+	>
 </div>
 
 <div class="container mt-5">
