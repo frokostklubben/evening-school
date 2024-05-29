@@ -16,14 +16,14 @@ const Classroom = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    location_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Location,
-        key: 'location_id',
-      },
-    },
+    // location_id: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    //   references: {
+    //     model: Location,
+    //     key: 'location_id',
+    //   },
+    // },
 
     capacity: {
       type: DataTypes.INTEGER,
@@ -38,7 +38,7 @@ const Classroom = sequelize.define(
 
 Classroom_purpose.hasMany(Classroom, { foreignKey: 'purpose_id' })
 Classroom.belongsTo(Classroom_purpose, { foreignKey: 'purpose_id' })
-
+Classroom.belongsTo(Location, { foreignKey: 'location_id' })
 Classroom.belongsToMany(Inventory, {
   through: 'ClassroomInventory',
   foreignKey: 'room_id',

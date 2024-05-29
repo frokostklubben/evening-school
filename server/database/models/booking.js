@@ -11,22 +11,22 @@ const Booking = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    course_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Course,
-        key: 'course_id',
-      },
-    },
-    room_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Classroom,
-        key: 'room_id',
-      },
-    },
+    // course_id: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    //   references: {
+    //     model: Course,
+    //     key: 'course_id',
+    //   },
+    // },
+    // room_id: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    //   references: {
+    //     model: Classroom,
+    //     key: 'room_id',
+    //   },
+    // },
     start_time: {
       type: DataTypes.TIME,
       allowNull: false,
@@ -44,5 +44,8 @@ const Booking = sequelize.define(
     timestamps: false,
   },
 )
+
+Booking.belongsTo(Classroom, { foreignKey: 'room_id' })
+Booking.belongsTo(Course, { foreignKey: 'course_id' })
 
 export default Booking

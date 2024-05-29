@@ -4,11 +4,36 @@ import Booking from '../database/models/booking.js'
 import Classroom from '../database/models/classroom.js'
 import Course from '../database/models/course.js'
 import Teacher from '../database/models/teacher.js'
+import Location from '../database/models/location.js'
 
 router.get('/api/bookings', async (req, res) => {
-  const bookings = await Booking.findAll()
-  res.send({ data: bookings })
-})
+  let school_id = req.session.user.schoolId;
+  const bookings = await Booking.findAll({
+    include: [
+      {
+        model: Classroom,
+        include: [
+          {
+            model: Location,
+            where: {
+              school_id: school_id,
+            },
+          },
+        ],
+      },
+      {
+        model: Course,
+        include: [
+          {
+            model: Teacher,
+          },
+        ],
+      },
+    ],
+  });
+
+  res.send({ data: bookings });
+});
 
 // History for bookings to a classroom
 router.get('/api/bookings/:roomId/room-history', async (req, res) => {
