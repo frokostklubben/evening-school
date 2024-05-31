@@ -8,6 +8,8 @@ import Location from '../database/models/location.js'
 
 router.get('/api/bookings', async (req, res) => {
   let school_id = req.session.user.schoolId;
+
+  let filteredBookings;
   const bookings = await Booking.findAll({
     include: [
       {
@@ -32,7 +34,26 @@ router.get('/api/bookings', async (req, res) => {
     ],
   });
 
-  res.send({ data: bookings });
+  filteredBookings = bookings.map(booking => {
+    booking = booking.toJSON();
+    let formattedBooking = {};
+    formattedBooking.bookingId = booking.booking_id;
+    formattedBooking.roomId = booking.room_id;
+    formattedBooking.courseId = booking.course_id;
+    formattedBooking.teacherId = booking.Course.teacher_id;
+    formattedBooking.locationId = booking.Classroom.location_id;
+    formattedBooking.courseName = booking.Course.course_name;
+    formattedBooking.roomName = booking.Classroom.room_name;
+    formattedBooking.teacherEmail = booking.Course.Teacher.email;
+    formattedBooking.startTime = booking.start_time;
+    formattedBooking.endTime = booking.end_time;
+    formattedBooking.date = booking.date;
+    formattedBooking.locationName = booking.Classroom.Location.school_name;
+    return formattedBooking;
+  })
+
+
+  res.send({ data: filteredBookings });
 });
 
 // History for bookings to a classroom

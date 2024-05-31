@@ -26,8 +26,11 @@
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
 
+	displayNames.set({
+		bookingId: 'Booking',
+	});
+
 	onMount(async () => {
-		//vi skal sætte displaynames
 		let response = await fetch(`${$BASE_URL}/bookings`, {
 			credentials: 'include'
 		});
@@ -38,21 +41,21 @@
 
 			teachers = result.data.map((booking) => {
 				return {
-					teacher_id: booking.Course.Teacher.teacher_id,
-					email: booking.Course.Teacher.email
+					teacher_id: booking.teacherId,
+					email: booking.teacherEmail
 				};
 			});
 
 			courseNames = result.data.map((booking) => {
 				return {
-					course_id: booking.course_id,
-					course_name: booking.Course.course_name
+					course_id: booking.courseId,
+					course_name: booking.courseName
 				};
 			});
 
 			courseIds = result.data.map((booking) => {
 				return {
-					course_id: booking.course_id
+					course_id: booking.courseId
 				};
 			});
 
@@ -67,6 +70,7 @@
 		fetchHeaderKeys().then(() => {
 			const derivedHeaderKeys = derived(itemList, ($itemList) => {
 				if ($itemList.length > 0) {
+					console.log($itemList[0]);
 					return Object.keys($itemList[0]);
 				} else {
 					fetchHeaderKeys();
@@ -108,7 +112,7 @@
 	}
 
 	async function fetchHeaderKeys() {
-		const response = await fetch(`${$BASE_URL}/headerKey/${collection}`, {
+		const response = await fetch(`${$BASE_URL}/headerKey/edit-booking`, {
 			credentials: 'include'
 		});
 
@@ -130,20 +134,24 @@
 
 		if (selectedCourseName !== 'empty') {
 			filteredBookings = filteredBookings.filter(
-				(booking) => booking.Course.course_name == selectedCourseName
+				(booking) => booking.courseName == selectedCourseName
 			);
 		}
 
 		if (selectedTeacher !== 'empty') {
 			filteredBookings = filteredBookings.filter(
-				(booking) => booking.Course.Teacher.email == selectedTeacher
+				(booking) => booking.teacherEmail == selectedTeacher
 			);
 		}
 
 		if (selectedCourseId !== 'empty') {
 			filteredBookings = filteredBookings.filter(
-				(booking) => booking.course_id == Number(selectedCourseId)
+				(booking) => booking.courseId == Number(selectedCourseId)
 			);
+		}
+
+		if (selectedCourseName === 'empty' && selectedTeacher === 'empty' && selectedCourseId === 'empty') {
+			resetFilters()
 		}
 	}
 
@@ -152,98 +160,127 @@
 			selectedCourseName = event.target.value;
 
 			filteredTeachers = $itemList
-				.filter((booking) => booking.Course.course_name === selectedCourseName)
+				.filter((booking) => booking.courseName === selectedCourseName)
 				.map((booking) => {
 					return {
-						teacher_id: booking.Course.Teacher.teacher_id,
-						email: booking.Course.Teacher.email
+						teacher_id: booking.teacherId,
+						email: booking.teacherEmail
 					};
 				});
-			
+
 			filteredTeachers = removeDuplicates(filteredTeachers, 'teacher_id');
 
 			filteredCourseIds = $itemList
-				.filter((booking) => booking.Course.course_name === selectedCourseName)
+				.filter((booking) => booking.courseName === selectedCourseName)
 				.map((booking) => {
 					return {
-						course_id: booking.course_id
+						course_id: booking.courseId
 					};
 				});
 
-			filteredCourseIds = removeDuplicates(filteredCourseIds, 'course_id');	
-			console.log(filteredCourseIds);
-
+			filteredCourseIds = removeDuplicates(filteredCourseIds, 'course_id');
 		} else {
 			selectedCourseName = 'empty';
-			resetFilters()
 		}
 		filterList();
 	}
 
 	function handleTeacherChange(event) {
-		if (event.target.value !== 'empty') {
+		if (event.target.value !== 'empty' && selectedCourseName === 'empty') {
 			selectedTeacher = event.target.value;
-	
+
 			filteredCourseNames = $itemList
-				.filter((booking) => booking.Course.Teacher.email === selectedTeacher)
+				.filter((booking) => booking.teacherEmail === selectedTeacher)
 				.map((booking) => {
 					return {
-						course_id: booking.Course.course_id,
-						course_name: booking.Course.course_name
+						course_id: booking.courseId,
+						course_name: booking.courseName
 					};
 				});
-	
+
 			filteredCourseNames = removeDuplicates(filteredCourseNames, 'course_id');
-	
+
 			filteredCourseIds = $itemList
-				.filter((booking) => booking.Course.Teacher.email === selectedTeacher)
+				.filter((booking) => booking.teacherEmail === selectedTeacher)
 				.map((booking) => {
 					return {
-						course_id: booking.course_id
+						course_id: booking.courseId
 					};
 				});
-	
+
 			filteredCourseIds = removeDuplicates(filteredCourseIds, 'course_id');
-	
+		} else if (event.target.value !== 'empty' && selectedCourseName !== 'empty') {
+			selectedTeacher = event.target.value;
+
+			filteredCourseNames = $itemList
+				.filter((booking) => booking.teacherEmail === selectedTeacher)
+				.filter((booking) => booking.courseName === selectedCourseName)
+				.map((booking) => {
+					return {
+						course_id: booking.courseId,
+						course_name: booking.courseName
+					};
+				});
+
+			filteredCourseNames = removeDuplicates(filteredCourseNames, 'course_id');
+
+			filteredCourseIds = $itemList
+				.filter((booking) => booking.teacherEmail === selectedTeacher)
+				.filter((booking) => booking.courseName === selectedCourseName)
+				.map((booking) => {
+					return {
+						course_id: booking.courseId
+					};
+				});
+
+			filteredCourseIds = removeDuplicates(filteredCourseIds, 'course_id');
 		} else {
-			selectedCourseName = 'empty';
+			selectedTeacher = 'empty';
 		}
 		filterList();
 	}
-	
+
 	function handleCourseIdChange(event) {
 		if (event.target.value !== 'empty') {
 			selectedCourseId = Number(event.target.value);
-	
 
-			//todo Når vi sætter en course id, skal både teacher og course name sættes til det rigtige
+			// when picking a course_id, teacher email and course name will be set in the dropdown menus above
 
+			selectedTeacher = $itemList
+				.filter((booking) => booking.courseId === selectedCourseId)
+				.map((booking) => {
+					return booking.teacherEmail;
+				})[0];
+
+			selectedCourseName = $itemList
+				.filter((booking) => booking.courseId === selectedCourseId)
+				.map((booking) => {
+					return booking.courseName;
+				})[0];
 
 			filteredCourseNames = $itemList
-				.filter((booking) => booking.course_id === selectedCourseId)
+				.filter((booking) => booking.courseId === selectedCourseId)
 				.map((booking) => {
 					return {
-						course_id: booking.Course.course_id,
-						course_name: booking.Course.course_name
+						course_id: booking.courseId,
+						course_name: booking.courseName
 					};
 				});
-	
+
 			filteredCourseNames = removeDuplicates(filteredCourseNames, 'course_id');
-	
+
 			filteredTeachers = $itemList
-				.filter((booking) => booking.course_id === selectedCourseId)
+				.filter((booking) => booking.courseId === selectedCourseId)
 				.map((booking) => {
 					return {
-						teacher_id: booking.Course.Teacher.teacher_id,
-						email: booking.Course.Teacher.email
+						teacher_id: booking.teacherId,
+						email: booking.teacherEmail
 					};
 				});
-	
+
 			filteredTeachers = removeDuplicates(filteredTeachers, 'teacher_id');
-	
 		} else {
 			selectedCourseId = 'empty';
-
 		}
 		filterList();
 	}
@@ -255,6 +292,8 @@
 		filteredCourseNames = courseNames;
 		filteredTeachers = teachers;
 		filteredCourseIds = courseIds;
+
+		filterList();
 	}
 </script>
 
@@ -291,11 +330,8 @@
 			onOptionChange={handleCourseIdChange}
 		/>
 	</div>
-	<button
-		class="btn btn-primary btn-lg mt-3"
-		title="Nulstil filtre"
-		on:click={resetFilters}
-	>
+	<button class="btn btn-primary btn-lg mt-3" title="Nulstil filtre" on:click={resetFilters}>
+	</button>
 </div>
 
 <div class="container mt-5">

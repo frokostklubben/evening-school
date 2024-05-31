@@ -39,6 +39,9 @@ router.get('/api/headerKey/:modelname', async (req, res) => {
       case 'inventories':
         columnNames = Object.keys(Inventory.getAttributes())
         break
+      case 'edit-booking':
+        columnNames = ['bookingId', 'roomId', 'courseId', 'teacherId', 'locationId', 'courseName', 'roomName', 'teacherEmail', 'startTime', 'endTime', 'date', 'locationName']
+        break
       case 'classrooms':
         const classroomAttributes = Object.keys(Classroom.getAttributes())
         const classroomPurposeAttributes = Object.keys(Classroom_purpose.getAttributes())
