@@ -38,16 +38,20 @@ router.get('/api/bookings', async (req, res) => {
     booking = booking.toJSON();
     let formattedBooking = {};
     formattedBooking.bookingId = booking.booking_id;
-    formattedBooking.roomId = booking.room_id;
     formattedBooking.courseId = booking.course_id;
-    formattedBooking.teacherId = booking.Course.teacher_id;
-    formattedBooking.locationId = booking.Classroom.location_id;
+    formattedBooking.date = booking.date;
     formattedBooking.courseName = booking.Course.course_name;
-    formattedBooking.roomName = booking.Classroom.room_name;
-    formattedBooking.teacherEmail = booking.Course.Teacher.email;
     formattedBooking.startTime = booking.start_time;
     formattedBooking.endTime = booking.end_time;
-    formattedBooking.date = booking.date;
+    formattedBooking.roomName = booking.Classroom.room_name;
+    formattedBooking.teacherEmail = booking.Course.Teacher.email;
+
+
+    formattedBooking.roomId = booking.room_id;
+    formattedBooking.teacherId = booking.Course.teacher_id;
+    formattedBooking.locationId = booking.Classroom.location_id;
+
+
     formattedBooking.locationName = booking.Classroom.Location.school_name;
     return formattedBooking;
   })

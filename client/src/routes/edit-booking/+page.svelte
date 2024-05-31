@@ -25,9 +25,18 @@
 	$: filteredTeachers = teachers;
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
+	let groupedData = {};
 
 	displayNames.set({
-		bookingId: 'Booking',
+		bookingId: 'B.ID',
+		teacherEmail: 'Underviseremail',
+		courseId: 'K.ID',
+		courseName: 'Kursus',
+		date: 'Dato',
+		startTime: 'Start',
+		endTime: 'Slut',
+		roomName: 'Lokale',
+		locationName: 'Afdeling'
 	});
 
 	onMount(async () => {
@@ -101,7 +110,7 @@
 	}
 
 	function setHeaderKeys(data) {
-		const excludeKeys = ['_id', 'hashed_password'];
+		const excludeKeys = ['_id', 'hashed_password', 'roomId', 'teacherId', 'locationId'];
 
 		// 	Made in cooperation with chatgpt (Marcus)
 		const filteredKeys = data.filter(
@@ -129,6 +138,18 @@
 		return Array.isArray(inventories) ? inventories.join(', ') : inventories;
 	}
 
+	function groupData() {
+		// Group the filteredBookings by course_id
+		groupedData = filteredBookings.reduce((groups, item) => {
+			const key = item.courseName;
+			if (!groups[key]) {
+				groups[key] = [];
+			}
+			groups[key].push(item);
+			return groups;
+		}, {});
+	}
+
 	function filterList() {
 		filteredBookings = $itemList;
 
@@ -150,8 +171,12 @@
 			);
 		}
 
-		if (selectedCourseName === 'empty' && selectedTeacher === 'empty' && selectedCourseId === 'empty') {
-			resetFilters()
+		if (
+			selectedCourseName === 'empty' &&
+			selectedTeacher === 'empty' &&
+			selectedCourseId === 'empty'
+		) {
+			resetFilters();
 		}
 	}
 
@@ -292,8 +317,7 @@
 		filteredCourseNames = courseNames;
 		filteredTeachers = teachers;
 		filteredCourseIds = courseIds;
-
-		filterList();
+		filterList(true);
 	}
 </script>
 
@@ -338,8 +362,11 @@
 	<div class="row justify-content-center">
 		<div class="col-12 col-lg-10">
 			{#if $itemList.length > 0}
+				<!--{#each Object.keys(groupedData) as courseId}-->
+				<!--<div class="mt-3">-->
+				<!--<h2>Course ID: {courseId}</h2>-->
 				<div class="list-group">
-					<table class="w-100">
+					<table class="w-100 spaced-table">
 						<thead>
 							<tr>
 								{#each $headerKeysDanish as key (key)}
@@ -348,14 +375,17 @@
 							</tr>
 						</thead>
 						<tbody>
+							<!--{#each groupedData[courseId] as listItem}-->
 							{#each filteredBookings as listItem, index}
 								<tr class="hover-row">
 									{#each $headerKeys as key (key)}
 										<td>
 											{#if key === 'inventories' || key === 'inventory' || key === 'item_list' || key === 'Inventories'}
 												{formatInventory(listItem[key])}
-											{:else if key === 'start_date' || key === 'end_date'}
-												{new Date(formatInventory(listItem[key])).toLocaleDateString()}
+											{:else if key === 'date'}
+												{new Date(listItem[key]).toLocaleDateString()}
+											{:else if key === 'startTime' || key === 'endTime'}
+												{listItem[key].slice(0, 5)}
 											{:else}
 												{listItem[key]}
 											{/if}
@@ -390,6 +420,7 @@
 						</tbody>
 					</table>
 				</div>
+				<!--{/each}-->
 			{:else if $optionId}
 				<div class="alert alert-warning" role="alert">Ingen data</div>
 			{/if}
@@ -404,5 +435,10 @@
 <style>
 	.hover-row:hover {
 		background-color: #e0e0e0;
+	}
+
+	.spaced-table th,
+	.spaced-table td {
+		padding: 0 1rem; /* Adjust as needed */
 	}
 </style>

@@ -40,7 +40,7 @@ router.get('/api/headerKey/:modelname', async (req, res) => {
         columnNames = Object.keys(Inventory.getAttributes())
         break
       case 'edit-booking':
-        columnNames = ['bookingId', 'roomId', 'courseId', 'teacherId', 'locationId', 'courseName', 'roomName', 'teacherEmail', 'startTime', 'endTime', 'date', 'locationName']
+        columnNames = ['bookingId', 'courseId', 'courseName', 'roomName', 'teacherEmail', 'startTime', 'endTime', 'date', 'locationName']
         break
       case 'classrooms':
         const classroomAttributes = Object.keys(Classroom.getAttributes())
