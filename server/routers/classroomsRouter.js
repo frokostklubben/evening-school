@@ -8,6 +8,7 @@ import { Op } from 'sequelize'
 import connection from '../database/database.js'
 import Booking from '../database/models/booking.js'
 import Location from '../database/models/location.js'
+import Holiday from '../database/models/holiday.js'
 
 router.get('/api/classrooms', adminCheck, async (req, res) => {
   const classrooms = await Classroom.findAll()
@@ -78,7 +79,6 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       await newClassroom.setClassroom_purpose(newPurpose, { transaction })
     }
 
-    // Oprette alle inventarobjekterne i en batch-operation, hvilket kan reducere overhead og forbedre ydeevnen:
     let newInventories = []
     if (inventories) {
       const inventoryItems = inventories.split(',').map(item => ({
@@ -103,7 +103,7 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       room_name: completeClassroom.room_name,
       location_id: completeClassroom.location_id,
       capacity: completeClassroom.capacity,
-      purpose: completeClassroom.classroom_purpose.purpose, // directly assign the purpose value
+      purpose: completeClassroom.classroom_purpose.purpose, 
       inventories: completeClassroom.Inventories.map(inventory => {
         return inventory.item_name
       }),
@@ -213,22 +213,18 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
     const schoolId = req.params.school_id
     let { startDate, endDate, startTime, endTime } = req.body
 
-    // Parse dates and times
     startDate = new Date(startDate)
     endDate = new Date(endDate)
     startTime = new Date(startTime[0])
     endTime = new Date(endTime[0])
 
-    // Create new dates with the date of startDate/endDate and the time of startTime/endTime
     startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
 
     endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
 
-    // Convert to local time
     startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset())
     endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset())
 
-    // Extract time
     startTime = startDate.toISOString().split('T')[1]
     endTime = endDate.toISOString().split('T')[1]
 
@@ -278,6 +274,30 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       },
     })
 
+
+    const allHolidays = await Holiday.findAll({
+      where: {
+        school_id: schoolId,
+        start_date: {
+          [Op.lte]: endDate,
+        },
+        end_date: {
+          [Op.gte]: startDate,
+        },
+      },
+    })
+
+    
+    function isDateWithinHoliday(date, holiday) {
+      return date >= new Date(holiday.start_date) && date <= new Date(holiday.end_date)
+    }
+
+
+    function isDateDuringAnyHoliday(date, allHolidays) {
+      return allHolidays.some(holiday => isDateWithinHoliday(date, holiday))
+    }
+
+    // TODO: explain better?  The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
     const bookingsByClassroom = allBookings.reduce((acc, booking) => {
       const roomId = booking.room_id
       if (!acc[roomId]) {
@@ -291,14 +311,12 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       return acc
     }, {})
 
-    const calculateFreeTimes = (bookings, openingHour, closingHour) => {
+    const calculateFreeTimes = (bookings, startHour, endHour) => {
       const intervals = []
       const bookingsByDate = bookings.reduce((acc, booking) => {
-        const date = booking.date.toISOString().split('T')[0]
-        if (!acc[date]) {
-          acc[date] = []
-        }
-        acc[date].push(booking)
+        const dateStr = booking.date.toISOString().split('T')[0]
+        if (!acc[dateStr]) acc[dateStr] = []
+        acc[dateStr].push(booking)
         return acc
       }, {})
 
@@ -308,10 +326,9 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       while (current <= end) {
         const dateStr = current.toISOString().split('T')[0]
         const dayBookings = bookingsByDate[dateStr] || []
-
         dayBookings.sort((a, b) => a.start_time.localeCompare(b.start_time))
 
-        let currentStart = openingHour
+        let currentStart = startHour
         const dayIntervals = []
 
         dayBookings.forEach(booking => {
@@ -321,12 +338,11 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
           currentStart = booking.end_time
         })
 
-        if (currentStart < closingHour) {
-          dayIntervals.push({ start: currentStart, end: closingHour })
+        if (currentStart < endHour) {
+          dayIntervals.push({ start: currentStart, end: endHour })
         }
 
         intervals.push({ date: dateStr, times: dayIntervals })
-
         current.setDate(current.getDate() + 1)
       }
 
@@ -341,11 +357,16 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       if (bookings.length === 0) {
         freeTimes = []
         const current = new Date(startDate)
-        while (current <= endDate) {
-          freeTimes.push({
-            date: current.toISOString().split('T')[0],
-            times: [{ start: startTime, end: endTime }],
-          })
+        const end = new Date(endDate)
+
+        while (current <= end) {
+          if (!isDateDuringAnyHoliday(current, allHolidays)) {
+            const dateStr = current.toISOString().split('T')[0]
+            freeTimes.push({
+              date: dateStr,
+              times: [{ start: startTime, end: endTime }],
+            })
+          }
           current.setDate(current.getDate() + 1)
         }
       } else {
@@ -361,25 +382,6 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
         purpose: classroom.classroom_purpose ? classroom.classroom_purpose.purpose : '',
         freeTimes,
       }
-    })
-
-    const allDatesInRange = []
-    let current = new Date(startDate)
-    while (current <= endDate) {
-      allDatesInRange.push(current.toISOString().split('T')[0])
-      current.setDate(current.getDate() + 1)
-    }
-
-    classroomsWithAvailability.forEach(classroom => {
-      allDatesInRange.forEach(date => {
-        if (!classroom.freeTimes.some(interval => interval.date === date)) {
-          classroom.freeTimes.push({
-            date,
-            times: [{ start: startTime, end: endTime }],
-          })
-        }
-      })
-      classroom.freeTimes.sort((a, b) => new Date(a.date) - new Date(b.date))
     })
 
     res.send({ data: classroomsWithAvailability })

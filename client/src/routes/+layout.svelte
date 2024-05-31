@@ -79,7 +79,7 @@
 						class="nav-link"
 						class:active={$page.url.pathname === '/room-search'}
 						data-sveltekit-preload-data
-						href={$user.email ? '/room-search' : '/'}>Søg lokale</a
+						href={$user.email ? '/room-search' : '/'}>Find ledige lokaler</a
 					>
 					<a
 						class="nav-link"

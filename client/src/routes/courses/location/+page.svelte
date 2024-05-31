@@ -8,9 +8,6 @@
 	import { titleStore } from '../../../stores/titleStore.js';
 	import GoBackButton from '../../../components/GoBackButton.svelte';
 
-	let selectedLocation = '';
-	let selectedSchoolName = '';
-
 	displayNames.set({
 		course_name: 'Kursusnavn',
 		description: 'Beskrivelse'

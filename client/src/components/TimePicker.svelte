@@ -9,14 +9,7 @@
 	function onTimeChange(event) {
 		value = event.detail[0];
 	}
-	/* 	
-  TODO: implement this with a onSelected 
-  if (event.detail[0] % 15 !== 0) {
-			toast.error('Vennligst kun velg 15 minutters intervaller');
-		} else {
-			value = event.detail[0];
-		}
-	} */
+	
 </script>
 
 <Datepicker

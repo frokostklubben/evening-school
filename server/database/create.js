@@ -131,27 +131,21 @@ await Course.bulkCreate([
   { teacher_id: 5, course_name: 'Data Science og Big Data Analyse', description: 'Teknikker til håndtering og analyse af store datamængder.' },
 ])
 
-// Skal være ledig fra: 8-10, 14-16, 18-19, 21-23
 await Booking.bulkCreate([
-  { course_id: 1, room_id: 3, start_time: '10:00:00', end_time: '12:00:00', date: '2024-06-05' },
-  { course_id: 1, room_id: 3, start_time: '12:00:00', end_time: '14:00:00', date: '2024-06-05' },
-  { course_id: 1, room_id: 3, start_time: '16:00:00', end_time: '18:00:00', date: '2024-06-05' },
-  { course_id: 1, room_id: 3, start_time: '19:00:00', end_time: '21:00:00', date: '2024-06-05' },
-
-  // { course_id: 1, room_id: 1, start_time: '16:30:00', end_time: '19:30:00', date: '2024-05-22' },
-  // { course_id: 2, room_id: 1, start_time: '12:00:00', end_time: '14:00:00', date: '2024-05-24' },
-  // { course_id: 3, room_id: 2, start_time: '10:00:00', end_time: '12:00:00', date: '2024-05-25' },
-  // { course_id: 4, room_id: 2, start_time: '14:00:00', end_time: '16:00:00', date: '2024-05-26' },
-  // { course_id: 5, room_id: 3, start_time: '09:00:00', end_time: '11:00:00', date: '2024-05-27' },
-  // { course_id: 6, room_id: 3, start_time: '13:00:00', end_time: '15:00:00', date: '2024-05-28' },
-  // { course_id: 7, room_id: 3, start_time: '11:00:00', end_time: '13:00:00', date: '2024-05-29' },
-  // { course_id: 8, room_id: 4, start_time: '15:00:00', end_time: '17:00:00', date: '2024-05-30' },
-  // { course_id: 9, room_id: 5, start_time: '10:00:00', end_time: '12:00:00', date: '2024-05-31' },
-  // { course_id: 10, room_id: 5, start_time: '09:00:00', end_time: '11:00:00', date: '2024-06-01' },
-  // { course_id: 1, room_id: 5, start_time: '12:00:00', end_time: '14:00:00', date: '2024-06-02' },
-  // { course_id: 2, room_id: 6, start_time: '14:00:00', end_time: '16:00:00', date: '2024-06-03' },
-  // { course_id: 3, room_id: 6, start_time: '16:00:00', end_time: '18:00:00', date: '2024-06-04' },
-  // { course_id: 4, room_id: 6, start_time: '11:00:00', end_time: '13:00:00', date: '2024-06-05' },
+  { course_id: 1, room_id: 1, start_time: '16:30:00', end_time: '19:30:00', date: '2024-05-22' },
+  { course_id: 2, room_id: 1, start_time: '12:00:00', end_time: '14:00:00', date: '2024-05-24' },
+  { course_id: 3, room_id: 2, start_time: '10:00:00', end_time: '12:00:00', date: '2024-05-25' },
+  { course_id: 4, room_id: 2, start_time: '14:00:00', end_time: '16:00:00', date: '2024-05-26' },
+  { course_id: 5, room_id: 3, start_time: '09:00:00', end_time: '11:00:00', date: '2024-05-27' },
+  { course_id: 6, room_id: 3, start_time: '13:00:00', end_time: '15:00:00', date: '2024-05-28' },
+  { course_id: 7, room_id: 3, start_time: '11:00:00', end_time: '13:00:00', date: '2024-05-29' },
+  { course_id: 8, room_id: 4, start_time: '15:00:00', end_time: '17:00:00', date: '2024-05-30' },
+  { course_id: 9, room_id: 5, start_time: '10:00:00', end_time: '12:00:00', date: '2024-05-31' },
+  { course_id: 10, room_id: 5, start_time: '09:00:00', end_time: '11:00:00', date: '2024-06-01' },
+  { course_id: 1, room_id: 5, start_time: '12:00:00', end_time: '14:00:00', date: '2024-06-02' },
+  { course_id: 2, room_id: 6, start_time: '14:00:00', end_time: '16:00:00', date: '2024-06-03' },
+  { course_id: 3, room_id: 6, start_time: '16:00:00', end_time: '18:00:00', date: '2024-06-04' },
+  { course_id: 4, room_id: 6, start_time: '11:00:00', end_time: '13:00:00', date: '2024-06-05' },
 ])
 
 const inventory = await Inventory.bulkCreate([
@@ -188,7 +182,6 @@ await inventory[12].addClassroom(classrooms[4]) // Skriveartikler til Softwareud
 await inventory[13].addClassroom(classrooms[4]) // Lydisoleringspaneler til Softwareudviklingsrum
 
 await Holiday.bulkCreate([
-  //someholidays
   { name: 'Juleaften', school_id: '1', start_date: '2024-12-24', end_date: '2024-12-24' },
   { name: 'Sommerferie', school_id: '2', start_date: '2024-06-01', end_date: '2024-08-01' },
 ])
