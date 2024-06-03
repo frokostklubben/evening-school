@@ -11,14 +11,6 @@ const Course = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    teacher_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: Teacher,
-        key: 'teacher_id',
-      },
-    },
     course_name: {
       type: DataTypes.STRING(55),
       allowNull: false,
@@ -33,5 +25,7 @@ const Course = sequelize.define(
     tableName: 'courses',
   },
 )
+
+Course.belongsTo(Teacher, { foreignKey: 'teacher_id' })
 
 export default Course

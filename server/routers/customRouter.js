@@ -85,7 +85,41 @@ router.get('/api/booking-form-info', async (req, res) => {
   }
 })
 
-router.post('/api/check-booking-dates', async (req, res) => {
+router.get("/api/edit-booking-form-info", async (req, res) => {
+
+  try {
+    let school_id = req.session.user.schoolId;
+
+    let locations = await location.findAll({
+      where: { school_id: school_id },
+      include: [{
+        model: classroom,
+        include: [{
+          model: Classroom_purpose,
+        }]
+      }]
+    });
+
+    let teachers = await teacher.findAll({
+      where: { school_id: school_id },
+    });
+
+    res.status(200).send({
+      data: {
+        locations,
+        teachers,
+      }
+    })
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: "Failed to get form info" });
+  }
+
+
+})
+
+router.post("/api/check-booking-dates", async (req, res) => {
   try {
     let { bookingDates, ignoreSetupTime } = req.body
     let school_id = req.session.user.schoolId

@@ -9,3 +9,5 @@ export let showAddModal = writable(false);
 export let selectedItem = writable({});
 
 export let optionId = writable('');
+
+export let editData = writable({});

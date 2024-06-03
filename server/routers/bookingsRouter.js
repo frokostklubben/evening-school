@@ -4,11 +4,61 @@ import Booking from '../database/models/booking.js'
 import Classroom from '../database/models/classroom.js'
 import Course from '../database/models/course.js'
 import Teacher from '../database/models/teacher.js'
+import Location from '../database/models/location.js'
 
 router.get('/api/bookings', async (req, res) => {
-  const bookings = await Booking.findAll()
-  res.send({ data: bookings })
-})
+  let school_id = req.session.user.schoolId;
+
+  let filteredBookings;
+  const bookings = await Booking.findAll({
+    include: [
+      {
+        model: Classroom,
+        include: [
+          {
+            model: Location,
+            where: {
+              school_id: school_id,
+            },
+          },
+        ],
+      },
+      {
+        model: Course,
+        include: [
+          {
+            model: Teacher,
+          },
+        ],
+      },
+    ],
+  });
+
+  filteredBookings = bookings.map(booking => {
+    booking = booking.toJSON();
+    let formattedBooking = {};
+    formattedBooking.bookingId = booking.booking_id;
+    formattedBooking.courseId = booking.course_id;
+    formattedBooking.date = booking.date;
+    formattedBooking.courseName = booking.Course.course_name;
+    formattedBooking.startTime = booking.start_time;
+    formattedBooking.endTime = booking.end_time;
+    formattedBooking.roomName = booking.Classroom.room_name;
+    formattedBooking.teacherEmail = booking.Course.Teacher.email;
+
+
+    formattedBooking.roomId = booking.room_id;
+    formattedBooking.teacherId = booking.Course.teacher_id;
+    formattedBooking.locationId = booking.Classroom.location_id;
+
+
+    formattedBooking.locationName = booking.Classroom.Location.school_name;
+    return formattedBooking;
+  })
+
+
+  res.send({ data: filteredBookings });
+});
 
 // History for bookings to a classroom
 router.get('/api/bookings/:roomId/room-history', async (req, res) => {

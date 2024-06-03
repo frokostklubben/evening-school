@@ -1,7 +1,5 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
-import { Op } from 'sequelize'
-import Location from './location.js'
 import Classroom_purpose from './classroomPurpose.js'
 import Inventory from './inventory.js'
 import Booking from './booking.js'
@@ -18,15 +16,6 @@ const Classroom = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    // location_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: Location,
-    //     key: 'location_id',
-    //   },
-    // },
-
     capacity: {
       type: DataTypes.INTEGER,
       allowNull: false,
