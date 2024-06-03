@@ -5,7 +5,9 @@
 	import { itemList } from '../../../stores/itemListStore';
 	import { optionId } from '../../../stores/modalStore';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
-	import { buttonStoreValue } from '../../../stores/buttonStore.js';
+	import { titleStore } from '../../../stores/titleStore.js';
+	import GoBackButton from '../../../components/GoBackButton.svelte';
+	import { isLoading } from '../../../stores/generalStore.js';
 
 	displayNames.set({
 		room_name: 'Rum',
@@ -19,13 +21,15 @@
 		fetchClassrooms();
 	});
 
-	// TODO: HVORFOR er denne kode nødvendig når det er samme kode i fetchResultOnOption i DropdownAndList.svelte?
 	async function fetchClassrooms() {
 		const response = await fetch(`${$BASE_URL}/classrooms/${$optionId}`, {
 			credentials: 'include'
 		});
 
+		isLoading.set(true);
+
 		if (response.ok) {
+			isLoading.set(false);
 			const result = await response.json();
 			itemList.set(result.data);
 		} else {
@@ -34,9 +38,10 @@
 	}
 </script>
 
-<!-- TODO: Hvis man går tilbage i browseren får man undefined! -->
+<GoBackButton />
+
 <div>
-	<h2 class="pt-3 text-center">Lokaler hos {$buttonStoreValue}</h2>
+	<h2 class="pt-3 text-center">Lokaler hos {$titleStore}</h2>
 </div>
 
 <ListItems

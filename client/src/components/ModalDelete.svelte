@@ -4,6 +4,7 @@
 	import { itemList } from '../stores/itemListStore.js';
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { showDeleteModal, selectedItem } from '../stores/modalStore.js';
+	import { isLoading } from '../stores/generalStore.js';
 
 	export let collection = '';
 	export let idKey = '';
@@ -14,8 +15,15 @@
 				credentials: 'include',
 				method: 'DELETE'
 			});
-			if (!response.ok) throw new Error('Failed to delete item');
 
+			isLoading.set(true);
+			const result = await response.json(); // Parse the response body as JSON
+
+			if (!response.ok) {
+				throw new Error(result.message || 'Failed to delete item');
+			}
+
+			isLoading.set(false);
 			toast.success(`${collection}#${$selectedItem[idKey]} er slettet`);
 
 			itemList.update((item) => {
@@ -24,6 +32,7 @@
 
 			return 'Deleted Successfully';
 		} catch (error) {
+			toast.error(`Fejl ved sletning: ${error.message}`);
 			console.error('Error deleting item:', error);
 		}
 	}

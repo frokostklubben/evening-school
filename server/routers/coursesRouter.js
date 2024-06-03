@@ -31,9 +31,6 @@ router.get('/api/courses/:locationId', async (req, res) => {
       where: { course_id: { [Op.in]: courseIds } },
     })
 
-    // Filter unique courses by course_name to avoid duplicates
-    // const uniqueCourses = Array.from(new Map(courses.map(course => [course['course_name'], course])).values())
-
     res.send({ data: courses })
   } catch (error) {
     console.error('Error fetching courses for location:', error)
@@ -41,7 +38,6 @@ router.get('/api/courses/:locationId', async (req, res) => {
   }
 })
 
-// TODO: fjerne locationId??
 router.get('/api/courses/:locationId/:roomId', async (req, res) => {
   try {
     const roomId = req.params.roomId

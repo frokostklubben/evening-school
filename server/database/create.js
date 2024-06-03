@@ -182,7 +182,6 @@ await inventory[12].addClassroom(classrooms[4]) // Skriveartikler til Softwareud
 await inventory[13].addClassroom(classrooms[4]) // Lydisoleringspaneler til Softwareudviklingsrum
 
 await Holiday.bulkCreate([
-  //someholidays
   { name: 'Juleaften', school_id: '1', start_date: '2024-12-24', end_date: '2024-12-24' },
   { name: 'Sommerferie', school_id: '2', start_date: '2024-06-01', end_date: '2024-08-01' },
 ])

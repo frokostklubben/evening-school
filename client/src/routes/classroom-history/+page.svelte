@@ -5,7 +5,9 @@
 	import { user } from '../../stores/userStore.js';
 	import { itemList } from '../../stores/itemListStore';
 	import { optionId } from '../../stores/modalStore.js';
-	import { buttonStoreValue } from '../../stores/buttonStore.js';
+	import { titleStore } from '../../stores/titleStore.js';
+	import GoBackButton from '../../components/GoBackButton.svelte';
+	import { isLoading } from '../../stores/generalStore.js';
 
 	displayNames.set({
 		course_name: 'Holdnavn',
@@ -30,8 +32,6 @@
 		return new Date(dateString).toLocaleDateString(undefined, options);
 	}
 
-	// Endpoint: api/bookings/:courseId/room-history
-
 	async function fetchBookings() {
 		let formattedData = [];
 
@@ -39,7 +39,10 @@
 			credentials: 'include'
 		});
 
+		isLoading.set(true);
+
 		if (response.ok) {
+			isLoading.set(false);
 			const result = await response.json();
 
 			formattedData = result.data.map((item) => {
@@ -55,8 +58,10 @@
 	}
 </script>
 
+<GoBackButton />
+
 <div>
-	<h2 class="pt-3 text-center">Historik over hold i lokale {$buttonStoreValue}</h2>
+	<h2 class="pt-3 text-center">Historik over hold i lokale {$titleStore}</h2>
 </div>
 
 <ListItems idKey={$user.schoolId} collection={'bookings'} showButtons={false} />

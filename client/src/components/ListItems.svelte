@@ -8,7 +8,7 @@
 	import { goto } from '$app/navigation';
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { onMount } from 'svelte';
-	import { buttonStoreValue } from '../stores/buttonStore.js';
+	import { titleStore } from '../stores/titleStore.js';
 
 	export let collection;
 	export let idKey;
@@ -50,6 +50,9 @@
 	}
 
 	async function fetchHeaderKeys() {
+		if (collection.includes('classrooms/available')) {
+			collection = 'classrooms/available';
+		}
 		const response = await fetch(`${$BASE_URL}/headerKey/${collection}`, {
 			credentials: 'include'
 		});
@@ -132,9 +135,7 @@
 													on:click={() => {
 														selectedItem.set(listItem);
 														optionId.set(listItem[button.key]);
-
-														buttonStoreValue.set(listItem[button.store]);
-
+														titleStore.set(listItem[button.store]);
 														goto(button.url);
 													}}
 												>
