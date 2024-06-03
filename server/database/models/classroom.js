@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
-import Location from './location.js'
 import Classroom_purpose from './classroomPurpose.js'
 import Inventory from './inventory.js'
 
@@ -29,7 +28,7 @@ const Classroom = sequelize.define(
 
 Classroom_purpose.hasMany(Classroom, { foreignKey: 'purpose_id' })
 Classroom.belongsTo(Classroom_purpose, { foreignKey: 'purpose_id' })
-Classroom.belongsTo(Location, { foreignKey: 'location_id' })
+
 Classroom.belongsToMany(Inventory, {
   through: 'ClassroomInventory',
   foreignKey: 'room_id',

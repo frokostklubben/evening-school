@@ -2,13 +2,28 @@
 	import { Button, Modal } from 'flowbite-svelte';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { BASE_URL } from '../stores/apiConfig.js';
-	import { selectedItem, showEditModal } from '../stores/modalStore.js';
+	import { selectedItem, showEditModal, editData } from '../stores/modalStore.js';
 	import { itemList } from '../stores/itemListStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
 
 	let itemKeys = [];
 	let idKey = 'bookingId';
+	$: teachers = $editData.teachers;
+	$: locations = $editData.locations;
+	$: classrooms = $editData.locations
+		? $editData.locations.map((location) => location.Classrooms).flat()
+		: [];
+
+console.log('selectedItem', $selectedItem);
+    //let selectedTeacher = $selectedItem.teacherId;
+    $: selectedTeacher = $selectedItem.teacherId;
+    $: selectedClassroom = $selectedItem.roomId;
+	$: selectedLocation = $selectedItem.locationId;
+
+	$: filteredClassrooms = selectedLocation
+		? classrooms.filter((classroom) => classroom.location_id == selectedLocation)
+		: classrooms;
 
 	$: {
 		if ($selectedItem) {
@@ -46,27 +61,28 @@
 	}
 
 	function handleLocationChange(event) {
-		console.log('Location id', event.target.value);
-		//$selectedItem['location_id'] = event.target.value;
+        selectedLocation = Number(event.target.value)
+    }
+
+	function handleClassroomChange(event) {
+        selectedClassroom = Number(event.target.value)
 	}
 
-    function handleClassroomChange(event) {
-        console.log('Classroom id', event.target.value);
-    }
-
-    function handleTeacherChange(event) {
-        console.log('Teacher id', event.target.value);
-    }
-
+	function handleTeacherChange(event) {
+        selectedTeacher = Number(event.target.value)
+	}
 </script>
 
-<Modal title={`Redigér Booking ID #${$selectedItem['bookingId']}`} bind:open={$showEditModal} autoclose>
+<Modal
+	title={`Redigér Booking ID #${$selectedItem['bookingId']}`}
+	bind:open={$showEditModal}
+	autoclose
+>
 	<div class="container-fluid mt-3">
 		<div class="row justify-content-center">
 			<div class="col-md-8">
 				<form on:submit|preventDefault={saveChanges} class="needs-validation">
 					<div class="mb-3">
-
 						<label for="courseName" class="form-label">{$displayNames['courseName']}</label>
 						<input
 							type="text"
@@ -76,35 +92,32 @@
 							readonly
 						/>
 
-
 						<SelectBoxOptions
 							label={'Afdeling'}
-							selected={''}
+							selected={selectedLocation}
 							idKey={'location_id'}
 							optionName={'school_name'}
-							options={[]}
+							options={locations}
 							onOptionChange={handleLocationChange}
 						/>
 
 						<SelectBoxOptions
 							label={'Lokale'}
-							selected={''}
+							selected={selectedClassroom}
 							idKey={'room_id'}
 							optionName={'room_name'}
-							options={[]}
+							options={filteredClassrooms}
 							onOptionChange={handleClassroomChange}
 						/>
 
-                        <SelectBoxOptions
+						<SelectBoxOptions
 							label={'Underviser'}
-							selected={''}
+							selected={selectedTeacher}
 							idKey={'teacher_id'}
 							optionName={'email'}
-							options={[]}
+							options={teachers}
 							onOptionChange={handleTeacherChange}
 						/>
-
-
 					</div>
 				</form>
 			</div>

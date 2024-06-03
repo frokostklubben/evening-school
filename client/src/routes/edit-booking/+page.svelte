@@ -6,7 +6,8 @@
 		optionId,
 		selectedItem,
 		showDeleteModal,
-		showEditModal
+		showEditModal,
+		editData
 	} from '../../stores/modalStore.js';
 	import { displayNames } from '../../stores/dictionaryStore.js';
 	import { BASE_URL } from '../../stores/apiConfig.js';
@@ -41,6 +42,9 @@
 	});
 
 	onMount(async () => {
+
+		fetchEditData()
+
 		let response = await fetch(`${$BASE_URL}/bookings`, {
 			credentials: 'include'
 		});
@@ -81,7 +85,6 @@
 		fetchHeaderKeys().then(() => {
 			const derivedHeaderKeys = derived(itemList, ($itemList) => {
 				if ($itemList.length > 0) {
-					console.log($itemList[0]);
 					return Object.keys($itemList[0]);
 				} else {
 					fetchHeaderKeys();
@@ -96,6 +99,24 @@
 			});
 		});
 	});
+
+	async function fetchEditData() {
+		try {
+			const response = await fetch(`${$BASE_URL}/edit-booking-form-info`, {
+				credentials: 'include'
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+				editData.set(result.data);
+			} else {
+				console.error('Failed to fetch edit booking data from the server');
+			}
+		} catch (error) {
+			console.error('Failed to fetch edit booking data from the server:', error.message);
+		
+	}
+}
 
 	/* 
 	So, in simple terms, this code is saying: 
@@ -325,7 +346,6 @@
 		//filterList();
 		filteredBookings = $itemList;
 		groupData()
-		console.log(filteredBookings);
 	}
 </script>
 
