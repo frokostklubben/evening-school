@@ -1,7 +1,6 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
 import Teacher from './teacher.js'
-import Location from './location.js'
 
 const Course = sequelize.define(
   'Course',
