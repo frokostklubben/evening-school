@@ -45,6 +45,13 @@ router.get('/api/headerKey/:modelname', async (req, res) => {
         columnNames = [...classroomAttributes, ...classroomPurposeAttributes, 'inventories']
 
         break
+      case 'classrooms/available':
+        classroomAttributes = Object.keys(Classroom.getAttributes())
+        classroomPurposeAttributes = Object.keys(Classroom_purpose.getAttributes())
+        classroomAttributes.push('school_name')
+        columnNames = [...classroomAttributes, ...classroomPurposeAttributes, 'inventory']
+
+        break
       case 'teachers':
         columnNames = Object.keys(Teacher.getAttributes())
         break

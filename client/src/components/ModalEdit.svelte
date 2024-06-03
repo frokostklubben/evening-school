@@ -5,6 +5,7 @@
 	import { selectedItem, showEditModal } from '../stores/modalStore.js';
 	import { itemList } from '../stores/itemListStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
+	import { isLoading } from '../stores/generalStore.js';
 
 	export let idKey;
 	export let collection = '';
@@ -16,8 +17,6 @@
 		}
 	}
 
-
-	// TODO: move to service - ts problems
 	function validateEmail(email) {
 		const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 		return regex.test(email);
@@ -41,8 +40,12 @@
 				body: JSON.stringify($selectedItem)
 			});
 
+			isLoading.set(true);
+
 			const result = await response.json();
+
 			if (response.ok) {
+				isLoading.set(false);
 				toast.success('Opdatering vellykket!');
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
@@ -52,12 +55,10 @@
 
 				showEditModal.set(false);
 			} else {
-				toast.error('Fejl ved opdatering:', error.message);
-
-				// throw new Error(result.message || 'Failed to update item');
+				toast.error(`Fejl ved opdatering:, ${result.message}`);
 			}
 		} catch (error) {
-			toast.error('Fejl ved opdatering:', error.message);
+			toast.error(`Fejl ved opdatering: ${error.message}`);
 		}
 	}
 
@@ -93,13 +94,13 @@
 									required
 								/>
 							{:else if key === 'start_date' || key === 'end_date'}
-							<input
-								type="date"
-								class="form-control"
-								id={key}
-								bind:value={$selectedItem[key]}
-								min={new Date().toISOString().split('T')[0]}
-								required
+								<input
+									type="date"
+									class="form-control"
+									id={key}
+									bind:value={$selectedItem[key]}
+									min={new Date().toISOString().split('T')[0]}
+									required
 								/>
 							{:else}
 								<input

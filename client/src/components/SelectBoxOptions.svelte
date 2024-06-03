@@ -1,6 +1,6 @@
 <script>
 	export let label = '';
-	export let options; //make a store instead
+	export let options;
 	export let selected = '';
 	export let onOptionChange;
 	export let idKey;

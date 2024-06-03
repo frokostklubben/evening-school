@@ -4,6 +4,7 @@
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import { user } from '../../../stores/userStore.js';
 	import { itemList } from '../../../stores/itemListStore';
+	import { isLoading } from '../../../stores/generalStore.js';
 
 	displayNames.set({
 		school_name: 'Skole',
@@ -23,7 +24,10 @@
 			credentials: 'include'
 		});
 
+		isLoading.set(true);
+
 		if (response.ok) {
+			isLoading.set(false);
 			const result = await response.json();
 			itemList.set(result.data);
 		} else {

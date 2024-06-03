@@ -6,6 +6,9 @@ import Inventory from '../database/models/inventory.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
 import { Op } from 'sequelize'
 import connection from '../database/database.js'
+import Booking from '../database/models/booking.js'
+import Location from '../database/models/location.js'
+import Holiday from '../database/models/holiday.js'
 
 router.get('/api/classrooms', adminCheck, async (req, res) => {
   const classrooms = await Classroom.findAll()
@@ -34,8 +37,6 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
         },
       ],
     })
-
-    // TODO: både formål og inventar skal kunne være null! Cannot read properties of null (reading 'purpose')
 
     let formattedClassrooms = classroomInventories.map(classroom => {
       return {
@@ -78,7 +79,6 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       await newClassroom.setClassroom_purpose(newPurpose, { transaction })
     }
 
-    // Oprette alle inventarobjekterne i en batch-operation, hvilket kan reducere overhead og forbedre ydeevnen:
     let newInventories = []
     if (inventories) {
       const inventoryItems = inventories.split(',').map(item => ({
@@ -103,7 +103,7 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       room_name: completeClassroom.room_name,
       location_id: completeClassroom.location_id,
       capacity: completeClassroom.capacity,
-      purpose: completeClassroom.classroom_purpose.purpose, // directly assign the purpose value
+      purpose: completeClassroom.classroom_purpose.purpose,
       inventories: completeClassroom.Inventories.map(inventory => {
         return inventory.item_name
       }),
@@ -118,13 +118,38 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
 
 router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   const { roomId } = req.params
-  const updates = req.body
+  const { location_id, purpose, capacity, inventories, room_name } = req.body
+
+  if (capacity === undefined || capacity === null) {
+    return res.status(400).send({ message: 'Kapacitet skal udfyldes' })
+  }
+
+  if (!room_name) {
+    return res.status(400).send({ message: 'Navn på lokalet skal defineres' })
+  }
 
   try {
     const classroom = await Classroom.findByPk(roomId)
 
     if (classroom) {
-      await classroom.update(updates)
+      await classroom.update({ location_id, capacity, room_name })
+
+      let classroomPurpose = await Classroom_purpose.findOne({ where: { purpose: purpose } })
+      if (!classroomPurpose) {
+        classroomPurpose = await Classroom_purpose.create({ purpose })
+      }
+
+      await classroom.setClassroom_purpose(classroomPurpose)
+
+      const oldInventories = await classroom.getInventories()
+      await classroom.removeInventories(oldInventories)
+
+      if (inventories && typeof inventories === 'string' && inventories.trim().length > 0) {
+        const inventoryItems = inventories.split(',').map(item => ({ item_name: item.trim() }))
+        const newInventories = await Inventory.bulkCreate(inventoryItems)
+        await classroom.addInventories(newInventories)
+      }
+
       res.send({ message: 'Classroom updated.', data: classroom })
     } else {
       res.status(404).send({ message: 'Classroom not found.' })
@@ -137,17 +162,28 @@ router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
 
 router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   const { roomId } = req.params
-
   const transaction = await connection.transaction()
 
   try {
     const classroom = await Classroom.findByPk(roomId, { transaction })
-    if (classroom) {
-      const purpose = await Classroom_purpose.findOne({ where: { classroom_id: roomId }, transaction })
-      const inventories = await Inventory.findAll({ where: { classroom_id: roomId }, transaction })
 
-      if (purpose) {
-        await purpose.destroy({ transaction })
+    if (classroom) {
+      // Check for active bookings
+      const activeBookings = await Booking.findAll({ where: { room_id: roomId }, transaction })
+      if (activeBookings && activeBookings.length > 0) {
+        await transaction.rollback()
+
+        return res.status(400).send({ message: 'Cannot delete classroom with active bookings.' })
+      }
+
+      const inventories = await classroom.getInventories({ transaction })
+
+      const purpose = await classroom.getClassroom_purpose({ transaction })
+
+      if (purpose && purpose.length > 0) {
+        for (let p of purpose) {
+          await p.destroy({ transaction })
+        }
       }
 
       if (inventories && inventories.length > 0) {
@@ -169,6 +205,192 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
     await transaction.rollback()
     console.error('Server Error:', error)
     res.status(500).send({ message: 'Server error while deleting classroom, its purpose and inventories.' })
+  }
+})
+
+router.post('/api/classrooms/available/:school_id', async (req, res) => {
+  try {
+    const schoolId = req.params.school_id
+    let { startDate, endDate, startTime, endTime } = req.body
+
+    startDate = new Date(startDate)
+    endDate = new Date(endDate)
+    startTime = new Date(startTime[0])
+    endTime = new Date(endTime[0])
+
+    startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
+
+    endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+
+    startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset())
+    endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset())
+
+    startTime = startDate.toISOString().split('T')[1]
+    endTime = endDate.toISOString().split('T')[1]
+
+    const allClassrooms = await Classroom.findAll({
+      include: [
+        {
+          model: Location,
+          attributes: ['school_name'],
+          where: { school_id: schoolId },
+        },
+        {
+          model: Inventory,
+          attributes: ['item_name'],
+        },
+        {
+          model: Classroom_purpose,
+          as: 'classroom_purpose',
+          attributes: ['purpose'],
+        },
+      ],
+    })
+
+    const allBookings = await Booking.findAll({
+      where: {
+        date: {
+          [Op.between]: [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]],
+        },
+        [Op.and]: [
+          {
+            [Op.or]: [
+              {
+                start_time: {
+                  [Op.between]: [startTime, endTime],
+                },
+              },
+              {
+                end_time: {
+                  [Op.between]: [startTime, endTime],
+                },
+              },
+              {
+                [Op.and]: [{ start_time: { [Op.lte]: startTime } }, { end_time: { [Op.gte]: endTime } }],
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const allHolidays = await Holiday.findAll({
+      where: {
+        school_id: schoolId,
+        start_date: {
+          [Op.lte]: endDate,
+        },
+        end_date: {
+          [Op.gte]: startDate,
+        },
+      },
+    })
+
+    function isDateWithinHoliday(date, holiday) {
+      const checkDate = new Date(date)
+      const holidayStartDate = new Date(holiday.start_date)
+      const holidayEndDate = new Date(holiday.end_date)
+
+      console.log(checkDate.toDateString(), holidayStartDate.toDateString(), holidayEndDate.toDateString())
+
+      return checkDate.toDateString() === holidayStartDate.toDateString() || (checkDate >= holidayStartDate && checkDate <= holidayEndDate)
+    }
+
+    function isDateDuringAnyHoliday(date, allHolidays) {
+      return allHolidays.some(holiday => isDateWithinHoliday(date, holiday))
+    }
+
+    // TODO: explain better?  The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
+    const bookingsByClassroom = allBookings.reduce((acc, booking) => {
+      const roomId = booking.room_id
+      if (!acc[roomId]) {
+        acc[roomId] = []
+      }
+      acc[roomId].push({
+        start_time: booking.start_time,
+        end_time: booking.end_time,
+        date: booking.date,
+      })
+      return acc
+    }, {})
+
+    const calculateFreeTimes = (bookings, startHour, endHour) => {
+      const intervals = []
+      const bookingsByDate = bookings.reduce((acc, booking) => {
+        const dateStr = booking.date.toISOString().split('T')[0]
+        if (!acc[dateStr]) acc[dateStr] = []
+        acc[dateStr].push(booking)
+        return acc
+      }, {})
+
+      const current = new Date(startDate)
+      const end = new Date(endDate)
+
+      while (current <= end) {
+        const dateStr = current.toISOString().split('T')[0]
+        const dayBookings = bookingsByDate[dateStr] || []
+        dayBookings.sort((a, b) => a.start_time.localeCompare(b.start_time))
+
+        let currentStart = startHour
+        const dayIntervals = []
+
+        dayBookings.forEach(booking => {
+          if (currentStart < booking.start_time) {
+            dayIntervals.push({ start: currentStart, end: booking.start_time })
+          }
+          currentStart = booking.end_time
+        })
+
+        if (currentStart < endHour) {
+          dayIntervals.push({ start: currentStart, end: endHour })
+        }
+
+        intervals.push({ date: dateStr, times: dayIntervals })
+        current.setDate(current.getDate() + 1)
+      }
+
+      return intervals
+    }
+
+    const classroomsWithAvailability = allClassrooms.map(classroom => {
+      const roomId = classroom.room_id
+      const bookings = bookingsByClassroom[roomId] || []
+      let freeTimes
+
+      if (bookings.length === 0) {
+        freeTimes = []
+        const current = new Date(startDate)
+        const end = new Date(endDate)
+
+        while (current <= end) {
+          if (!isDateDuringAnyHoliday(current, allHolidays)) {
+            const dateStr = current.toISOString().split('T')[0]
+            freeTimes.push({
+              date: dateStr,
+              times: [{ start: startTime, end: endTime }],
+            })
+          }
+          current.setDate(current.getDate() + 1)
+        }
+      } else {
+        freeTimes = calculateFreeTimes(bookings, startTime, endTime)
+      }
+
+      return {
+        room_id: roomId,
+        room_name: classroom.room_name,
+        capacity: classroom.capacity,
+        school_name: classroom.Location.school_name,
+        inventory: classroom.Inventories.map(item => item.item_name),
+        purpose: classroom.classroom_purpose ? classroom.classroom_purpose.purpose : '',
+        freeTimes,
+      }
+    })
+
+    res.send({ data: classroomsWithAvailability })
+  } catch (error) {
+    console.error('Error fetching available classrooms:', error)
+    res.status(500).send({ error: 'Failed to fetch available classrooms' })
   }
 })
 

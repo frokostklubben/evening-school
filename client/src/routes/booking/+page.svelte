@@ -395,7 +395,7 @@
 			toast.error('Starttidspunkt skal være før sluttidspunkt', { duration: 5000 });
 			return;
 		}
-		
+
 		let booking = bookingDates.find((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
@@ -646,7 +646,7 @@
 		label={'Vælg lokale'}
 		selected={selectedClassroom}
 		idKey={'room_id'}
-		optionName={'room_id'}
+		optionName={'room_name'}
 		options={filteredClassrooms}
 		onOptionChange={handleClassroomChange}
 	/>
@@ -750,8 +750,11 @@
 			{/if}
 			<button
 				type="submit"
-				class="btn {bookingReadyForPreview && checkedBookings.length > 0 ? 'btn-success' : 'btn-primary'}"
-				disabled={!AllInfoIsGiven}>{bookingReadyForPreview && checkedBookings.length > 0 ? 'Ok' : 'Anmod booking'}</button
+				class="btn {bookingReadyForPreview && checkedBookings.length > 0
+					? 'btn-success'
+					: 'btn-primary'}"
+				disabled={!AllInfoIsGiven}
+				>{bookingReadyForPreview && checkedBookings.length > 0 ? 'Ok' : 'Anmod booking'}</button
 			>
 		</div>
 	</form>

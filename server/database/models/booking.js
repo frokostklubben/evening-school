@@ -19,14 +19,14 @@ const Booking = sequelize.define(
         key: 'course_id',
       },
     },
-    room_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Classroom,
-        key: 'room_id',
-      },
-    },
+    // room_id: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    //   references: {
+    //     model: Classroom,
+    //     key: 'room_id',
+    //   },
+    // },
     start_time: {
       type: DataTypes.TIME,
       allowNull: false,

@@ -5,10 +5,8 @@
 	import { optionId } from '../../../stores/modalStore.js';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { itemList } from '../../../stores/itemListStore.js';
-	import { buttonStoreValue } from '../../../stores/buttonStore.js';
-
-	let selectedLocation = '';
-	let selectedSchoolName = '';
+	import { titleStore } from '../../../stores/titleStore.js';
+	import GoBackButton from '../../../components/GoBackButton.svelte';
 
 	displayNames.set({
 		course_name: 'Kursusnavn',
@@ -33,8 +31,10 @@
 	}
 </script>
 
+<GoBackButton />
+
 <div>
-	<h2 class="pt-3 text-center">Hold hos {$buttonStoreValue}</h2>
+	<h2 class="pt-3 text-center">Hold hos {$titleStore}</h2>
 </div>
 
 <ListItems

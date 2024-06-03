@@ -5,7 +5,9 @@
 	import { user } from '../../stores/userStore.js';
 	import { itemList } from '../../stores/itemListStore';
 	import { optionId } from '../../stores/modalStore.js';
-	import { buttonStoreValue } from '../../stores/buttonStore.js';
+	import { titleStore } from '../../stores/titleStore.js';
+	import GoBackButton from '../../components/GoBackButton.svelte';
+	import { isLoading } from '../../stores/generalStore.js';
 
 	displayNames.set({
 		room_name: 'Lokale',
@@ -37,7 +39,10 @@
 			credentials: 'include'
 		});
 
+		isLoading.set(true);
+
 		if (response.ok) {
+			isLoading.set(false);
 			const result = await response.json();
 
 			formattedData = result.data.map((item) => {
@@ -53,8 +58,10 @@
 	}
 </script>
 
+<GoBackButton />
+
 <div>
-	<h2 class="pt-3 text-center">Historik lokaler for: {$buttonStoreValue}</h2>
+	<h2 class="pt-3 text-center">Historik lokaler for: {$titleStore}</h2>
 
 	<ListItems idKey={$user.schoolId} collection={'bookings'} showButtons={false} />
 </div>
