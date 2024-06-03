@@ -11,14 +11,6 @@ const Course = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    // teacher_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: true,
-    //   references: {
-    //     model: Teacher,
-    //     key: 'teacher_id',
-    //   },
-    // },
     course_name: {
       type: DataTypes.STRING(55),
       allowNull: false,

@@ -7,9 +7,6 @@
 	import { itemList } from '../../../stores/itemListStore.js';
 	import { buttonStoreValue } from '../../../stores/buttonStore.js';
 
-	let selectedLocation = '';
-	let selectedSchoolName = '';
-
 	displayNames.set({
 		course_name: 'Kursusnavn',
 		description: 'Beskrivelse'

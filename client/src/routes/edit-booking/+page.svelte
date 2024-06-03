@@ -12,6 +12,7 @@
 	import { BASE_URL } from '../../stores/apiConfig.js';
 	import { onMount } from 'svelte';
 	import SelectBoxOptions from '../../components/SelectBoxOptions.svelte';
+	import ModalEditBooking from '../../components/ModalEditBooking.svelte';
 
 	let collection = 'bookings';
 	let idKey = 'booking_id';
@@ -28,7 +29,7 @@
 	let groupedData = {};
 
 	displayNames.set({
-		bookingId: 'B.ID',
+		bookingId: 'Booking ID',
 		teacherEmail: 'Underviseremail',
 		courseId: 'K.ID',
 		courseName: 'Kursus',
@@ -71,6 +72,7 @@
 			teachers = removeDuplicates(teachers, 'teacher_id');
 			courseNames = removeDuplicates(courseNames, 'course_id');
 			courseIds = removeDuplicates(courseIds, 'course_id');
+			groupData()
 		} else {
 			console.error('Failed to fetch bookings from the server');
 		}
@@ -110,7 +112,7 @@
 	}
 
 	function setHeaderKeys(data) {
-		const excludeKeys = ['_id', 'hashed_password', 'roomId', 'teacherId', 'locationId'];
+		const excludeKeys = ['_id', 'hashed_password', 'roomId', 'teacherId', 'locationId', 'courseId', 'courseName', 'teacherEmail'];
 
 		// 	Made in cooperation with chatgpt (Marcus)
 		const filteredKeys = data.filter(
@@ -139,9 +141,9 @@
 	}
 
 	function groupData() {
-		// Group the filteredBookings by course_id
+		// Group the filteredBookings by courseName
 		groupedData = filteredBookings.reduce((groups, item) => {
-			const key = item.courseName;
+			const key = item.courseId;
 			if (!groups[key]) {
 				groups[key] = [];
 			}
@@ -152,6 +154,7 @@
 
 	function filterList() {
 		filteredBookings = $itemList;
+		filteredBookings.sort((a, b) => a.courseId - b.courseId);
 
 		if (selectedCourseName !== 'empty') {
 			filteredBookings = filteredBookings.filter(
@@ -174,10 +177,12 @@
 		if (
 			selectedCourseName === 'empty' &&
 			selectedTeacher === 'empty' &&
-			selectedCourseId === 'empty'
+			selectedCourseId === 'empty' 
 		) {
 			resetFilters();
 		}
+
+		groupData()
 	}
 
 	function handleCourseNameChange(event) {
@@ -317,7 +322,10 @@
 		filteredCourseNames = courseNames;
 		filteredTeachers = teachers;
 		filteredCourseIds = courseIds;
-		filterList(true);
+		//filterList();
+		filteredBookings = $itemList;
+		groupData()
+		console.log(filteredBookings);
 	}
 </script>
 
@@ -346,7 +354,7 @@
 
 	<div class="w-100">
 		<SelectBoxOptions
-			label={'Kursus id'}
+			label={'Kursus ID'}
 			selected={selectedCourseId}
 			idKey={'course_id'}
 			optionName={'course_id'}
@@ -354,18 +362,18 @@
 			onOptionChange={handleCourseIdChange}
 		/>
 	</div>
-	<button class="btn btn-primary btn-lg mt-3" title="Nulstil filtre" on:click={resetFilters}>
-	</button>
+	<button class="btn btn-primary btn-md mt-3" title="Nulstil filtre" on:click={resetFilters}>Nulstil</button>
 </div>
 
 <div class="container mt-5">
 	<div class="row justify-content-center">
 		<div class="col-12 col-lg-10">
-			{#if $itemList.length > 0}
-				<!--{#each Object.keys(groupedData) as courseId}-->
-				<!--<div class="mt-3">-->
-				<!--<h2>Course ID: {courseId}</h2>-->
-				<div class="list-group">
+			{#if filteredBookings.length > 0}
+				{#each Object.keys(groupedData) as courseId}
+				<div class="mt-3 border border-2 p-3 mb-3">
+				<h4>{groupedData[courseId][0].courseName} | Kursus ID #{courseId}</h4>
+				<h5>{groupedData[courseId][0].teacherEmail}</h5>
+				<div class="list-group mt-6">
 					<table class="w-100 spaced-table">
 						<thead>
 							<tr>
@@ -375,8 +383,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							<!--{#each groupedData[courseId] as listItem}-->
-							{#each filteredBookings as listItem, index}
+							{#each groupedData[courseId] as listItem}
+							<!--{#each filteredBookings as listItem, index}-->
 								<tr class="hover-row">
 									{#each $headerKeys as key (key)}
 										<td>
@@ -420,7 +428,8 @@
 						</tbody>
 					</table>
 				</div>
-				<!--{/each}-->
+				</div>
+				{/each}
 			{:else if $optionId}
 				<div class="alert alert-warning" role="alert">Ingen data</div>
 			{/if}
@@ -428,7 +437,7 @@
 	</div>
 </div>
 
-<!-- <ModalEdit {collection} {idKey} />  -->
+<ModalEditBooking /> 
 
 <ModalDelete {collection} {idKey} />
 
@@ -439,6 +448,6 @@
 
 	.spaced-table th,
 	.spaced-table td {
-		padding: 0 1rem; /* Adjust as needed */
+		padding: 0 1rem;
 	}
 </style>

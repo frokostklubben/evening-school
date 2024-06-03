@@ -16,15 +16,6 @@ const Classroom = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    // location_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: Location,
-    //     key: 'location_id',
-    //   },
-    // },
-
     capacity: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
 import School from './school.js'
+import Classroom from './classroom.js'
 
 const Location = sequelize.define(
   'Location',
@@ -44,5 +45,8 @@ const Location = sequelize.define(
     tableName: 'locations',
   },
 )
+
+Location.hasMany(Classroom, { foreignKey: 'location_id' })
+Classroom.belongsTo(Location, { foreignKey: 'location_id' })
 
 export default Location
