@@ -103,7 +103,7 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       room_name: completeClassroom.room_name,
       location_id: completeClassroom.location_id,
       capacity: completeClassroom.capacity,
-      purpose: completeClassroom.classroom_purpose.purpose, 
+      purpose: completeClassroom.classroom_purpose.purpose,
       inventories: completeClassroom.Inventories.map(inventory => {
         return inventory.item_name
       }),
@@ -274,7 +274,6 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       },
     })
 
-
     const allHolidays = await Holiday.findAll({
       where: {
         school_id: schoolId,
@@ -287,11 +286,15 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       },
     })
 
-    
     function isDateWithinHoliday(date, holiday) {
-      return date >= new Date(holiday.start_date) && date <= new Date(holiday.end_date)
-    }
+      const checkDate = new Date(date)
+      const holidayStartDate = new Date(holiday.start_date)
+      const holidayEndDate = new Date(holiday.end_date)
 
+      console.log(checkDate.toDateString(), holidayStartDate.toDateString(), holidayEndDate.toDateString())
+
+      return checkDate.toDateString() === holidayStartDate.toDateString() || (checkDate >= holidayStartDate && checkDate <= holidayEndDate)
+    }
 
     function isDateDuringAnyHoliday(date, allHolidays) {
       return allHolidays.some(holiday => isDateWithinHoliday(date, holiday))
