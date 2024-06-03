@@ -78,6 +78,7 @@
 	$: ignoreSetupTime = false;
 	$: sortOrderDate = 'asc';
 	$: sortOrderStatus = 'asc';
+	$: showChangedColumn = checkedBookings.some((booking) => booking.changed);
 
 	let courseStartDate;
 	$: weekNumber = 0;
@@ -289,9 +290,17 @@
 		startDate: ''
 	}));
 
+	function deleteSingleBooking(bookingToBeDeleted) {
+		checkedBookings = checkedBookings.filter((booking) => booking !== bookingToBeDeleted);
+		checkedBookings = checkedBookings;
+	}
+
 	async function saveBooking() {
 		checkedBookings = checkedBookings.map(
-			({ conflict, newDate, newStartTime, newEndTime, ...rest }) => rest
+			({ conflict, newDate, newStartTime, newEndTime, ...rest }) => ({
+				...rest,
+				course_id: selectedCourse
+			})
 		);
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings`, {
@@ -343,6 +352,15 @@
 				.flat();
 		}
 
+		let allStartDatesBeforeEndDates = bookingDates.every(
+			(booking) => booking.startTime < booking.endTime
+		);
+
+		if (!allStartDatesBeforeEndDates) {
+			toast.error('Starttidspunkt skal være før sluttidspunkt', { duration: 5000 });
+			return;
+		}
+
 		try {
 			const response = await fetch(`${$BASE_URL}/check-booking-dates`, {
 				credentials: 'include',
@@ -359,6 +377,7 @@
 					...booking,
 					date: new Date(booking.date)
 				}));
+				sortCheckedBookingByDate();
 				bookingReadyForPreview = true;
 			}
 		} catch (error) {
@@ -367,6 +386,16 @@
 	}
 
 	async function checkNewDateAndTime(bookingToCheck) {
+		if (bookingToCheck.newDate < new Date().toISOString().split('T')[0]) {
+			toast.error('Datoen kan ikke være før i dag', { duration: 5000 });
+			return;
+		}
+
+		if (bookingToCheck.newStartTime >= bookingToCheck.newEndTime) {
+			toast.error('Starttidspunkt skal være før sluttidspunkt', { duration: 5000 });
+			return;
+		}
+
 		let booking = bookingDates.find((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
@@ -644,7 +673,6 @@
 				id="startdate"
 				name="startdate"
 				class="form-control"
-				value={new Date().toISOString().split('T')[0]}
 				on:change={updateStartDates}
 			/>
 		</div>
@@ -661,149 +689,171 @@
 				</div>
 			</div>
 
-			{#if weekNumber > 0}
+			{#if weekNumber > 0 && new Date(courseStartDate) > new Date()}
 				<p>
 					Du har valgt <b>uge {weekNumber}</b> som startuge. Vælg en ny dato for at ændre startugen.
 				</p>
 			{/if}
-			<table class="table">
-				<thead>
-					<tr>
-						<th scope="col">Vælg</th>
-						<th scope="col">Dag</th>
-						<th scope="col">Start Time</th>
-						<th scope="col">End Time</th>
-						<th scope="col">Start dato </th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each days as day}
-						{#if day.startDate >= new Date().toISOString().split('T')[0]}
-							<tr>
-								<td
-									><input
-										type="checkbox"
-										bind:checked={day.selected}
-										on:change={() => toggleDay(day)}
-									/></td
-								>
-								<td>{day.name}</td>
-								<td
-									><input
-										type="time"
-										step="900"
-										bind:value={day.startTime}
-										on:change={(event) => updateStartTime(day, event)}
-									/></td
-								>
-								<td
-									><input
-										type="time"
-										step="900"
-										bind:value={day.endTime}
-										on:change={(event) => updateEndTime(day, event)}
-									/></td
-								>
-								<td
-									><input
-										type="date"
-										min={new Date().toISOString().split('T')[0]}
-										bind:value={day.startDate}
-										on:change={(event) => updateStartDate(day, event)}
-									/></td
-								>
-							</tr>
-						{/if}
-					{/each}
-				</tbody>
-			</table>
+
+			{#if new Date(courseStartDate) > new Date()}
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col">Vælg</th>
+							<th scope="col">Dag</th>
+							<th scope="col">Start</th>
+							<th scope="col">Slut</th>
+							<th scope="col">Dato</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each days as day}
+							{#if day.startDate >= new Date().toISOString().split('T')[0]}
+								<tr>
+									<td
+										><input
+											type="checkbox"
+											bind:checked={day.selected}
+											on:change={() => toggleDay(day)}
+										/></td
+									>
+									<td>{day.name}</td>
+									<td
+										><input
+											type="time"
+											step="900"
+											bind:value={day.startTime}
+											on:change={(event) => updateStartTime(day, event)}
+										/></td
+									>
+									<td
+										><input
+											type="time"
+											step="900"
+											bind:value={day.endTime}
+											on:change={(event) => updateEndTime(day, event)}
+										/></td
+									>
+									<td
+										><input
+											type="date"
+											min={new Date().toISOString().split('T')[0]}
+											bind:value={day.startDate}
+											on:change={(event) => updateStartDate(day, event)}
+										/></td
+									>
+								</tr>
+							{/if}
+						{/each}
+					</tbody>
+				</table>
+			{/if}
 			<button
 				type="submit"
-				class="btn {bookingReadyForPreview ? 'btn-success' : 'btn-primary'}"
-				disabled={!AllInfoIsGiven}>{bookingReadyForPreview ? 'Ok' : 'Anmod booking'}</button
+				class="btn {bookingReadyForPreview && checkedBookings.length > 0
+					? 'btn-success'
+					: 'btn-primary'}"
+				disabled={!AllInfoIsGiven}
+				>{bookingReadyForPreview && checkedBookings.length > 0 ? 'Ok' : 'Anmod booking'}</button
 			>
 		</div>
 	</form>
 </div>
-<div class="border border-2 p-3 m-3">
-	<p><strong>Trin 4</strong></p>
-	<table class="table">
-		<thead>
-			<tr>
-				<th scope="col" class="sortable" on:click={sortCheckedBookingByDate}>
-					Dato {sortOrderDate === 'asc' ? '▲' : '▼'}
-				</th>
-				<th scope="col">Starttidspunkt</th>
-				<th scope="col">Sluttidspunkt</th>
-				<th scope="col" class="sortable" on:click={sortCheckedBookingByConflict}>
-					Status {sortOrderStatus === 'asc' ? '▲' : '▼'}
-				</th>
-				<th scope="col">Ny tid</th>
-				<th scope="col"></th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each checkedBookings as booking}
+{#if bookingReadyForPreview && checkedBookings.length > 0}
+	<div class="border border-2 p-3 m-3">
+		<p><strong>Trin 4</strong></p>
+		<table class="table">
+			<thead>
 				<tr>
-					<td
-						>{booking.date.toLocaleDateString('da-DK', { weekday: 'long' })[0].toUpperCase() +
-							booking.date.toLocaleDateString('da-DK', { weekday: 'long' }).slice(1).toLowerCase()}
-						{booking.date.getDate()}/{booking.date.getMonth() + 1}/{booking.date.getFullYear()}</td
-					>
-					<td>{booking.startTime}</td>
-					<td>{booking.endTime}</td>
-					<td>
-						{#if booking.holidayConflict}
-							<div>
-								Lukket - {booking.holidayConflict.name},
-								{new Date(booking.holidayConflict.start_date).toLocaleDateString()} -
-								{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
-							</div>
-						{:else if booking.conflicts}
-							<span class="text-danger">Ikke ledig: </span>
-							{booking.bookingConflicts
-								.map((conflict) => {
-									const [startHour, startMinute] = conflict.start_time.split(':');
-									const [endHour, endMinute] = conflict.end_time.split(':');
-									return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
-								})
-								.join(', ')}
-						{:else}
-							<span class="text-success">Ledig</span>
-						{/if}
-					</td>
-					<td>
-						<input
-							type="date"
-							min={new Date().toISOString().split('T')[0]}
-							bind:value={booking.newDate}
-						/>
-						<input type="time" bind:value={booking.newStartTime} step="900" />
-						<input type="time" bind:value={booking.newEndTime} step="900" />
+					<th scope="col" class="sortable" on:click={sortCheckedBookingByDate}>
+						Dato {sortOrderDate === 'asc' ? '▲' : '▼'}
+					</th>
+					<th scope="col">Starttidspunkt</th>
+					<th scope="col">Sluttidspunkt</th>
+					<th scope="col" class="sortable" on:click={sortCheckedBookingByConflict}>
+						Status {sortOrderStatus === 'asc' ? '▲' : '▼'}
+					</th>
+					<th scope="col" class="col-4">Ny tid</th>
 
-						<button
-							class="btn btn-primary"
-							on:click={() => {
-								checkNewDateAndTime(booking);
-							}}
-							disabled={!booking.newDate || !booking.newStartTime || !booking.newEndTime}
-							>Tjek</button
-						>
-					</td>
-					<td>
-						{booking.changed ? 'Ændret tidspunkt' : ''}
-					</td>
+					{#if showChangedColumn}
+						<th scope="col"></th>
+					{/if}
+					<th scope="col"></th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
-	<button
-		class="btn btn-primary"
-		on:click={saveBooking}
-		disabled={!bookingReadyForPreview || !checkedBookings.every((booking) => !booking.conflict)}
-		>Færdiggør booking</button
-	>
-</div>
+			</thead>
+			<tbody>
+				{#each checkedBookings as booking}
+					<tr>
+						<td
+							>{booking.date.toLocaleDateString('da-DK', { weekday: 'long' })[0].toUpperCase() +
+								booking.date
+									.toLocaleDateString('da-DK', { weekday: 'long' })
+									.slice(1)
+									.toLowerCase()}
+							{booking.date.getDate()}/{booking.date.getMonth() +
+								1}/{booking.date.getFullYear()}</td
+						>
+						<td>{booking.startTime}</td>
+						<td>{booking.endTime}</td>
+						<td>
+							{#if booking.holidayConflict}
+								<div>
+									Lukket - {booking.holidayConflict.name},
+									{new Date(booking.holidayConflict.start_date).toLocaleDateString()} -
+									{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
+								</div>
+							{:else if booking.conflicts}
+								<span class="text-danger">Ikke ledig: </span>
+								{booking.bookingConflicts
+									.map((conflict) => {
+										const [startHour, startMinute] = conflict.start_time.split(':');
+										const [endHour, endMinute] = conflict.end_time.split(':');
+										return `${startHour}:${startMinute}-${endHour}:${endMinute}`;
+									})
+									.join(', ')}
+							{:else}
+								<span class="text-success">Ledig</span>
+							{/if}
+						</td>
+						<td>
+							<input
+								type="date"
+								min={new Date().toISOString().split('T')[0]}
+								bind:value={booking.newDate}
+							/>
+							<input type="time" bind:value={booking.newStartTime} step="900" />
+							<input type="time" bind:value={booking.newEndTime} step="900" />
+
+							<button
+								class="btn btn-primary"
+								on:click={() => {
+									checkNewDateAndTime(booking);
+								}}
+								disabled={!booking.newDate || !booking.newStartTime || !booking.newEndTime}
+								>Tjek</button
+							>
+						</td>
+						{#if showChangedColumn}
+							<td>{booking.changed ? 'Ændret tidspunkt' : ''}</td>
+						{/if}
+						<td>
+							<button class="btn" on:click={() => deleteSingleBooking(booking)}>
+								<i class="bi bi-trash-fill"></i>
+							</button>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+		<button
+			class="btn btn-primary"
+			on:click={saveBooking}
+			disabled={!bookingReadyForPreview ||
+				!checkedBookings.every((booking) => !booking.conflict) ||
+				!checkedBookings.length}>Færdiggør booking</button
+		>
+	</div>
+{/if}
 
 <Toaster />
 
