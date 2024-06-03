@@ -1,7 +1,7 @@
 import sequelize from '../database.js'
-import Course from './course.js'
-import Classroom from './classroom.js'
 import { DataTypes } from 'sequelize'
+import Classroom from './classroom.js'
+import Course from './course.js'
 
 const Booking = sequelize.define(
   'Booking',
@@ -29,7 +29,10 @@ const Booking = sequelize.define(
   },
 )
 
+Classroom.hasMany(Booking, { foreignKey: 'room_id' })
 Booking.belongsTo(Classroom, { foreignKey: 'room_id' })
+
+Course.hasMany(Booking, { foreignKey: 'course_id' })
 Booking.belongsTo(Course, { foreignKey: 'course_id' })
 
 export default Booking
