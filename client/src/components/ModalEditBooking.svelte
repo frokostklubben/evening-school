@@ -37,9 +37,37 @@
 		}
 	}
 
+	function dateToTimeString(date) {
+		return date.toTimeString().split(' ')[0];
+	}
+
+	function formatTime(time, initialTime) {
+		if (!time) {
+			return initialTime;
+		}
+
+		// If time is a Date object, convert it to a time string
+		if (time instanceof Date) {
+			return dateToTimeString(time);
+		}
+
+		// If time is already in 'HH:MM:SS' format, return it as is
+		if (time.includes(':')) {
+			return time;
+		}
+
+		// If time is in 'HH:MM' format, add seconds
+		return `${time}:00`;
+	}
+
 	function handleStartTimeChange(event) {
 		selectedStartTime = event.detail[1];
-		console.log('selectedStartTime', selectedStartTime);
+		// I want to update the startTime of selectedItem with  event.detail[1];
+
+		// Update the startTime of selectedItem
+		selectedItem.update((value) => {
+			return { ...value, startTime: selectedStartTime };
+		});
 	}
 
 	function handleEndTimeChange(event) {
@@ -53,8 +81,8 @@
 			roomId: selectedClassroom,
 			locationId: selectedLocation,
 			date: selectedDate,
-			startTime: selectedStartTime,
-			endTime: selectedEndTime
+			startTime: formatTime(selectedStartTime, $selectedItem.startTime),
+			endTime: formatTime(selectedEndTime, $selectedItem.endTime)
 		};
 
 		console.log('payload', payload);
@@ -92,6 +120,7 @@
 
 	function handleLocationChange(event) {
 		selectedLocation = Number(event.target.value);
+		selectedClassroom = null;
 	}
 
 	function handleClassroomChange(event) {
@@ -173,7 +202,13 @@
 	<svelte:fragment slot="footer">
 		<div class="container">
 			<div class="text-center">
-				<Button class="me-2" type="submit" color="green" on:click={saveChanges}>Gem</Button>
+				<Button
+					class="me-2"
+					type="submit"
+					color="green"
+					on:click={saveChanges}
+					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button
+				>
 				<Button color="red">Afbryd</Button>
 			</div>
 		</div>

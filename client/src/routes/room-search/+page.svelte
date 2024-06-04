@@ -40,13 +40,29 @@
 		endTime.setHours(23, 0, 0, 0);
 	});
 
+	function formatTime(date) {
+		date = new Date(date);
+		let hours = date.getHours();
+		let minutes = date.getMinutes();
+		let seconds = date.getSeconds();
+
+		// Pad single-digit hours, minutes, or seconds with a leading zero
+		hours = hours < 10 ? '0' + hours : hours;
+		minutes = minutes < 10 ? '0' + minutes : minutes;
+		seconds = seconds < 10 ? '0' + seconds : seconds;
+
+		return `${hours}:${minutes}:${seconds}`;
+	}
+
 	async function fetchAvailableClassrooms() {
 		const requestData = {
 			startDate: startDate,
 			endDate: endDate,
-			startTime: startTime,
-			endTime: endTime
+			startTime: formatTime(startTime),
+			endTime: formatTime(endTime)
 		};
+
+		console.log('requestData:', requestData);
 
 		const response = await fetch(`${$BASE_URL}/classrooms/available/${$user.schoolId}`, {
 			method: 'POST',
@@ -74,14 +90,24 @@
 		return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear().toString().substr(-2)}`;
 	}
 
-	function formatTime(timeStr) {
-		return timeStr.split(':')[0] + ':' + timeStr.split(':')[1];
-	}
+	// function formatTime(timeStr) {
+	// 	return timeStr.split(':')[0] + ':' + timeStr.split(':')[1];
+	// }
 
 	function showAllTimes(classroom) {
 		selectedClassroom = classroom;
 		modalTitle = `${classroom.room_name} (${classroom.school_name})`;
 		showModal = true;
+	}
+
+	function handleStartTimeChange(event) {
+		startTime = event.detail[1];
+		console.log('startTime:', startTime);
+	}
+
+	function handleEndTimeChange(event) {
+		endTime = event.detail[1];
+		console.log('endTime:', endTime);
 	}
 </script>
 
@@ -89,8 +115,8 @@
 	<div class="sidebar">
 		<form on:submit|preventDefault={fetchAvailableClassrooms}>
 			<DatePicker bind:value={dateRange} id="dateRange" label="Vælg dato interval" {modeRange} />
-			<TimePicker bind:value={startTime} id="startTime" />
-			<TimePicker bind:value={endTime} id="endTime" />
+			<TimePicker bind:value={startTime} id="startTime" onTimeChange={handleStartTimeChange} />
+			<TimePicker bind:value={endTime} id="endTime" onTimeChange={handleEndTimeChange} />
 			<button type="submit" class="btn btn-primary">Søg</button>
 		</form>
 	</div>
@@ -141,9 +167,7 @@
 <Modal title={modalTitle} bind:open={showModal} autoclose>
 	{#each selectedClassroom.freeTimes as interval}
 		<p>
-			{formatDate(interval.date)}: {interval.times
-				.map((t) => `${formatTime(t.start)} - ${formatTime(t.end)}`)
-				.join(', ')}
+			{formatDate(interval.date)}: {interval.times.map((t) => `${t.start} - ${t.end}`).join(', ')}
 		</p>
 	{/each}
 </Modal>

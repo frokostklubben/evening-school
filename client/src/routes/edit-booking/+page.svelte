@@ -423,8 +423,11 @@
 														{formatInventory(listItem[key])}
 													{:else if key === 'date'}
 														{new Date(listItem[key]).toLocaleDateString()}
-													{:else if key === 'startTime' || key === 'endTime'}
-														{listItem[key]}
+													{:else if key === 'startTime'}
+														<!-- {listItem[key]} -->
+														{listItem['startTime']}
+													{:else if key === 'endTime'}
+														{listItem['endTime']}
 													{:else}
 														{listItem[key]}
 													{/if}

@@ -208,6 +208,7 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   }
 })
 
+// Uses a post to get the available classrooms for a given date and time range posted to the endpoint.
 router.post('/api/classrooms/available/:school_id', async (req, res) => {
   try {
     const schoolId = req.params.school_id
@@ -215,18 +216,9 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
 
     startDate = new Date(startDate)
     endDate = new Date(endDate)
-    startTime = new Date(startTime[0])
-    endTime = new Date(endTime[0])
 
-    startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
-
-    endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
-
-    startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset())
-    endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset())
-
-    startTime = startDate.toISOString().split('T')[1]
-    endTime = endDate.toISOString().split('T')[1]
+    startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0))
+    endDate = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 0, 0, 0))
 
     const allClassrooms = await Classroom.findAll({
       include: [

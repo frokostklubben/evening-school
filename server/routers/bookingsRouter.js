@@ -176,19 +176,13 @@ router.post('/api/bookings', async (req, res) => {
 //   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 // }
 
-function addSecondsToTimeString(timeString) {
-  return `${timeString}:00`
-}
+// function addSecondsToTimeString(timeString) {
+//   return `${timeString}:00`
+// }
 
 router.patch('/api/bookings/:bookingId', async (req, res) => {
   const { bookingId } = req.params
   const { teacherId, roomId, locationId, date, startTime, endTime } = req.body
-
-  const startTimeString = addSecondsToTimeString(startTime)
-  console.log(startTimeString)
-
-  const endTimeString = addSecondsToTimeString(endTime)
-  console.log(endTimeString)
 
   try {
     const [updated] = await Booking.update(
@@ -197,15 +191,13 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
         room_id: roomId,
         location_id: locationId,
         date,
-        start_time: startTimeString,
-        end_time: endTimeString,
+        start_time: startTime,
+        end_time: endTime,
       },
       {
         where: { booking_id: bookingId },
       },
     )
-
-    console.log(updated.start_time)
 
     if (!updated) {
       throw new Error('Failed to update booking')
