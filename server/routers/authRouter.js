@@ -47,8 +47,8 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
       hashed_password,
       role_id,
     })
-    //const message = `Velkommen til luffelands staffbestilling. \nDin adgangskode er: ${password} \nDu kan ændre din adgangskode når du er logget ind.`;
-    //sendMail(email, 'Velkommen til luffelands staffbestilling', message);
+    //const message = `Velkommen til Aftenskolerne. \nDin adgangskode er: ${password} \nDu kan ændre din adgangskode når du er logget ind.`;
+    //sendMail(email, 'Velkommen til Aftenskolerne', message);
     res.status(200).send({ data: response })
   } else {
     res.status(400).send({ data: 'User was not created: user already exists' })

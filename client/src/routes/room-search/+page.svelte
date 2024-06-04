@@ -9,6 +9,7 @@
 	let dateRange = [new Date(), new Date()];
 	let startTime;
 	let endTime;
+	let modeRange = true;
 	let startDate = dateRange[0];
 	let endDate = dateRange[1];
 	let availableClassrooms = [];
@@ -87,7 +88,7 @@
 <div class="container">
 	<div class="sidebar">
 		<form on:submit|preventDefault={fetchAvailableClassrooms}>
-			<DatePicker bind:value={dateRange} id="dateRange" label="Vælg dato interval" />
+			<DatePicker bind:value={dateRange} id="dateRange" label="Vælg dato interval" {modeRange} />
 			<TimePicker bind:value={startTime} id="startTime" />
 			<TimePicker bind:value={endTime} id="endTime" />
 			<button type="submit" class="btn btn-primary">Søg</button>

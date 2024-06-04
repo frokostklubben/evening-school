@@ -3,20 +3,14 @@
 	import 'flatpickr/dist/flatpickr.min.css';
 
 	export let value = [];
-	//export let value;
 	export let id;
 	export let label;
-	export let modeRange;
 
 	function onDateChange(event) {
 		value = event.detail[0];
-		//	value = event.detail;
 	}
 
 	function formatDate(date) {
-		//TODO: check if date is wrong
-		date = new Date(date);
-
 		const days = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
 		const months = [
 			'jan.',
@@ -32,18 +26,13 @@
 			'nov.',
 			'dec.'
 		];
-		return modeRange
-			? `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}. ${months[date.getMonth()]} ${date.getFullYear()}`
-			: `${date.getDate().toString().padStart(2, '0')}. ${months[date.getMonth()]} ${date.getFullYear()}`;
+		return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}. ${months[date.getMonth()]} ${date.getFullYear()}`;
 	}
 
-	$: formattedDateRange = modeRange
-		? value[0] && value[1]
+	$: formattedDateRange =
+		value[0] && value[1]
 			? `<strong>Fra:</strong> ${formatDate(value[0])} &nbsp;&nbsp;&nbsp; <strong>Til:</strong> ${formatDate(value[1])}`
-			: 'Vælg startdato og slutdato'
-		: value
-			? `Valgt dato  ${formatDate(value)}`
-			: `Vælg dato`;
+			: 'Vælg dato';
 </script>
 
 <div class="datepicker-wrapper">
@@ -62,7 +51,6 @@
 			altFormat: 'D d/m/Y',
 			altInput: true,
 			altInputClass: 'invisible',
-			mode: modeRange ? 'range' : 'single',
 			time_24hr: true,
 			minDate: 'today',
 			minuteIncrement: 15,

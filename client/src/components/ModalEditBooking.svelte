@@ -6,20 +6,26 @@
 	import { itemList } from '../stores/itemListStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
+	import DatePicker from '../components/DatePicker.svelte';
+	import TimePicker from '../components/TimePicker.svelte';
 
 	let itemKeys = [];
 	let idKey = 'bookingId';
+	let modeRange = false;
+
 	$: teachers = $editData.teachers;
 	$: locations = $editData.locations;
 	$: classrooms = $editData.locations
 		? $editData.locations.map((location) => location.Classrooms).flat()
 		: [];
 
-console.log('selectedItem', $selectedItem);
-    //let selectedTeacher = $selectedItem.teacherId;
-    $: selectedTeacher = $selectedItem.teacherId;
-    $: selectedClassroom = $selectedItem.roomId;
+	$: selectedTeacher = $selectedItem.teacherId;
+	$: selectedClassroom = $selectedItem.roomId;
 	$: selectedLocation = $selectedItem.locationId;
+
+	$: selectedDate = new Date($selectedItem.date);
+	$: selectedStartTime = $selectedItem.startTime;
+	$: selectedEndTime = $selectedItem.endTime;
 
 	$: filteredClassrooms = selectedLocation
 		? classrooms.filter((classroom) => classroom.location_id == selectedLocation)
@@ -31,7 +37,28 @@ console.log('selectedItem', $selectedItem);
 		}
 	}
 
+	function handleStartTimeChange(event) {
+		selectedStartTime = event.detail[1];
+		console.log('selectedStartTime', selectedStartTime);
+	}
+
+	function handleEndTimeChange(event) {
+		selectedEndTime = event.detail[1];
+		console.log('selectedEndTime', selectedEndTime);
+	}
+
 	async function saveChanges() {
+		let payload = {
+			teacherId: selectedTeacher,
+			roomId: selectedClassroom,
+			locationId: selectedLocation,
+			date: selectedDate,
+			startTime: selectedStartTime,
+			endTime: selectedEndTime
+		};
+
+		console.log('payload', payload);
+
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings/${$selectedItem[idKey]}`, {
 				credentials: 'include',
@@ -39,12 +66,15 @@ console.log('selectedItem', $selectedItem);
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify($selectedItem)
+				body: JSON.stringify(payload)
 			});
 
 			const result = await response.json();
+
 			if (response.ok) {
 				toast.success('Opdatering vellykket!');
+
+				$itemList = $itemList;
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 				if (index !== -1) {
@@ -61,15 +91,15 @@ console.log('selectedItem', $selectedItem);
 	}
 
 	function handleLocationChange(event) {
-        selectedLocation = Number(event.target.value)
-    }
+		selectedLocation = Number(event.target.value);
+	}
 
 	function handleClassroomChange(event) {
-        selectedClassroom = Number(event.target.value)
+		selectedClassroom = Number(event.target.value);
 	}
 
 	function handleTeacherChange(event) {
-        selectedTeacher = Number(event.target.value)
+		selectedTeacher = Number(event.target.value);
 	}
 </script>
 
@@ -119,6 +149,22 @@ console.log('selectedItem', $selectedItem);
 							onOptionChange={handleTeacherChange}
 						/>
 					</div>
+					<DatePicker
+						bind:value={$selectedItem.date}
+						id={new Date($selectedItem.date)}
+						label="Vælg dato"
+						{modeRange}
+					/>
+					<TimePicker
+						bind:value={$selectedItem.startTime}
+						id="startTime"
+						onTimeChange={handleStartTimeChange}
+					/>
+					<TimePicker
+						bind:value={$selectedItem.endTime}
+						id="endTime"
+						onTimeChange={handleEndTimeChange}
+					/>
 				</form>
 			</div>
 		</div>

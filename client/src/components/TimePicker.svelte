@@ -5,11 +5,12 @@
 
 	export let value;
 	export let id;
+	export let onTimeChange;
 
-	function onTimeChange(event) {
-		value = event.detail[0];
-	}
-	
+	// function onTimeChange(event) {
+	// 	value = event.detail[1];
+	// 	console.log('value string?', value);
+	// }
 </script>
 
 <Datepicker
@@ -20,7 +21,6 @@
 	options={{
 		enableTime: true,
 		inline: true,
-		mode: 'range',
 		time_24hr: true,
 		minTime: '08:00',
 		maxTime: '23:00',
