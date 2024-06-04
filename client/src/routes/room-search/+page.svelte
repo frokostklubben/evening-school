@@ -90,10 +90,6 @@
 		return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear().toString().substr(-2)}`;
 	}
 
-	// function formatTime(timeStr) {
-	// 	return timeStr.split(':')[0] + ':' + timeStr.split(':')[1];
-	// }
-
 	function showAllTimes(classroom) {
 		selectedClassroom = classroom;
 		modalTitle = `${classroom.room_name} (${classroom.school_name})`;
@@ -226,6 +222,9 @@
 		gap: 20px;
 	}
 	.classroom {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
 		border: 1px solid #ccc;
 		padding: 20px;
 		border-radius: 5px;
@@ -239,6 +238,6 @@
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 	}
 	.available-times {
-		margin-top: 10px;
+		margin-top: auto;
 	}
 </style>
