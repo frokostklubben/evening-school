@@ -2,6 +2,8 @@ import { isAlpha, isValidEmail } from '../services/validation.js'
 import User from '../database/models/user.js'
 import { Op } from 'sequelize'
 
+// TODO: BRUGES DETTE IKKE LÆNGERE???
+
 export async function validateUser(req, res, next) {
   const { first_name, last_name, email } = req.body
   let errors = []
