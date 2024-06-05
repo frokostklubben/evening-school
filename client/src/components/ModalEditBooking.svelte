@@ -9,6 +9,8 @@
 	import DatePicker from '../components/DatePicker.svelte';
 	import TimePicker from '../components/TimePicker.svelte';
 
+	export let onEditChanges;
+
 	let itemKeys = [];
 	let idKey = 'bookingId';
 	let modeRange = false;
@@ -24,8 +26,10 @@
 	$: selectedLocation = $selectedItem.locationId;
 
 	$: selectedDate = new Date($selectedItem.date);
-	$: selectedStartTime = $selectedItem.startTime;
-	$: selectedEndTime = $selectedItem.endTime;
+	// $: selectedStartTime = $selectedItem.startTime;
+	// $: selectedEndTime = $selectedItem.endTime;
+	let selectedStartTime;
+	let selectedEndTime;
 
 	$: filteredClassrooms = selectedLocation
 		? classrooms.filter((classroom) => classroom.location_id == selectedLocation)
@@ -52,9 +56,9 @@
 		}
 
 		// If time is already in 'HH:MM:SS' format, return it as is
-		if (time.includes(':')) {
-			return time;
-		}
+		// if (time.includes(':')) {
+		// 	return time;
+		// }
 
 		// If time is in 'HH:MM' format, add seconds
 		return `${time}:00`;
@@ -63,6 +67,7 @@
 	function handleStartTimeChange(event) {
 		selectedStartTime = event.detail[1];
 		// I want to update the startTime of selectedItem with  event.detail[1];
+		selectedStartTime = formatTime(selectedStartTime, $selectedItem.startTime);
 
 		// Update the startTime of selectedItem
 		selectedItem.update((value) => {
@@ -71,21 +76,35 @@
 	}
 
 	function handleEndTimeChange(event) {
+		console.log('selectedItem before:', $selectedItem);
+
 		selectedEndTime = event.detail[1];
-		console.log('selectedEndTime', selectedEndTime);
+
+		selectedEndTime = formatTime(selectedEndTime, $selectedItem.endTime);
+
+		// HER skal det lægges til 00
+		console.log('selectedEndTime event detail:', selectedEndTime);
+
+		selectedItem.update((value) => {
+			return { ...value, endTime: selectedEndTime };
+		});
+
+		console.log('selectedItem after:', $selectedItem);
 	}
 
 	async function saveChanges() {
+		//	console.log('><<<<<<<<<<<<<<<<<< saveChanges:', selectedEndTime);
+
 		let payload = {
 			teacherId: selectedTeacher,
 			roomId: selectedClassroom,
 			locationId: selectedLocation,
 			date: selectedDate,
-			startTime: formatTime(selectedStartTime, $selectedItem.startTime),
-			endTime: formatTime(selectedEndTime, $selectedItem.endTime)
+			startTime: selectedStartTime,
+			endTime: selectedEndTime
+			// startTime: formatTime(selectedStartTime, $selectedItem.startTime),
+			// endTime: formatTime(selectedEndTime, $selectedItem.endTime)
 		};
-
-		console.log('payload', payload);
 
 		try {
 			const response = await fetch(`${$BASE_URL}/bookings/${$selectedItem[idKey]}`, {
@@ -99,12 +118,15 @@
 
 			const result = await response.json();
 
+			console.log('result.data:', result.data);
+
 			if (response.ok) {
 				toast.success('Opdatering vellykket!');
 
-				$itemList = $itemList;
+				const index = $itemList.findIndex((item) => {
+					return item['bookingId'] == $selectedItem['bookingId'];
+				});
 
-				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 				if (index !== -1) {
 					$itemList[index] = $selectedItem;
 				}
@@ -206,7 +228,10 @@
 					class="me-2"
 					type="submit"
 					color="green"
-					on:click={saveChanges}
+					on:click={() => {
+						onEditChanges();
+						saveChanges();
+					}}
 					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button
 				>
 				<Button color="red">Afbryd</Button>

@@ -27,7 +27,7 @@
 	$: filteredTeachers = teachers;
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
-	let groupedData = {};
+	$: groupedData = {};
 
 	displayNames.set({
 		bookingId: 'Booking ID',
@@ -355,6 +355,12 @@
 		filteredBookings = $itemList;
 		groupData();
 	}
+
+	function handleEditChanges() {
+		filteredBookings = $itemList;
+		// filterList();
+		// groupData();
+	}
 </script>
 
 <div class="d-flex flex-column align-items-center mx-auto" style="max-width: 400px;">
@@ -473,7 +479,7 @@
 	</div>
 </div>
 
-<ModalEditBooking />
+<ModalEditBooking onEditChanges={handleEditChanges} />
 
 <ModalDelete {collection} {idKey} />
 

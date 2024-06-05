@@ -6,11 +6,6 @@
 	export let value;
 	export let id;
 	export let onTimeChange;
-
-	// function onTimeChange(event) {
-	// 	value = event.detail[1];
-	// 	console.log('value string?', value);
-	// }
 </script>
 
 <Datepicker
