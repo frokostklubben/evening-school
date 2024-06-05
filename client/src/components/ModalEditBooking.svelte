@@ -26,10 +26,8 @@
 	$: selectedLocation = $selectedItem.locationId;
 
 	$: selectedDate = new Date($selectedItem.date);
-	// $: selectedStartTime = $selectedItem.startTime;
-	// $: selectedEndTime = $selectedItem.endTime;
-	let selectedStartTime;
-	let selectedEndTime;
+	let selectedStartTime = $selectedItem.startTime;
+	let selectedEndTime = $selectedItem.endTime;
 
 	$: filteredClassrooms = selectedLocation
 		? classrooms.filter((classroom) => classroom.location_id == selectedLocation)
@@ -55,46 +53,29 @@
 			return dateToTimeString(time);
 		}
 
-		// If time is already in 'HH:MM:SS' format, return it as is
-		// if (time.includes(':')) {
-		// 	return time;
-		// }
-
 		// If time is in 'HH:MM' format, add seconds
 		return `${time}:00`;
 	}
 
 	function handleStartTimeChange(event) {
 		selectedStartTime = event.detail[1];
-		// I want to update the startTime of selectedItem with  event.detail[1];
 		selectedStartTime = formatTime(selectedStartTime, $selectedItem.startTime);
 
-		// Update the startTime of selectedItem
 		selectedItem.update((value) => {
 			return { ...value, startTime: selectedStartTime };
 		});
 	}
 
 	function handleEndTimeChange(event) {
-		console.log('selectedItem before:', $selectedItem);
-
 		selectedEndTime = event.detail[1];
-
 		selectedEndTime = formatTime(selectedEndTime, $selectedItem.endTime);
-
-		// HER skal det lægges til 00
-		console.log('selectedEndTime event detail:', selectedEndTime);
 
 		selectedItem.update((value) => {
 			return { ...value, endTime: selectedEndTime };
 		});
-
-		console.log('selectedItem after:', $selectedItem);
 	}
 
 	async function saveChanges() {
-		//	console.log('><<<<<<<<<<<<<<<<<< saveChanges:', selectedEndTime);
-
 		let payload = {
 			teacherId: selectedTeacher,
 			roomId: selectedClassroom,
@@ -119,17 +100,25 @@
 			const result = await response.json();
 
 			console.log('result.data:', result.data);
+			console.log('idKey:', idKey);
+			console.log('$selectedItem[idKey]:', $selectedItem[idKey]); // Add this line
 
 			if (response.ok) {
+				onEditChanges(result.data); // Pass the updated data to the parent component
 				toast.success('Opdatering vellykket!');
 
-				const index = $itemList.findIndex((item) => {
-					return item['bookingId'] == $selectedItem['bookingId'];
-				});
+				//const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 
-				if (index !== -1) {
-					$itemList[index] = $selectedItem;
-				}
+				// if (index !== -1) {
+				// 	// Make a copy of $itemList
+				// 	let newList = [...$itemList];
+
+				// 	// Update the item in the copy
+				// 	newList[index] = { ...result.data };
+
+				// 	// Set the store to the new list
+				// 	itemList.set(newList);
+				// }
 
 				showEditModal.set(false);
 			} else {
@@ -229,7 +218,7 @@
 					type="submit"
 					color="green"
 					on:click={() => {
-						onEditChanges();
+						// onEditChanges();
 						saveChanges();
 					}}
 					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button

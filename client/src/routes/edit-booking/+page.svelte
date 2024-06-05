@@ -23,11 +23,13 @@
 	let teachers = [];
 	let courseNames = [];
 	let courseIds = [];
-	$: filteredBookings = $itemList;
+	$: filteredBookings = $itemList; // Kun hvis længden ændrer sig
 	$: filteredTeachers = teachers;
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
-	$: groupedData = {};
+
+	//let groupedData = {};
+	$: groupedData = groupData(filteredBookings);
 
 	displayNames.set({
 		bookingId: 'Booking ID',
@@ -79,7 +81,6 @@
 		} else {
 			console.error('Failed to fetch bookings from the server');
 		}
-		//vi skal hente vores items fra backend og sætte itemstore
 
 		fetchHeaderKeys().then(() => {
 			const derivedHeaderKeys = derived(itemList, ($itemList) => {
@@ -108,7 +109,6 @@
 			if (response.ok) {
 				const result = await response.json();
 				editData.set(result.data);
-				console.log('editData:', $editData);
 			} else {
 				console.error('Failed to fetch edit booking data from the server');
 			}
@@ -164,14 +164,14 @@
 		}
 	}
 
-	function formatInventory(inventories) {
-		if (!inventories) return '';
-		return Array.isArray(inventories) ? inventories.join(', ') : inventories;
-	}
+	function groupData(bookings) {
+		// added bookings here, marcus
+		// Check if bookings is not null or undefined
+		if (!bookings) {
+			return {};
+		}
 
-	function groupData() {
-		// Group the filteredBookings by courseName
-		groupedData = filteredBookings.reduce((groups, item) => {
+		return bookings.reduce((groups, item) => {
 			const key = item.courseId;
 			if (!groups[key]) {
 				groups[key] = [];
@@ -179,10 +179,19 @@
 			groups[key].push(item);
 			return groups;
 		}, {});
+		// Group the filteredBookings by courseName
+		// groupedData = filteredBookings.reduce((groups, item) => {
+		// 	const key = item.courseId;
+		// 	if (!groups[key]) {
+		// 		groups[key] = [];
+		// 	}
+		// 	groups[key].push(item);
+		// 	return groups;
+		// }, {});
 	}
 
 	function filterList() {
-		filteredBookings = $itemList;
+		// TODO removed this: filteredBookings = $itemList;
 		filteredBookings.sort((a, b) => a.courseId - b.courseId);
 
 		if (selectedCourseName !== 'empty') {
@@ -211,7 +220,7 @@
 			resetFilters();
 		}
 
-		groupData();
+		// TODO: removed groupData(); and made it reactive
 	}
 
 	function handleCourseNameChange(event) {
@@ -356,10 +365,32 @@
 		groupData();
 	}
 
-	function handleEditChanges() {
+	// function handleEditChanges() {
+	// 	filteredBookings = $itemList;
+	// 	// filterList();
+	// 	//	groupData();
+	// }
+
+	function handleEditChanges(updatedData) {
+		console.log('updatedData in handleEditChanges:', updatedData);
+
+		const updatedBooking = updatedData;
+
+		// Find the index of the updated item in itemList
+		const index = $itemList.findIndex((item) => item[idKey] === updatedBooking[idKey]);
+
+		// If the item is found, update it
+		if (index !== -1) {
+			let newList = [...$itemList];
+
+			// Update the item in the copy
+			newList[index] = { ...newList[index], ...updatedBooking };
+
+			// Set the store to the new list
+			itemList.set(newList); // update korrekt?
+		}
+		//	filterList();
 		filteredBookings = $itemList;
-		// filterList();
-		// groupData();
 	}
 </script>
 
@@ -421,19 +452,11 @@
 								</thead>
 								<tbody>
 									{#each groupedData[courseId] as listItem}
-										<!--{#each filteredBookings as listItem, index}-->
 										<tr class="hover-row">
 											{#each $headerKeys as key (key)}
 												<td>
-													{#if key === 'inventories' || key === 'inventory' || key === 'item_list' || key === 'Inventories'}
-														{formatInventory(listItem[key])}
-													{:else if key === 'date'}
+													{#if key === 'date'}
 														{new Date(listItem[key]).toLocaleDateString()}
-													{:else if key === 'startTime'}
-														<!-- {listItem[key]} -->
-														{listItem['startTime']}
-													{:else if key === 'endTime'}
-														{listItem['endTime']}
 													{:else}
 														{listItem[key]}
 													{/if}
@@ -444,8 +467,6 @@
 													class="btn"
 													on:click={() => {
 														selectedItem.set(listItem);
-														console.log('selectedItem:', $selectedItem);
-
 														showEditModal.set(true);
 													}}
 													title="Rediger"

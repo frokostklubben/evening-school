@@ -2,6 +2,7 @@ import Router from 'express'
 const router = Router()
 import Booking from '../database/models/booking.js'
 import Classroom from '../database/models/classroom.js'
+import Classroom_purpose from '../database/models/classroomPurpose.js'
 import Course from '../database/models/course.js'
 import Teacher from '../database/models/teacher.js'
 import Location from '../database/models/location.js'
@@ -168,21 +169,10 @@ router.post('/api/bookings', async (req, res) => {
   }
 })
 
-// function convertToTimeString(dateTimeString) {
-//   const dateObj = new Date(dateTimeString)
-//   const hours = dateObj.getHours()
-//   const minutes = dateObj.getMinutes()
-//   const seconds = dateObj.getSeconds()
-//   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-// }
-
-// function addSecondsToTimeString(timeString) {
-//   return `${timeString}:00`
-// }
-
 router.patch('/api/bookings/:bookingId', async (req, res) => {
   const { bookingId } = req.params
   const { teacherId, roomId, locationId, date, startTime, endTime } = req.body
+  //const updatedBooking = req.body
 
   try {
     const [updated] = await Booking.update(
@@ -203,8 +193,41 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
       throw new Error('Failed to update booking')
     }
 
-    const updatedBooking = await Booking.findOne({ where: { booking_id: bookingId } })
-    res.status(200).send({ data: updatedBooking })
+    // Get the updated booking
+    const booking = await Booking.findOne({ where: { booking_id: bookingId } })
+
+    // Get the other information
+    const school_id = req.session.user.schoolId
+
+    const locations = await Location.findAll({
+      where: { school_id: school_id },
+      include: [
+        {
+          model: Classroom,
+          include: [
+            {
+              model: Classroom_purpose,
+              attributes: ['purpose'],
+            },
+          ],
+        },
+      ],
+    })
+
+    const teachers = await Teacher.findAll({
+      where: { school_id: school_id },
+    })
+
+    // const bookingsWithInfo = {
+    //   booking,
+    //   locations,
+    //   teachers,
+    // }
+
+    res.status(200).send({ data: booking })
+
+    // const updatedBooking = await Booking.findOne({ where: { booking_id: bookingId } })
+    // res.status(200).send({ data: updatedBooking })
   } catch (error) {
     res.status(500).send({ error: error.message })
   }
