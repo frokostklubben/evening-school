@@ -579,7 +579,7 @@
 	}
 </script>
 
-<h2>Event/foredrag</h2>
+<h2>Booking</h2>
 
 <div class="border border-2 p-3 m-3">
 	<p><strong>Trin 1</strong></p>

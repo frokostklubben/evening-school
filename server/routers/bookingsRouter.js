@@ -7,55 +7,61 @@ import Course from '../database/models/course.js'
 import Teacher from '../database/models/teacher.js'
 import Location from '../database/models/location.js'
 
+
 router.get('/api/bookings', async (req, res) => {
-  let school_id = req.session.user.schoolId
+  try {
+    let school_id = req.session.user.schoolId
 
-  let filteredBookings
-  const bookings = await Booking.findAll({
-    include: [
-      {
-        model: Classroom,
-        include: [
-          {
-            model: Location,
-            where: {
-              school_id: school_id,
+    let filteredBookings
+    const bookings = await Booking.findAll({
+      include: [
+        {
+          model: Classroom,
+          include: [
+            {
+              model: Location,
+              where: {
+                school_id: school_id,
+              },
             },
-          },
-        ],
-      },
-      {
-        model: Course,
-        include: [
-          {
-            model: Teacher,
-          },
-        ],
-      },
-    ],
-  })
+          ],
+        },
+        {
+          model: Course,
+          include: [
+            {
+              model: Teacher,
+            },
+          ],
+        },
+      ],
+    })
 
-  filteredBookings = bookings.map(booking => {
-    booking = booking.toJSON()
-    let formattedBooking = {}
-    formattedBooking.bookingId = booking.booking_id
-    formattedBooking.courseId = booking.course_id
-    formattedBooking.date = booking.date
-    formattedBooking.courseName = booking.Course.course_name
-    formattedBooking.startTime = booking.start_time
-    formattedBooking.endTime = booking.end_time
-    formattedBooking.roomName = booking.Classroom.room_name
-    formattedBooking.teacherEmail = booking.Course.Teacher.email
+    filteredBookings = bookings.map(booking => {
+      booking = booking.toJSON()
 
-    formattedBooking.roomId = booking.room_id
-    formattedBooking.teacherId = booking.Course.teacher_id
-    formattedBooking.locationId = booking.Classroom.location_id
+      let formattedBooking = {}
+      formattedBooking.bookingId = booking.booking_id
+      formattedBooking.courseId = booking.course_id
+      formattedBooking.date = booking.date
+      formattedBooking.courseName = booking.Course.course_name
+      formattedBooking.startTime = booking.start_time
+      formattedBooking.endTime = booking.end_time
+      formattedBooking.roomName = booking.Classroom.room_name
+      formattedBooking.teacherEmail = booking.Course.Teacher.email
 
-    formattedBooking.locationName = booking.Classroom.Location.school_name
-    return formattedBooking
-  })
+      formattedBooking.roomId = booking.room_id
+      formattedBooking.teacherId = booking.Course.teacher_id
+      formattedBooking.locationId = booking.Classroom.location_id
 
-  res.send({ data: filteredBookings })
+      formattedBooking.locationName = booking.Classroom.Location.school_name
+      return formattedBooking
+    })
+
+    res.status(200).send({ data: filteredBookings })
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
 })
 
 // History for bookings to a classroom
@@ -172,7 +178,6 @@ router.post('/api/bookings', async (req, res) => {
 router.patch('/api/bookings/:bookingId', async (req, res) => {
   const { bookingId } = req.params
   const { teacherId, roomId, locationId, date, startTime, endTime } = req.body
-  //const updatedBooking = req.body
 
   try {
     const [updated] = await Booking.update(
@@ -196,27 +201,27 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
     // Get the updated booking
     const booking = await Booking.findOne({ where: { booking_id: bookingId } })
 
-    // Get the other information
-    const school_id = req.session.user.schoolId
+    // // Get the other information
+    // const school_id = req.session.user.schoolId
 
-    const locations = await Location.findAll({
-      where: { school_id: school_id },
-      include: [
-        {
-          model: Classroom,
-          include: [
-            {
-              model: Classroom_purpose,
-              attributes: ['purpose'],
-            },
-          ],
-        },
-      ],
-    })
+    // const locations = await Location.findAll({
+    //   where: { school_id: school_id },
+    //   include: [
+    //     {
+    //       model: Classroom,
+    //       include: [
+    //         {
+    //           model: Classroom_purpose,
+    //           attributes: ['purpose'],
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // })
 
-    const teachers = await Teacher.findAll({
-      where: { school_id: school_id },
-    })
+    // const teachers = await Teacher.findAll({
+    //   where: { school_id: school_id },
+    // })
 
     // const bookingsWithInfo = {
     //   booking,

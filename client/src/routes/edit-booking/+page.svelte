@@ -23,7 +23,7 @@
 	let teachers = [];
 	let courseNames = [];
 	let courseIds = [];
-	$: filteredBookings = $itemList; // Kun hvis længden ændrer sig
+	$: filteredBookings = $itemList; // OBS: Kun hvis længden ændrer sig
 	$: filteredTeachers = teachers;
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;

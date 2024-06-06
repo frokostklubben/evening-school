@@ -68,12 +68,12 @@
 						data-sveltekit-preload-data
 						href="/booking">Booking</a
 					>
-<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/edit-booking'}
-							data-sveltekit-preload-data
-							href="/edit-booking">Rediger booking</a
-						>
+					<a
+						class="nav-link"
+						class:active={$page.url.pathname === '/edit-booking'}
+						data-sveltekit-preload-data
+						href="/edit-booking">Rediger booking</a
+					>
 
 					<a
 						class="nav-link"
