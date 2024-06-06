@@ -96,9 +96,9 @@
 	<div class="main-content">
 		<div class="filter-section">
 			<div class="filter-item">
-				<label for="schoolSelect">Vælg skole</label>
+				<label for="schoolSelect">Vælg afdeling</label>
 				<select id="schoolSelect" bind:value={selectedSchool} class="filter-select">
-					<option value="">Alle skoler</option>
+					<option value="">Alle afd.</option>
 					{#each Array.from(new Set(filteredClassrooms.map((c) => c.school_name))) as school}
 						<option>{school}</option>
 					{/each}
