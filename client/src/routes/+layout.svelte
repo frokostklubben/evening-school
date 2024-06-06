@@ -6,6 +6,7 @@
 	import { validateSession, login, logout } from '../utils/auth.js';
 	import { isLoading, loginLoading } from '../stores/generalStore.js';
 	import { Toaster } from 'svelte-french-toast';
+	import Spinner from '../components/Spinner.svelte';
 
 	let isOpen = false;
 	$: testUser = $newUser;

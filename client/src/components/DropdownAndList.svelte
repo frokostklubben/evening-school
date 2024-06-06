@@ -2,11 +2,13 @@
 	import { onMount } from 'svelte';
 	import ListItems from './ListItems.svelte';
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
-	import { itemList } from '../stores/itemListStore';
+	import { headerKeysDanish, itemList, headerKeys } from '../stores/itemListStore';
 	import { optionId, showAddModal } from '../stores/modalStore';
 	import ModalAdd from '../components/ModalAdd.svelte';
 	import { Button } from 'flowbite-svelte';
 	import { BASE_URL } from '../stores/apiConfig.js';
+	import { selectionsLoading, contentLoading } from '../stores/generalStore';
+	import Spinner from './Spinner.svelte';
 
 	export let listIdKey; // f.eks. user_id, hvis resultatet er users
 	export let listCollection;
@@ -22,10 +24,14 @@
 
 	let options = [];
 	let hasSelected = false;
+	headerKeysDanish.set([]);
+	headerKeys.set([]);
+
+	itemList.set([]);
 
 	onMount(() => {
-		$optionId = '';
-		itemList.set([]);
+		selectionsLoading.set(true);
+		$optionId = 'empty';
 		fetchOptions();
 	});
 
@@ -40,12 +46,14 @@
 		if (response.ok) {
 			const result = await response.json();
 			options = result.data;
+			selectionsLoading.set(false);
 		} else {
 			console.error(`Failed to fetch ${optionsCollection}`);
 		}
 	}
 
 	function handleOptionChange(event) {
+		contentLoading.set(true);
 		fetchResultOnOption(event.target.value);
 		optionId.set(event.target.value);
 		hasSelected = false;
@@ -61,42 +69,54 @@
 				const result = await response.json();
 				itemList.set(result.data);
 				hasSelected = true;
+				contentLoading.set(false);
+
 			} else {
 				console.error(`Failed to fetch ${listCollection} on ${optionsCollection}`);
 			}
 		}
+
 	}
 
 	import './dropdownAndList.css';
 </script>
 
 <div id="options-container">
-	<div id="button-and-dropdown">
-		<SelectBoxOptions
-			{label}
-			selected={''}
-			idKey={optionsIdKey}
-			{optionName}
-			{options}
-			onOptionChange={handleOptionChange}
-		/>
-		{#if $optionId}
-			<div class="text-center">
-				<Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}
-					>{modalTitle}</Button
-				>
-			</div>
+	{#if !$selectionsLoading}
+		<div id="button-and-dropdown">
+			<SelectBoxOptions
+				{label}
+				selected={'empty'}
+				idKey={optionsIdKey}
+				{optionName}
+				{options}
+				onOptionChange={handleOptionChange}
+			/>
+			{#if $optionId != 'empty' && !$contentLoading && hasSelected}
+				<div class="text-center">
+					<Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}
+						>{modalTitle}</Button
+					>
+				</div>
+			{/if}
+		</div>
+		{#if !$contentLoading}
+			<ListItems
+				idKey={listIdKey}
+				collection={listCollection}
+				{showButtons}
+				{buttons}
+				{showEditButton}
+				{showDeleteButton}
+			/>
+		{:else}
+			<Spinner />
 		{/if}
-	</div>
+	{/if}
+	{#if $selectionsLoading}
+		<Spinner />
+	{/if}
 
-	<ListItems
-		idKey={listIdKey}
-		collection={listCollection}
-		{showButtons}
-		{buttons}
-		{showEditButton}
-		{showDeleteButton}
-	/>
 </div>
 
 {#if showAddModal}

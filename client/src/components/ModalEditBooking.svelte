@@ -15,7 +15,6 @@
 		? $editData.locations.map((location) => location.Classrooms).flat()
 		: [];
 
-console.log('selectedItem', $selectedItem);
     //let selectedTeacher = $selectedItem.teacherId;
     $: selectedTeacher = $selectedItem.teacherId;
     $: selectedClassroom = $selectedItem.roomId;

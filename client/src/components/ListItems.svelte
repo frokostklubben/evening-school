@@ -9,6 +9,8 @@
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { onMount } from 'svelte';
 	import { titleStore } from '../stores/titleStore.js';
+	import { selectionsLoading, secondSelectionsLoading } from '../stores/generalStore';
+	import Spinner from './Spinner.svelte';
 
 	export let collection;
 	export let idKey;
@@ -17,25 +19,27 @@
 	export let showEditButton = false;
 	export let showDeleteButton = false;
 
+	let loadedData = false;
 	let hasSelected = false;
 
 	onMount(() => {
-		fetchHeaderKeys().then(() => {
-			const derivedHeaderKeys = derived(itemList, ($itemList) => {
-				if ($itemList.length > 0) {
-					return Object.keys($itemList[0]);
-				} else {
-					fetchHeaderKeys();
-				}
-				return [];
-			});
+		if ($headerKeysDanish.length === 0) {
+			selectionsLoading.set(true);
+			fetchHeaderKeys().then(() => {
+				const derivedHeaderKeys = derived(itemList, ($itemList) => {
+					if ($itemList.length > 0) {
+						return Object.keys($itemList[0]);
+					} 
+					return headerKeys;
+				});
 
-			derivedHeaderKeys.subscribe((keys) => {
-				if (keys.length > 0) {
-					setHeaderKeys(keys);
-				}
+				derivedHeaderKeys.subscribe((keys) => {
+					if (keys.length > 0) {
+						setHeaderKeys(keys);
+					}
+				});
 			});
-		});
+		}
 	});
 
 	function setHeaderKeys(data) {
@@ -46,7 +50,8 @@
 			(key) => !excludeKeys.some((excludeKey) => key.endsWith(excludeKey) || key === excludeKey)
 		);
 		headerKeys.set(filteredKeys);
-		headerKeysDanish.set(filteredKeys.map((key) => displayNames[key] || key));
+		headerKeysDanish.set(filteredKeys.map((key) => $displayNames[key] == undefined ? key: $displayNames[key]));
+		selectionsLoading.set(false);
 	}
 
 	async function fetchHeaderKeys() {
@@ -64,6 +69,7 @@
 		} else {
 			console.error('Failed to fetch header keys from the server');
 		}
+
 	}
 
 	function formatInventory(inventories) {
@@ -81,7 +87,7 @@
 						<thead>
 							<tr>
 								{#each $headerKeysDanish as key (key)}
-									<th>{$displayNames[key]}</th>
+									<th>{key}</th>
 								{/each}
 							</tr>
 						</thead>
@@ -149,8 +155,12 @@
 						</tbody>
 					</table>
 				</div>
-			{:else if $optionId}
-				<div class="alert alert-warning" role="alert">Ingen data</div>
+			{:else if $optionId != 'empty'}
+				{#if $itemList.length == 0 && !$selectionsLoading && !$secondSelectionsLoading}
+					<div class="alert alert-warning" role="alert">Ingen data</div>
+				{:else }
+					<Spinner />
+				{/if}
 			{/if}
 		</div>
 	</div>
