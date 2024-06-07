@@ -8,6 +8,7 @@
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
 	import DatePicker from '../components/DatePicker.svelte';
 	import TimePicker from '../components/TimePicker.svelte';
+	import { headerKeysDanish } from '../stores/itemListStore.js';
 
 	export let onEditChanges;
 
@@ -99,26 +100,55 @@
 
 			const result = await response.json();
 
-			console.log('result.data:', result.data);
-			console.log('idKey:', idKey);
-			console.log('$selectedItem[idKey]:', $selectedItem[idKey]); // Add this line
+			// console.log('result.data:', result.data);
+			// console.log('idKey:', idKey);
+			// console.log('$selectedItem[idKey]:', $selectedItem[idKey]); // Add this line
 
 			if (response.ok) {
 				onEditChanges(result.data); // Pass the updated data to the parent component
 				toast.success('Opdatering vellykket!');
 
-				//const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
+				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 
-				// if (index !== -1) {
-				// 	// Make a copy of $itemList
-				// 	let newList = [...$itemList];
+				if (index !== -1) {
+					const editedBooking = result.data;
 
-				// 	// Update the item in the copy
-				// 	newList[index] = { ...result.data };
+					// console.log('headerkeysDanish:', $headerKeysDanish);
+					// console.log('editedBooking:', editedBooking);
+					// console.log('displaynames', $displayNames);
 
-				// 	// Set the store to the new list
-				// 	itemList.set(newList);
-				// }
+					// let newBooking = {};
+					// Object.keys(editedBooking).forEach((key, index) => {
+					// newBooking[$headerKeysDanish[index]] = editedBooking[key];
+					// });
+
+					// let newBooking = {};
+					// Object.keys(editedBooking).forEach((key) => {
+					// 	newBooking[$displayNames[key]] = editedBooking[key];
+					// });
+
+					// console.log('itemlist', $itemList);
+					// console.log('newBooking:', editedBooking);
+
+					$itemList[index] = editedBooking;
+				}
+
+				/*
+				if (index !== -1) {
+					// Make a copy of $itemList
+					let newList = [...$itemList];
+
+					const editedBooking = result.data;
+					// Update the item in the copy
+					newList[index] = editedBooking
+
+					// Set the store to the new list
+					itemList.set(newList);
+					
+				}
+				*/
+	
+
 
 				showEditModal.set(false);
 			} else {

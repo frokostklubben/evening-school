@@ -199,37 +199,42 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
     }
 
     // Get the updated booking
-    const booking = await Booking.findOne({ where: { booking_id: bookingId } })
+    const booking = await Booking.findOne({ where: { booking_id: bookingId },
+      include: [
+        {
+          model: Classroom,
+          include: [
+            {
+              model: Location,
+            },
+          ],
+        },
+        {
+          model: Course,
+          include: [
+            {
+              model: Teacher,
+            },
+          ],
+        },
+      ]})
 
-    // // Get the other information
-    // const school_id = req.session.user.schoolId
-
-    // const locations = await Location.findAll({
-    //   where: { school_id: school_id },
-    //   include: [
-    //     {
-    //       model: Classroom,
-    //       include: [
-    //         {
-    //           model: Classroom_purpose,
-    //           attributes: ['purpose'],
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // })
-
-    // const teachers = await Teacher.findAll({
-    //   where: { school_id: school_id },
-    // })
-
-    // const bookingsWithInfo = {
-    //   booking,
-    //   locations,
-    //   teachers,
-    // }
-
-    res.status(200).send({ data: booking })
+      const formattedBooking = {
+        bookingId: booking.booking_id,
+        courseId: booking.course_id,
+        courseName: booking.Course.course_name,
+        date: booking.date,
+        endTime: booking.end_time,
+        locationId: booking.Classroom.Location.location_id,
+        locationName: booking.Classroom.Location.school_name,
+        roomId: booking.room_id,
+        roomName: booking.Classroom.room_name,
+        startTime: booking.start_time,
+        teacherEmail: booking.Course.Teacher.email,
+        teacherId: booking.Course.teacher_id,
+      }
+      console.log(formattedBooking);
+    res.status(200).send({ data: formattedBooking })
 
     // const updatedBooking = await Booking.findOne({ where: { booking_id: bookingId } })
     // res.status(200).send({ data: updatedBooking })

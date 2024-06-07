@@ -28,8 +28,8 @@
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
 
-	//let groupedData = {};
-	$: groupedData = groupData(filteredBookings);
+	$: groupedData = {};
+	// $: groupedData = groupData(filteredBookings);
 
 	displayNames.set({
 		bookingId: 'Booking ID',
@@ -164,14 +164,10 @@
 		}
 	}
 
-	function groupData(bookings) {
-		// added bookings here, marcus
-		// Check if bookings is not null or undefined
-		if (!bookings) {
-			return {};
-		}
+	function groupData() {
 
-		return bookings.reduce((groups, item) => {
+		// Group the filteredBookings by courseName
+		groupedData = filteredBookings.reduce((groups, item) => {
 			const key = item.courseId;
 			if (!groups[key]) {
 				groups[key] = [];
@@ -179,19 +175,15 @@
 			groups[key].push(item);
 			return groups;
 		}, {});
-		// Group the filteredBookings by courseName
-		// groupedData = filteredBookings.reduce((groups, item) => {
-		// 	const key = item.courseId;
-		// 	if (!groups[key]) {
-		// 		groups[key] = [];
-		// 	}
-		// 	groups[key].push(item);
-		// 	return groups;
-		// }, {});
+
 	}
 
 	function filterList() {
 		// TODO removed this: filteredBookings = $itemList;
+		$itemList = $itemList;
+		filteredBookings = $itemList;
+		filteredBookings = filteredBookings
+
 		filteredBookings.sort((a, b) => a.courseId - b.courseId);
 
 		if (selectedCourseName !== 'empty') {
@@ -220,7 +212,7 @@
 			resetFilters();
 		}
 
-		// TODO: removed groupData(); and made it reactive
+		groupData()
 	}
 
 	function handleCourseNameChange(event) {
@@ -360,7 +352,6 @@
 		filteredCourseNames = courseNames;
 		filteredTeachers = teachers;
 		filteredCourseIds = courseIds;
-		//filterList();
 		filteredBookings = $itemList;
 		groupData();
 	}
@@ -371,14 +362,15 @@
 	// 	//	groupData();
 	// }
 
-	function handleEditChanges(updatedData) {
-		console.log('updatedData in handleEditChanges:', updatedData);
+	function handleEditChanges() {
+		filterList();
+		// groupData();
 
+		/*
 		const updatedBooking = updatedData;
 
 		// Find the index of the updated item in itemList
 		const index = $itemList.findIndex((item) => item[idKey] === updatedBooking[idKey]);
-
 		// If the item is found, update it
 		if (index !== -1) {
 			let newList = [...$itemList];
@@ -389,8 +381,9 @@
 			// Set the store to the new list
 			itemList.set(newList); // update korrekt?
 		}
+		*/
 		//	filterList();
-		filteredBookings = $itemList;
+		// filteredBookings = $itemList;
 	}
 </script>
 

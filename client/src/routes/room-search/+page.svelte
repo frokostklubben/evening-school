@@ -62,7 +62,7 @@
 			endTime: formatTime(endTime)
 		};
 
-		console.log('requestData:', requestData);
+		// console.log('requestData:', requestData);
 
 		const response = await fetch(`${$BASE_URL}/classrooms/available/${$user.schoolId}`, {
 			method: 'POST',
@@ -98,12 +98,12 @@
 
 	function handleStartTimeChange(event) {
 		startTime = event.detail[1];
-		console.log('startTime:', startTime);
+		// console.log('startTime:', startTime);
 	}
 
 	function handleEndTimeChange(event) {
 		endTime = event.detail[1];
-		console.log('endTime:', endTime);
+		// console.log('endTime:', endTime);
 	}
 </script>
 
