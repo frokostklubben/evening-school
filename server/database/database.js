@@ -4,6 +4,7 @@ import { Sequelize } from 'sequelize'
 const connection = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
   host: 'localhost',
   dialect: 'mysql',
+  timezone: '+00:00', // Set timezone to UTC
 })
 
 try {
