@@ -54,17 +54,9 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
       reset_password_expires,
     })
 
-    // Log the reset password token to the console for testing
-    console.log(`Reset Password Token: ${reset_password_token}`)
-
-    console.log(`Reset Password Expires: ${reset_password_expires}`)
-
     // Use localhost for the reset link in development
     const resetLink = `http://localhost:5173/reset-password?token=${reset_password_token}`
-    const message = `Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i 1 time.`
-
-    // sendMail(email, 'Welcome to Aftenskolerne', message)
-
+    const message = `>>>>>>>>>> Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i 1 time.<<<<<<<<<<<`
     console.log('send mail: ', message)
 
     res.status(200).send({ data: response })
@@ -72,29 +64,6 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     res.status(400).send({ data: 'User was not created: user already exists' })
   }
 })
-
-// router.post('/auth/signup', adminCheck, async (req, res) => {
-//   const { first_name, last_name, email, school_id } = req.body
-//   const role_id = 2
-//   const existingUser = await User.findOne({ where: { email } })
-
-//   if (!existingUser) {
-//     const password = await randomPassword()
-//     const hashed_password = await hashPassword(password)
-//     const response = await User.create({
-//       first_name,
-//       last_name,
-//       email,
-//       school_id,
-//       hashed_password,
-//       role_id,
-//     })
-//
-//     res.status(200).send({ data: response })
-//   } else {
-//     res.status(400).send({ data: 'User was not created: user already exists' })
-//   }
-// })
 
 router.get('/auth/logout', (req, res) => {
   delete req.session.user
