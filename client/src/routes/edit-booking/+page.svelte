@@ -16,32 +16,19 @@
 	import ModalEditBooking from '../../components/ModalEditBooking.svelte';
 
 	let collection = 'bookings';
-	let idKey = 'booking_id';
+	let idKey;
 	let selectedTeacher = 'empty';
 	let selectedCourseName = 'empty';
 	let selectedCourseId = 'empty';
 	let teachers = [];
 	let courseNames = [];
 	let courseIds = [];
-	$: filteredBookings = $itemList; // OBS: Kun hvis længden ændrer sig
+	$: filteredBookings = $itemList;
 	$: filteredTeachers = teachers;
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
 
 	$: groupedData = {};
-	// $: groupedData = groupData(filteredBookings);
-	// let groupedData;
-	
-	// $: {
-	// 	groupedData = filteredBookings.reduce((groups, item) => {
-	// 		const key = item.courseId;
-	// 		if (!groups[key]) {
-	// 			groups[key] = [];
-	// 		}
-	// 		groups[key].push(item);
-	// 		return groups;
-	// 	}, {});
-	// }
 
 	displayNames.set({
 		bookingId: 'Booking ID',
@@ -177,7 +164,6 @@
 	}
 
 	function groupData() {
-
 		// Group the filteredBookings by courseName
 		groupedData = filteredBookings.reduce((groups, item) => {
 			const key = item.courseId;
@@ -187,17 +173,10 @@
 			groups[key].push(item);
 			return groups;
 		}, {});
-
 	}
 
 	function filterList() {
-		// TODO removed this: filteredBookings = $itemList;
-		// $itemList = $itemList;
 		filteredBookings = $itemList;
-		// Update filteredBookings here
-		console.log("filteredBookings in filterlist", filteredBookings);
-		let booking15 = filteredBookings.filter((booking) => booking.bookingId == 15);
-		console.log("filteredBookings in filterlist", booking15);
 
 		filteredBookings.sort((a, b) => a.courseId - b.courseId);
 
@@ -206,7 +185,6 @@
 				(booking) => booking.courseName == selectedCourseName
 			);
 		}
-
 
 		if (selectedTeacher !== 'empty') {
 			filteredBookings = filteredBookings.filter(
@@ -228,7 +206,7 @@
 			resetFilters();
 		}
 
-		groupData()
+		groupData();
 	}
 
 	function handleCourseNameChange(event) {
@@ -372,26 +350,15 @@
 		groupData();
 	}
 
-	// function handleEditChanges() {
-	// 	filteredBookings = $itemList;
-	// 	// filterList();
-	// 	//	groupData();
-	// }
-
 	function handleEditChanges(updatedBooking) {
-
 		let updatedBookingId = updatedBooking.bookingId;
-		
-		filteredBookings = filteredBookings.map(item => {
+
+		filteredBookings = filteredBookings.map((item) => {
 			return item.bookingId === updatedBookingId ? updatedBooking : item;
 		});
-		// groupData();
-		filterList()
+
+		filterList();
 	}
-
-
-	
-	
 </script>
 
 <div class="d-flex flex-column align-items-center mx-auto" style="max-width: 400px;">
@@ -502,7 +469,7 @@
 
 <ModalEditBooking onEditChanges={handleEditChanges} />
 
-<ModalDelete {collection} {idKey} />
+<ModalDelete {collection} idKey={'bookingId'} />
 
 <style>
 	.hover-row:hover {

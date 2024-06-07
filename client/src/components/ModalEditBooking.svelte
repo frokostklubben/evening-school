@@ -8,7 +8,6 @@
 	import SelectBoxOptions from './SelectBoxOptions.svelte';
 	import DatePicker from '../components/DatePicker.svelte';
 	import TimePicker from '../components/TimePicker.svelte';
-	import { headerKeysDanish } from '../stores/itemListStore.js';
 
 	export let onEditChanges;
 
@@ -84,8 +83,6 @@
 			date: selectedDate,
 			startTime: selectedStartTime,
 			endTime: selectedEndTime
-			// startTime: formatTime(selectedStartTime, $selectedItem.startTime),
-			// endTime: formatTime(selectedEndTime, $selectedItem.endTime)
 		};
 
 		try {
@@ -105,40 +102,16 @@
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 
-				// if (index !== -1) {
-				// 	const editedBooking = result.data;			
-				// 	$itemList[index] = editedBooking;
-
-				// }
-
 				const editedBooking = result.data;
-				
+
 				if (index !== -1) {
-				
-					itemList.update(items => {
+					itemList.update((items) => {
 						items[index] = editedBooking;
 						return items;
 					});
 				}
 
-				onEditChanges(editedBooking); // Pass the updated data to the parent component
-
-				/*
-				if (index !== -1) {
-					// Make a copy of $itemList
-					let newList = [...$itemList];
-
-					const editedBooking = result.data;
-					// Update the item in the copy
-					newList[index] = editedBooking
-
-					// Set the store to the new list
-					itemList.set(newList);
-					
-				}
-				*/
-	
-
+				onEditChanges(editedBooking);
 
 				showEditModal.set(false);
 			} else {
@@ -238,7 +211,6 @@
 					type="submit"
 					color="green"
 					on:click={() => {
-						// onEditChanges();
 						saveChanges();
 					}}
 					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button

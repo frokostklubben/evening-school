@@ -283,8 +283,6 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       const holidayStartDate = new Date(holiday.start_date)
       const holidayEndDate = new Date(holiday.end_date)
 
-      console.log(checkDate.toDateString(), holidayStartDate.toDateString(), holidayEndDate.toDateString())
-
       return checkDate.toDateString() === holidayStartDate.toDateString() || (checkDate >= holidayStartDate && checkDate <= holidayEndDate)
     }
 
@@ -292,7 +290,7 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       return allHolidays.some(holiday => isDateWithinHoliday(date, holiday))
     }
 
-    // TODO: explain better?  The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
+    // The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
     const bookingsByClassroom = allBookings.reduce((acc, booking) => {
       const roomId = booking.room_id
       if (!acc[roomId]) {

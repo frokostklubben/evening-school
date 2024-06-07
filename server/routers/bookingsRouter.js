@@ -2,11 +2,9 @@ import Router from 'express'
 const router = Router()
 import Booking from '../database/models/booking.js'
 import Classroom from '../database/models/classroom.js'
-import Classroom_purpose from '../database/models/classroomPurpose.js'
 import Course from '../database/models/course.js'
 import Teacher from '../database/models/teacher.js'
 import Location from '../database/models/location.js'
-
 
 router.get('/api/bookings', async (req, res) => {
   try {
@@ -101,8 +99,6 @@ router.get('/api/bookings/:roomId/room-history', async (req, res) => {
 })
 
 // History for bookings to a course
-// bookings/${$optionId}/course-history
-
 router.get('/api/bookings/:courseId/course-history', async (req, res) => {
   try {
     let courseId = req.params.courseId
@@ -199,7 +195,8 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
     }
 
     // Get the updated booking
-    const booking = await Booking.findOne({ where: { booking_id: bookingId },
+    const booking = await Booking.findOne({
+      where: { booking_id: bookingId },
       include: [
         {
           model: Classroom,
@@ -217,30 +214,45 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
             },
           ],
         },
-      ]})
+      ],
+    })
 
-      const formattedBooking = {
-        bookingId: booking.booking_id,
-        courseId: booking.course_id,
-        date: booking.date,
-        courseName: booking.Course.course_name,
-        endTime: booking.end_time,
-        locationId: booking.Classroom.Location.location_id,
-        locationName: booking.Classroom.Location.school_name,
-        roomId: booking.room_id,
-        roomName: booking.Classroom.room_name,
-        startTime: booking.start_time,
-        teacherEmail: booking.Course.Teacher.email,
-        teacherId: booking.Course.teacher_id,
-      }
-      console.log(formattedBooking);
+    const formattedBooking = {
+      bookingId: booking.booking_id,
+      courseId: booking.course_id,
+      date: booking.date,
+      courseName: booking.Course.course_name,
+      endTime: booking.end_time,
+      locationId: booking.Classroom.Location.location_id,
+      locationName: booking.Classroom.Location.school_name,
+      roomId: booking.room_id,
+      roomName: booking.Classroom.room_name,
+      startTime: booking.start_time,
+      teacherEmail: booking.Course.Teacher.email,
+      teacherId: booking.Course.teacher_id,
+    }
+    console.log(formattedBooking)
     res.status(200).send({ data: formattedBooking })
-
-    // const updatedBooking = await Booking.findOne({ where: { booking_id: bookingId } })
-    // res.status(200).send({ data: updatedBooking })
   } catch (error) {
     res.status(500).send({ error: error.message })
   }
 })
 
+router.delete('/api/bookings/:bookingId', async (req, res) => {
+  const { bookingId } = req.params
+
+  try {
+    const deleted = await Booking.destroy({
+      where: { booking_id: bookingId },
+    })
+
+    if (!deleted) {
+      throw new Error('Failed to delete booking')
+    }
+
+    res.status(200).send({ data: 'Booking was deleted' })
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
 export default router
