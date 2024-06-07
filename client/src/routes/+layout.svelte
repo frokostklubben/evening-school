@@ -35,10 +35,14 @@
 		>
 			<span class="navbar-toggler-icon"></span>
 		</button>
+		{#if !$isLoading}
 		<div class:show={isOpen} class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
 			<div class="navbar-nav">
+				
 				<!-- navbar showing for admin -->
 				{#if $user.roleId === 1}
+			
 					<a
 						class="nav-link"
 						class:active={$page.url.pathname === '/classrooms/admin'}
@@ -118,10 +122,10 @@
 							aria-label="Password"
 							bind:value={testUser.password}
 						/>
-						<button class="btn btn-outline-success" type="submit">Login</button>
+						<button class="btn btn-outline-success" type="submit">Log&nbspind</button>
 					</form>
 				{:else}
-					<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Logud</button>
+					<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Log&nbspud</button>
 				{/if}
 			{:else}
 				<!-- Show spinner while loading -->
@@ -129,8 +133,10 @@
 					<div class="spinner-border text-primary" role="status"></div>
 				</div>
 			{/if}
-		</div>
-	</div>
+
+			</div>
+		{/if}
+			</div>
 </nav>
 
 {#if $user.email}
