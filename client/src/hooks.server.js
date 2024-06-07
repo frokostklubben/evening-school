@@ -7,7 +7,7 @@ export async function handle({ event, resolve }) {
 
 	event.locals.user = user;
 
-	if (!user && event.url.pathname !== '/') {
+	if (!user && event.url.pathname !== '/' && !event.url.pathname.startsWith('/reset-password')) {
 		return new Response(null, { status: 302, headers: { location: '/' } });
 	}
 
