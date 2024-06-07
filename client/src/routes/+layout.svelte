@@ -122,10 +122,10 @@
 							aria-label="Password"
 							bind:value={testUser.password}
 						/>
-						<button class="btn btn-outline-success" type="submit">Login</button>
+						<button class="btn btn-outline-success" type="submit">Log&nbspind</button>
 					</form>
 				{:else}
-					<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Logud</button>
+					<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Log&nbspud</button>
 				{/if}
 			{:else}
 				<!-- Show spinner while loading -->
