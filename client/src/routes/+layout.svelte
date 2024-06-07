@@ -35,10 +35,14 @@
 		>
 			<span class="navbar-toggler-icon"></span>
 		</button>
+		{#if !$isLoading}
 		<div class:show={isOpen} class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
 			<div class="navbar-nav">
+				
 				<!-- navbar showing for admin -->
 				{#if $user.roleId === 1}
+			
 					<a
 						class="nav-link"
 						class:active={$page.url.pathname === '/classrooms/admin'}
@@ -129,8 +133,10 @@
 					<div class="spinner-border text-primary" role="status"></div>
 				</div>
 			{/if}
-		</div>
-	</div>
+
+			</div>
+		{/if}
+			</div>
 </nav>
 
 <main class="container">
