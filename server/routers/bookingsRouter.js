@@ -222,8 +222,8 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
       const formattedBooking = {
         bookingId: booking.booking_id,
         courseId: booking.course_id,
-        courseName: booking.Course.course_name,
         date: booking.date,
+        courseName: booking.Course.course_name,
         endTime: booking.end_time,
         locationId: booking.Classroom.Location.location_id,
         locationName: booking.Classroom.Location.school_name,

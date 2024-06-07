@@ -30,6 +30,18 @@
 
 	$: groupedData = {};
 	// $: groupedData = groupData(filteredBookings);
+	// let groupedData;
+	
+	// $: {
+	// 	groupedData = filteredBookings.reduce((groups, item) => {
+	// 		const key = item.courseId;
+	// 		if (!groups[key]) {
+	// 			groups[key] = [];
+	// 		}
+	// 		groups[key].push(item);
+	// 		return groups;
+	// 	}, {});
+	// }
 
 	displayNames.set({
 		bookingId: 'Booking ID',
@@ -180,9 +192,12 @@
 
 	function filterList() {
 		// TODO removed this: filteredBookings = $itemList;
-		$itemList = $itemList;
+		// $itemList = $itemList;
 		filteredBookings = $itemList;
-		filteredBookings = filteredBookings
+		// Update filteredBookings here
+		console.log("filteredBookings in filterlist", filteredBookings);
+		let booking15 = filteredBookings.filter((booking) => booking.bookingId == 15);
+		console.log("filteredBookings in filterlist", booking15);
 
 		filteredBookings.sort((a, b) => a.courseId - b.courseId);
 
@@ -191,6 +206,7 @@
 				(booking) => booking.courseName == selectedCourseName
 			);
 		}
+
 
 		if (selectedTeacher !== 'empty') {
 			filteredBookings = filteredBookings.filter(
@@ -362,29 +378,20 @@
 	// 	//	groupData();
 	// }
 
-	function handleEditChanges() {
-		filterList();
+	function handleEditChanges(updatedBooking) {
+
+		let updatedBookingId = updatedBooking.bookingId;
+		
+		filteredBookings = filteredBookings.map(item => {
+			return item.bookingId === updatedBookingId ? updatedBooking : item;
+		});
 		// groupData();
-
-		/*
-		const updatedBooking = updatedData;
-
-		// Find the index of the updated item in itemList
-		const index = $itemList.findIndex((item) => item[idKey] === updatedBooking[idKey]);
-		// If the item is found, update it
-		if (index !== -1) {
-			let newList = [...$itemList];
-
-			// Update the item in the copy
-			newList[index] = { ...newList[index], ...updatedBooking };
-
-			// Set the store to the new list
-			itemList.set(newList); // update korrekt?
-		}
-		*/
-		//	filterList();
-		// filteredBookings = $itemList;
+		filterList()
 	}
+
+
+	
+	
 </script>
 
 <div class="d-flex flex-column align-items-center mx-auto" style="max-width: 400px;">

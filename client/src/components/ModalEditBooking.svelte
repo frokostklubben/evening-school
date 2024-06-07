@@ -100,38 +100,28 @@
 
 			const result = await response.json();
 
-			// console.log('result.data:', result.data);
-			// console.log('idKey:', idKey);
-			// console.log('$selectedItem[idKey]:', $selectedItem[idKey]); // Add this line
-
 			if (response.ok) {
-				onEditChanges(result.data); // Pass the updated data to the parent component
 				toast.success('Opdatering vellykket!');
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 
+				// if (index !== -1) {
+				// 	const editedBooking = result.data;			
+				// 	$itemList[index] = editedBooking;
+
+				// }
+
+				const editedBooking = result.data;
+				
 				if (index !== -1) {
-					const editedBooking = result.data;
-
-					// console.log('headerkeysDanish:', $headerKeysDanish);
-					// console.log('editedBooking:', editedBooking);
-					// console.log('displaynames', $displayNames);
-
-					// let newBooking = {};
-					// Object.keys(editedBooking).forEach((key, index) => {
-					// newBooking[$headerKeysDanish[index]] = editedBooking[key];
-					// });
-
-					// let newBooking = {};
-					// Object.keys(editedBooking).forEach((key) => {
-					// 	newBooking[$displayNames[key]] = editedBooking[key];
-					// });
-
-					// console.log('itemlist', $itemList);
-					// console.log('newBooking:', editedBooking);
-
-					$itemList[index] = editedBooking;
+				
+					itemList.update(items => {
+						items[index] = editedBooking;
+						return items;
+					});
 				}
+
+				onEditChanges(editedBooking); // Pass the updated data to the parent component
 
 				/*
 				if (index !== -1) {
