@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { user, newUser } from '../stores/userStore.js';
 	import { onMount } from 'svelte';
-	import { validateSession, login, logout } from '../utils/auth.js';
+	import { login, logout, validateSession } from '../utils/auth.js';
 	import { isLoading, loginLoading } from '../stores/generalStore.js';
 	import { Toaster } from 'svelte-french-toast';
 
@@ -35,10 +35,14 @@
 		>
 			<span class="navbar-toggler-icon"></span>
 		</button>
+		{#if !$isLoading}
 		<div class:show={isOpen} class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
 			<div class="navbar-nav">
+				
 				<!-- navbar showing for admin -->
 				{#if $user.roleId === 1}
+			
 					<a
 						class="nav-link"
 						class:active={$page.url.pathname === '/classrooms/admin'}
@@ -48,14 +52,14 @@
 
 					<a
 						class="nav-link"
-						class:active={$page.url.pathname === '/users'}
+						class:active={$page.url.pathname === '/users/admin'}
 						data-sveltekit-preload-data
 						href={$user.email ? '/users/admin' : '/'}>Kontoransatte</a
 					>
 
 					<a
 						class="nav-link"
-						class:active={$page.url.pathname === '/afdelinger'}
+						class:active={$page.url.pathname === '/location/admin'}
 						data-sveltekit-preload-data
 						href={$user.email ? '/location/admin' : '/'}>Afdelinger</a
 					>
@@ -77,7 +81,7 @@
 
 					<a
 						class="nav-link"
-						class:active={$page.url.pathname === '/afdelinger'}
+						class:active={$page.url.pathname === '/location/user'}
 						data-sveltekit-preload-data
 						href={$user.email ? '/location/user' : '/'}>Afdelinger</a
 					>
@@ -89,7 +93,7 @@
 					>
 					<a
 						class="nav-link"
-						class:active={$page.url.pathname === '/your-employees'}
+						class:active={$page.url.pathname === '/users/user'}
 						data-sveltekit-preload-data
 						href={$user.email ? '/users/user' : '/'}>Medarbejdere</a
 					>
@@ -118,10 +122,10 @@
 							aria-label="Password"
 							bind:value={testUser.password}
 						/>
-						<button class="btn btn-outline-success" type="submit">Login</button>
+						<button class="btn btn-outline-success" type="submit">Log&nbspind</button>
 					</form>
 				{:else}
-					<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Logud</button>
+					<button class="btn btn-outline-success d-flex ms-auto" on:click={logout}>Log&nbspud</button>
 				{/if}
 			{:else}
 				<!-- Show spinner while loading -->
@@ -129,27 +133,35 @@
 					<div class="spinner-border text-primary" role="status"></div>
 				</div>
 			{/if}
-		</div>
-	</div>
+
+			</div>
+		{/if}
+			</div>
 </nav>
 
-<main class="container">
-	{#if !$isLoading}
-		<slot />
-		<Toaster />
-	{:else}
-		<!-- Show spinner while loading -->
-		<div
-			class="d-flex justify-content-center align-items-center"
-			style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; background-color: rgba(255, 255, 255, 0.5);"
-		>
-			<div class="spinner-border text-primary" role="status"></div>
-		</div>
-	{/if}
-</main>
+{#if $user.email}
+	<main class="container">
+		{#if !$isLoading}
+			<slot />
+			<Toaster />
+		{:else}
+			<!-- Show spinner while loading -->
+			<div
+				class="d-flex justify-content-center align-items-center"
+				style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; background-color: rgba(255, 255, 255, 0.5);"
+			>
+				<div class="spinner-border text-primary" role="status"></div>
+			</div>
+		{/if}
+	</main>
+{/if}
 
 <style>
 	.navbar {
 		z-index: 1000;
+	}
+	.nav-link.active {
+		font-weight: bold;
+		color: #000408 !important;
 	}
 </style>

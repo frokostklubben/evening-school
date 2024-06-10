@@ -9,7 +9,7 @@ export const adminCheck = (req, res, next) => {
 }
 
 export const checkAuth = (req, res, next) => {
-  if (req.path === '/auth/login') {
+  if (req.path === '/auth/login' || req.path === '/auth/reset-password') {
     return next()
   }
 
