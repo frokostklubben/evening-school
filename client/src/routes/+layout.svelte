@@ -64,16 +64,16 @@
 				{:else if $user.roleId === 2}
 					<a
 						class="nav-link"
-						class:active={$page.url.pathname === '/booking'}
+						class:active={$page.url.pathname === '/booking-panels'}
 						data-sveltekit-preload-data
-						href="/booking">Booking</a
+						href="/booking-panels">Booking</a
 					>
-<a
-							class="nav-link"
-							class:active={$page.url.pathname === '/edit-booking'}
-							data-sveltekit-preload-data
-							href="/edit-booking">Rediger booking</a
-						>
+					<a
+						class="nav-link"
+						class:active={$page.url.pathname === '/edit-booking'}
+						data-sveltekit-preload-data
+						href="/edit-booking">Rediger booking</a
+					>
 
 					<a
 						class="nav-link"
