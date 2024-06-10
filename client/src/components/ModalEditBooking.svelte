@@ -24,7 +24,7 @@
 	$: selectedTeacher = $selectedItem.teacherId;
 	$: selectedClassroom = $selectedItem.roomId;
 	$: selectedLocation = $selectedItem.locationId;
-	$: ignoreSetupTime = $selectedItem.ignoreSetupTime;
+	$: ignoreSetupTime = false;
 
 	$: selectedDate = new Date($selectedItem.date);
 	let selectedStartTime = $selectedItem.startTime;
@@ -77,17 +77,23 @@
 	}
 
 	async function checkBookingDate() {
-		console.log('checkBookingDate');
-
 		let booking = [
 			{
 				course_id: $selectedItem.courseId,
 				room_id: $selectedItem.roomId,
 				startTime: $selectedItem.startTime,
 				endTime: $selectedItem.endTime,
-				date: new Date($selectedItem.date)
+				date: new Date(
+					new Date($selectedItem.date).setHours(new Date($selectedItem.date).getHours() + 2)
+				)
 			}
 		];
+
+		console.log('booking >>>>>>>>>>>>>>>>', booking);
+
+		// booking[0].date.setHours(new Date($selectedItem.date).getHours() + 2);
+
+		console.log('booking after', booking);
 
 		let allStartDatesBeforeEndDates = booking.every(
 			(booking) => booking.startTime < booking.endTime
@@ -111,12 +117,20 @@
 			if (response.ok) {
 				const result = await response.json();
 
+				if (result.data.conflict) {
+					toast.error('Konflikt med eksisterende booking', { duration: 5000 });
+				} else {
+					saveChanges();
+				}
+
 				console.log('result.data >>>>>>>>>>>>>>>>', result.data);
 
 				booking = result.data.map((booking) => ({
 					...booking,
 					date: new Date(booking.date)
 				}));
+			} else {
+				toast.error('Fejl ved opdatering:', error.message);
 			}
 		} catch (error) {
 			console.error('Error saving booking:', error);
@@ -192,7 +206,8 @@
 	<div class="container-fluid mt-3">
 		<div class="row justify-content-center">
 			<div class="col-md-8">
-				<form on:submit|preventDefault={saveChanges} class="needs-validation">
+				<!-- on:submit|preventDefault={saveChanges} -->
+				<form class="needs-validation">
 					<div class="mb-3">
 						<label for="courseName" class="form-label">{$displayNames['courseName']}</label>
 						<input

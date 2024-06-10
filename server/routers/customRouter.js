@@ -126,6 +126,8 @@ router.post('/api/check-booking-dates', async (req, res) => {
 
     console.log('bookingDates', bookingDates)
 
+    console.log('ignoreSetupTime:', ignoreSetupTime)
+
     // loop thought each booking date and check for conflicts
     for (let i = 0; i < bookingDates.length; i++) {
       //see if any holidays conflict with the booking date
@@ -181,8 +183,6 @@ router.post('/api/check-booking-dates', async (req, res) => {
         bookingDates[i].conflict = false
       }
     }
-
-    bookingDates.ignoreSetupTime = true
 
     res.status(200).send({ data: bookingDates })
   } catch (err) {
