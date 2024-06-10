@@ -91,8 +91,6 @@
 
 		console.log('booking >>>>>>>>>>>>>>>>', booking);
 
-		// booking[0].date.setHours(new Date($selectedItem.date).getHours() + 2);
-
 		console.log('booking after', booking);
 
 		let allStartDatesBeforeEndDates = booking.every(
@@ -174,10 +172,10 @@
 				}
 
 				onEditChanges(editedBooking);
-
 				showEditModal.set(false);
 			} else {
-				toast.error('Fejl ved opdatering:', error.message);
+				//	toast.error('Fejl ved opdatering:', result.error);
+				toast.error('Tidspunkter for booking ikke ledig');
 			}
 		} catch (error) {
 			toast.error('Fejl ved opdatering:', error.message);
