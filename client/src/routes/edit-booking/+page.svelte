@@ -434,6 +434,8 @@
 													class="btn"
 													on:click={() => {
 														selectedItem.set(listItem);
+														console.log('selectedItem:', $selectedItem);
+
 														showEditModal.set(true);
 													}}
 													title="Rediger"

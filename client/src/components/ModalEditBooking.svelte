@@ -24,6 +24,7 @@
 	$: selectedTeacher = $selectedItem.teacherId;
 	$: selectedClassroom = $selectedItem.roomId;
 	$: selectedLocation = $selectedItem.locationId;
+	$: ignoreSetupTime = $selectedItem.ignoreSetupTime;
 
 	$: selectedDate = new Date($selectedItem.date);
 	let selectedStartTime = $selectedItem.startTime;
@@ -73,6 +74,53 @@
 		selectedItem.update((value) => {
 			return { ...value, endTime: selectedEndTime };
 		});
+	}
+
+	async function checkBookingDate() {
+		console.log('checkBookingDate');
+
+		let booking = [
+			{
+				course_id: $selectedItem.courseId,
+				room_id: $selectedItem.roomId,
+				startTime: $selectedItem.startTime,
+				endTime: $selectedItem.endTime,
+				date: new Date($selectedItem.date)
+			}
+		];
+
+		let allStartDatesBeforeEndDates = booking.every(
+			(booking) => booking.startTime < booking.endTime
+		);
+
+		if (!allStartDatesBeforeEndDates) {
+			toast.error('Starttidspunkt skal være før sluttidspunkt', { duration: 5000 });
+			return;
+		}
+
+		try {
+			const response = await fetch(`${$BASE_URL}/check-booking-dates`, {
+				credentials: 'include',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ bookingDates: booking, ignoreSetupTime })
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+
+				console.log('result.data >>>>>>>>>>>>>>>>', result.data);
+
+				booking = result.data.map((booking) => ({
+					...booking,
+					date: new Date(booking.date)
+				}));
+			}
+		} catch (error) {
+			console.error('Error saving booking:', error);
+		}
 	}
 
 	async function saveChanges() {
@@ -182,22 +230,42 @@
 							onOptionChange={handleTeacherChange}
 						/>
 					</div>
+
 					<DatePicker
 						bind:value={$selectedItem.date}
 						id={new Date($selectedItem.date)}
 						label="Vælg dato"
 						{modeRange}
 					/>
-					<TimePicker
-						bind:value={$selectedItem.startTime}
-						id="startTime"
-						onTimeChange={handleStartTimeChange}
-					/>
-					<TimePicker
-						bind:value={$selectedItem.endTime}
-						id="endTime"
-						onTimeChange={handleEndTimeChange}
-					/>
+
+					<div class="mb-3">
+						<TimePicker
+							bind:value={$selectedItem.startTime}
+							id="startTime"
+							onTimeChange={handleStartTimeChange}
+						/>
+						<TimePicker
+							bind:value={$selectedItem.endTime}
+							id="endTime"
+							onTimeChange={handleEndTimeChange}
+						/>
+					</div>
+
+					<div class="mb-3">
+						<div class="d-flex align-content-center gap-2">
+							<label for="setup-time" class="form-label"
+								>Ignorér klargøringstid (15 minutter):</label
+							>
+							<div class="form-check form-check-inline">
+								<input
+									class="form-check-input border-3 p-2 rounded"
+									type="checkbox"
+									id={'setup-time'}
+									bind:checked={ignoreSetupTime}
+								/>
+							</div>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -211,7 +279,8 @@
 					type="submit"
 					color="green"
 					on:click={() => {
-						saveChanges();
+						// saveChanges();
+						checkBookingDate();
 					}}
 					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button
 				>
