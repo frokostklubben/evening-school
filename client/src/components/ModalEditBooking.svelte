@@ -81,17 +81,11 @@
 			{
 				course_id: $selectedItem.courseId,
 				room_id: $selectedItem.roomId,
-				startTime: $selectedItem.startTime,
-				endTime: $selectedItem.endTime,
-				date: new Date(
-					new Date($selectedItem.date).setHours(new Date($selectedItem.date).getHours() + 2)
-				)
+				startTime: new Date($selectedItem.startTime).toTimeString().split(' ')[0], // 'HH:MM:SS' format
+				endTime: new Date($selectedItem.endTime).toTimeString().split(' ')[0],
+				date: new Date($selectedItem.date).toISOString()
 			}
 		];
-
-		console.log('booking >>>>>>>>>>>>>>>>', booking);
-
-		console.log('booking after', booking);
 
 		let allStartDatesBeforeEndDates = booking.every(
 			(booking) => booking.startTime < booking.endTime
@@ -115,20 +109,18 @@
 			if (response.ok) {
 				const result = await response.json();
 
-				if (result.data.conflict) {
+				if (result.data.some((item) => item.conflict)) {
 					toast.error('Konflikt med eksisterende booking', { duration: 5000 });
 				} else {
 					saveChanges();
 				}
-
-				console.log('result.data >>>>>>>>>>>>>>>>', result.data);
 
 				booking = result.data.map((booking) => ({
 					...booking,
 					date: new Date(booking.date)
 				}));
 			} else {
-				toast.error('Fejl ved opdatering:', error.message);
+				toast.error('Fejl ved opdatering:');
 			}
 		} catch (error) {
 			console.error('Error saving booking:', error);
@@ -174,7 +166,6 @@
 				onEditChanges(editedBooking);
 				showEditModal.set(false);
 			} else {
-				//	toast.error('Fejl ved opdatering:', result.error);
 				toast.error('Tidspunkter for booking ikke ledig');
 			}
 		} catch (error) {
@@ -204,7 +195,6 @@
 	<div class="container-fluid mt-3">
 		<div class="row justify-content-center">
 			<div class="col-md-8">
-				<!-- on:submit|preventDefault={saveChanges} -->
 				<form class="needs-validation">
 					<div class="mb-3">
 						<label for="courseName" class="form-label">{$displayNames['courseName']}</label>
@@ -292,7 +282,6 @@
 					type="submit"
 					color="green"
 					on:click={() => {
-						// saveChanges();
 						checkBookingDate();
 					}}
 					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button

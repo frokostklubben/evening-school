@@ -16,7 +16,6 @@
 	import ModalEditBooking from '../../components/ModalEditBooking.svelte';
 
 	let collection = 'bookings';
-	let idKey;
 	let selectedTeacher = 'empty';
 	let selectedCourseName = 'empty';
 	let selectedCourseId = 'empty';
@@ -434,8 +433,6 @@
 													class="btn"
 													on:click={() => {
 														selectedItem.set(listItem);
-														console.log('selectedItem:', $selectedItem);
-
 														showEditModal.set(true);
 													}}
 													title="Rediger"

@@ -5,7 +5,7 @@ import classroom from '../database/models/classroom.js'
 import course from '../database/models/course.js'
 import booking from '../database/models/booking.js'
 import Holiday from '../database/models/holiday.js'
-import { Op } from 'sequelize'
+import { Op, literal } from 'sequelize'
 import Booking from '../database/models/booking.js'
 import Classroom_purpose from '../database/models/classroomPurpose.js'
 
@@ -123,10 +123,6 @@ router.post('/api/check-booking-dates', async (req, res) => {
   try {
     let { bookingDates, ignoreSetupTime } = req.body
     let school_id = req.session.user.schoolId
-
-    console.log('bookingDates', bookingDates)
-
-    console.log('ignoreSetupTime:', ignoreSetupTime)
 
     // loop thought each booking date and check for conflicts
     for (let i = 0; i < bookingDates.length; i++) {

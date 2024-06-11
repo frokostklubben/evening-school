@@ -628,7 +628,7 @@
 		label={'Vælg afdeling'}
 		selected={selectedLocation}
 		idKey={'location_id'}
-		optionName={'street_name'}
+		optionName={'school_name'}
 		options={locations}
 		onOptionChange={handleLocationChange}
 	/>
@@ -802,7 +802,7 @@
 									{new Date(booking.holidayConflict.start_date).toLocaleDateString()} -
 									{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
 								</div>
-							{:else if booking.conflicts}
+							{:else if booking.conflict}
 								<span class="text-danger">Ikke ledig: </span>
 								{booking.bookingConflicts
 									.map((conflict) => {
