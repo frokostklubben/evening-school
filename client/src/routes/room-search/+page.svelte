@@ -40,28 +40,31 @@
 		endTime.setHours(23, 0, 0, 0);
 	});
 
-	function formatTime(date) {
-		date = new Date(date);
-		let hours = date.getHours();
-		let minutes = date.getMinutes();
-		let seconds = date.getSeconds();
+	// function formatTime(date) {
+	// 	date = new Date(date);
+	// 	let hours = date.getHours();
+	// 	let minutes = date.getMinutes();
+	// 	let seconds = date.getSeconds();
 
-		// Pad single-digit hours, minutes, or seconds with a leading zero
-		hours = hours < 10 ? '0' + hours : hours;
-		minutes = minutes < 10 ? '0' + minutes : minutes;
-		seconds = seconds < 10 ? '0' + seconds : seconds;
+	// 	// Pad single-digit hours, minutes, or seconds with a leading zero
+	// 	hours = hours < 10 ? '0' + hours : hours;
+	// 	minutes = minutes < 10 ? '0' + minutes : minutes;
+	// 	seconds = seconds < 10 ? '0' + seconds : seconds;
 
-		return `${hours}:${minutes}:${seconds}`;
-	}
+	// 	return `${hours}:${minutes}:${seconds}`;
+	// }
 
 	async function fetchAvailableClassrooms() {
 		const requestData = {
 			startDate: startDate,
 			endDate: endDate,
-			startTime: formatTime(startTime),
-			endTime: formatTime(endTime)
+			// startDate: new Date(startDate).toISOString(),
+			// endDate: new Date(endDate).toISOString(),
+			// startTime: formatTime(startTime),
+			// endTime: formatTime(endTime)
+			startTime: new Date(startTime).toTimeString().split(' ')[0],
+			endTime: new Date(endTime).toTimeString().split(' ')[0]
 		};
-
 
 		const response = await fetch(`${$BASE_URL}/classrooms/available/${$user.schoolId}`, {
 			method: 'POST',
@@ -97,7 +100,6 @@
 
 	function handleStartTimeChange(event) {
 		startTime = event.detail[1];
-
 	}
 
 	function handleEndTimeChange(event) {

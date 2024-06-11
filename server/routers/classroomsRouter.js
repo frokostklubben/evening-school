@@ -239,31 +239,52 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       ],
     })
 
-    const allBookings = await Booking.findAll({
-      where: {
-        date: {
-          [Op.between]: [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]],
-        },
-        [Op.and]: [
-          {
-            [Op.or]: [
-              {
-                start_time: {
-                  [Op.between]: [startTime, endTime],
-                },
-              },
-              {
-                end_time: {
-                  [Op.between]: [startTime, endTime],
-                },
-              },
-              {
-                [Op.and]: [{ start_time: { [Op.lte]: startTime } }, { end_time: { [Op.gte]: endTime } }],
-              },
-            ],
-          },
-        ],
+    const isSameDay = startDate.toISOString().split('T')[0] === endDate.toISOString().split('T')[0]
+
+    // If date range:
+    const whereConditions = {
+      date: {
+        [Op.between]: [startDate, endDate],
       },
+      [Op.and]: [
+        {
+          [Op.or]: [
+            {
+              start_time: {
+                [Op.between]: [startTime, endTime],
+              },
+            },
+            {
+              end_time: {
+                [Op.between]: [startTime, endTime],
+              },
+            },
+            {
+              [Op.and]: [{ start_time: { [Op.lte]: startTime } }, { end_time: { [Op.gte]: endTime } }],
+            },
+          ],
+        },
+      ],
+    }
+
+    // If single day:
+    if (isSameDay) {
+      whereConditions[Op.and].push(
+        {
+          start_time: {
+            [Op.gte]: startTime,
+          },
+        },
+        {
+          end_time: {
+            [Op.lte]: endTime,
+          },
+        },
+      )
+    }
+
+    const allBookings = await Booking.findAll({
+      where: whereConditions,
     })
 
     const allHolidays = await Holiday.findAll({

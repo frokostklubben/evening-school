@@ -8,8 +8,6 @@
 	import { Button } from 'flowbite-svelte';
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { displayNames } from '../../../stores/dictionaryStore.js';
-	import { isLoading } from '../../../stores/generalStore.js';
-	import '../../../components/dropdownAndList.css';
 
 	let modalTitle = 'Nyt lokale';
 	let locations = [];
@@ -48,10 +46,7 @@
 			credentials: 'include'
 		});
 
-		isLoading.set(true);
-
 		if (response.ok) {
-			isLoading.set(false);
 			const result = await response.json();
 			itemList.set(result.data);
 		} else {
@@ -117,7 +112,7 @@
 	</div>
 
 	<ListItems
-		idKey={'room_id'}
+		idKey={'location_id'}
 		collection={'classrooms'}
 		showButtons={false}
 		buttons={[]}
