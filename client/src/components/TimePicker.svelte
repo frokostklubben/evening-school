@@ -1,7 +1,6 @@
 <script>
 	import Datepicker from 'svelte-flatpickr';
 	import 'flatpickr/dist/flatpickr.min.css';
-	import { toast } from 'svelte-french-toast';
 
 	export let value;
 	export let id;

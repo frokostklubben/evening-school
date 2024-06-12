@@ -4,9 +4,7 @@
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import { user } from '../../../stores/userStore.js';
 	import { itemList } from '../../../stores/itemListStore';
-	import { isLoading } from '../../../stores/generalStore.js';
 	import { headerKeysDanish, headerKeys } from '../../../stores/itemListStore.js';
-	import Spinner from '../../../components/Spinner.svelte';
 	import { selectionsLoading } from '../../../stores/generalStore.js';
 
 	selectionsLoading.set(true);

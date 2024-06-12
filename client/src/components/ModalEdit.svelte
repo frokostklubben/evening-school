@@ -5,7 +5,6 @@
 	import { selectedItem, showEditModal } from '../stores/modalStore.js';
 	import { itemList } from '../stores/itemListStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
-	import { isLoading } from '../stores/generalStore.js';
 
 	export let idKey;
 	export let collection = '';

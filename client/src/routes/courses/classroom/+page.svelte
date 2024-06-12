@@ -10,6 +10,7 @@
 	import { headerKeysDanish } from '../../../stores/itemListStore.js';
 
 	headerKeysDanish.set([]);
+	itemList.set([]);
 
 	displayNames.set({
 		course_name: 'Kursusnavn',
