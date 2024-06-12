@@ -43,7 +43,12 @@
 	});
 
 	function setHeaderKeys(data) {
-		const excludeKeys = ['_id', 'hashed_password'];
+		const excludeKeys = [
+			'_id',
+			'hashed_password',
+			'reset_password_token',
+			'reset_password_expires'
+		];
 
 		// 	Made in cooperation with chatgpt (Marcus)
 		const filteredKeys = data.filter(

@@ -19,7 +19,6 @@
 
 
 	let collection = 'bookings';
-	let idKey = 'booking_id';
 	let selectedTeacher = 'empty';
 	let selectedCourseName = 'empty';
 	let selectedCourseId = 'empty';
@@ -30,7 +29,8 @@
 	$: filteredTeachers = teachers;
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
-	let groupedData = {};
+
+	$: groupedData = {};
 
 	displayNames.set({
 		bookingId: 'Booking ID',
@@ -130,9 +130,8 @@
 			}
 		} catch (error) {
 			console.error('Failed to fetch edit booking data from the server:', error.message);
-		
+		}
 	}
-}
 
 	/* 
 	So, in simple terms, this code is saying: 
@@ -149,7 +148,16 @@
 	}
 
 	function setHeaderKeys(data) {
-		const excludeKeys = ['_id', 'hashed_password', 'roomId', 'teacherId', 'locationId', 'courseId', 'courseName', 'teacherEmail'];
+		const excludeKeys = [
+			'_id',
+			'hashed_password',
+			'roomId',
+			'teacherId',
+			'locationId',
+			'courseId',
+			'courseName',
+			'teacherEmail'
+		];
 
 		// 	Made in cooperation with chatgpt (Marcus)
 		const filteredKeys = data.filter(
@@ -172,11 +180,6 @@
 		}
 	}
 
-	function formatInventory(inventories) {
-		if (!inventories) return '';
-		return Array.isArray(inventories) ? inventories.join(', ') : inventories;
-	}
-
 	function groupData() {
 		// Group the filteredBookings by courseName
 		groupedData = filteredBookings.reduce((groups, item) => {
@@ -191,6 +194,7 @@
 
 	function filterList() {
 		filteredBookings = $itemList;
+
 		filteredBookings.sort((a, b) => a.courseId - b.courseId);
 
 		if (selectedCourseName !== 'empty') {
@@ -214,12 +218,12 @@
 		if (
 			selectedCourseName === 'empty' &&
 			selectedTeacher === 'empty' &&
-			selectedCourseId === 'empty' 
+			selectedCourseId === 'empty'
 		) {
 			resetFilters();
 		}
 
-		groupData()
+		groupData();
 	}
 
 	function handleCourseNameChange(event) {
@@ -359,9 +363,18 @@
 		filteredCourseNames = courseNames;
 		filteredTeachers = teachers;
 		filteredCourseIds = courseIds;
-		//filterList();
 		filteredBookings = $itemList;
-		groupData()
+		groupData();
+	}
+
+	function handleEditChanges(updatedBooking) {
+		let updatedBookingId = updatedBooking.bookingId;
+
+		filteredBookings = filteredBookings.map((item) => {
+			return item.bookingId === updatedBookingId ? updatedBooking : item;
+		});
+
+		filterList();
 	}
 </script>
 
@@ -399,7 +412,10 @@
 			onOptionChange={handleCourseIdChange}
 		/>
 	</div>
-	<button class="btn btn-primary btn-md mt-3" title="Nulstil filtre" on:click={resetFilters}>Nulstil</button>
+
+	<button class="btn btn-primary btn-md mt-3" title="Nulstil filtre" on:click={resetFilters}
+		>Nulstil</button
+	>
 </div>
 
 <div class="container mt-5">
@@ -407,65 +423,60 @@
 		<div class="col-12 col-lg-10">
 			{#if filteredBookings.length > 0}
 				{#each Object.keys(groupedData) as courseId}
-				<div class="mt-3 border border-2 p-3 mb-3">
-				<h4>{groupedData[courseId][0].courseName} | Kursus ID #{courseId}</h4>
-				<h5>{groupedData[courseId][0].teacherEmail}</h5>
-				<div class="list-group mt-6">
-					<table class="w-100 spaced-table">
-						<thead>
-							<tr>
-								{#each $headerKeysDanish as key (key)}
-									<th>{$displayNames[key]}</th>
-								{/each}
-							</tr>
-						</thead>
-						<tbody>
-							{#each groupedData[courseId] as listItem}
-							<!--{#each filteredBookings as listItem, index}-->
-								<tr class="hover-row">
-									{#each $headerKeys as key (key)}
-										<td>
-											{#if key === 'inventories' || key === 'inventory' || key === 'item_list' || key === 'Inventories'}
-												{formatInventory(listItem[key])}
-											{:else if key === 'date'}
-												{new Date(listItem[key]).toLocaleDateString()}
-											{:else if key === 'startTime' || key === 'endTime'}
-												{listItem[key].slice(0, 5)}
-											{:else}
-												{listItem[key]}
-											{/if}
-										</td>
+					<div class="mt-3 border border-2 p-3 mb-3">
+						<h4>{groupedData[courseId][0].courseName} | Kursus ID #{courseId}</h4>
+						<h5>{groupedData[courseId][0].teacherEmail}</h5>
+						<div class="list-group mt-6">
+							<table class="w-100 spaced-table">
+								<thead>
+									<tr>
+										{#each $headerKeysDanish as key (key)}
+											<th>{$displayNames[key]}</th>
+										{/each}
+									</tr>
+								</thead>
+								<tbody>
+									{#each groupedData[courseId] as listItem}
+										<tr class="hover-row">
+											{#each $headerKeys as key (key)}
+												<td>
+													{#if key === 'date'}
+														{new Date(listItem[key]).toLocaleDateString()}
+													{:else}
+														{listItem[key]}
+													{/if}
+												</td>
+											{/each}
+											<td>
+												<button
+													class="btn"
+													on:click={() => {
+														selectedItem.set(listItem);
+														showEditModal.set(true);
+													}}
+													title="Rediger"
+												>
+													<i class="bi bi-pencil-square"></i>
+												</button>
+											</td>
+											<td>
+												<button
+													class="btn"
+													on:click={() => {
+														selectedItem.set(listItem);
+														showDeleteModal.set(true);
+													}}
+													title="Slet"
+												>
+													<i class="bi bi-trash-fill"></i>
+												</button>
+											</td>
+										</tr>
 									{/each}
-									<td>
-										<button
-											class="btn"
-											on:click={() => {
-												selectedItem.set(listItem);
-												showEditModal.set(true);
-											}}
-											title="Rediger"
-										>
-											<i class="bi bi-pencil-square"></i>
-										</button>
-									</td>
-									<td>
-										<button
-											class="btn"
-											on:click={() => {
-												selectedItem.set(listItem);
-												showDeleteModal.set(true);
-											}}
-											title="Slet"
-										>
-											<i class="bi bi-trash-fill"></i>
-										</button>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
-				</div>
+								</tbody>
+							</table>
+						</div>
+					</div>
 				{/each}
 			{:else if $optionId}
 				<div class="alert alert-warning" role="alert">Ingen data</div>
@@ -478,7 +489,7 @@
 {/if}
 <ModalEditBooking /> 
 
-<ModalDelete {collection} {idKey} />
+<ModalDelete {collection} idKey={'bookingId'} />
 
 <style>
 	.hover-row:hover {

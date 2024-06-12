@@ -10,7 +10,7 @@
 	import { selectionsLoading, contentLoading } from '../stores/generalStore';
 	import Spinner from './Spinner.svelte';
 
-	export let listIdKey; // f.eks. user_id, hvis resultatet er users
+	export let listIdKey; // Example: user_id, if resultat is users
 	export let listCollection;
 	export let optionsCollection;
 	export let optionsIdKey;
@@ -77,8 +77,6 @@
 		}
 
 	}
-
-	import './dropdownAndList.css';
 </script>
 
 <div id="options-container">

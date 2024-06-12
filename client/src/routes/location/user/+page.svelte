@@ -47,7 +47,7 @@
 	idKey={$user.schoolId}
 	collection={'locations'}
 	showButtons={true}
-	showEditButton={true}
+	showEditButton={false}
 	showDeleteButton={false}
 	buttons={[
 		{ id: 1, key: 'location_id', url: '/classrooms/user', text: 'Lokaler', store: 'school_name' },
