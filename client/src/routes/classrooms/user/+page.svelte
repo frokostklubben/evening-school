@@ -9,6 +9,7 @@
 	import GoBackButton from '../../../components/GoBackButton.svelte';
 	import { isLoading } from '../../../stores/generalStore.js';
 	import { headerKeysDanish } from '../../../stores/itemListStore.js';
+	import { backupOptionId } from '../../../stores/generalStore.js';
 
 	headerKeysDanish.set([]);
 
@@ -20,6 +21,12 @@
 	});
 
 	onMount(() => {
+		if ($backupOptionId === "") {
+			backupOptionId.set($optionId);
+		} else {
+			$optionId = $backupOptionId;
+		}
+
 		itemList.set([]);
 		fetchClassrooms();
 	});

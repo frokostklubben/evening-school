@@ -6,6 +6,7 @@
 	import { itemList } from '../../../stores/itemListStore';
 	import { headerKeysDanish } from '../../../stores/itemListStore.js';
 	import { selectionsLoading } from '../../../stores/generalStore.js';
+	import { backupOptionId } from '../../../stores/generalStore.js'	
 
 	selectionsLoading.set(true);
 	headerKeysDanish.set([]);
@@ -22,6 +23,7 @@
 	onMount(() => {	
 		itemList.set([]);
 		fetchLocations();
+		backupOptionId.set("");
 	});
 
 	async function fetchLocations() {
