@@ -140,35 +140,40 @@ router.post('/api/check-booking-dates', async (req, res) => {
         continue
       }
 
-      //see if any bookings conflict with the booking date
-      let bookingConflicts = await booking.findAll({
-        where: {
-          [Op.and]: [
-            { date: bookingDates[i].date },
-            { room_id: bookingDates[i].room_id },
-            {
-              [Op.or]: [
-                {
-                  start_time: ignoreSetupTime
-                    ? { [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime] }
-                    : {
-                        [Op.between]: [bookingDates[i].startTime, new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() + 15 * 60000).toTimeString().substring(0, 5)],
-                      },
-                },
-                {
-                  end_time: ignoreSetupTime
-                    ? {
-                        [Op.between]: [bookingDates[i].startTime, bookingDates[i].endTime],
-                      }
-                    : {
-                        [Op.between]: [new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5), bookingDates[i].endTime],
-                      },
-                },
-              ],
-            },
-          ],
-        },
-      })
+        let bookingConflicts = await booking.findAll({
+          where: {
+            [Op.and]: [
+              { date: bookingDates[i].date },
+              { room_id: bookingDates[i].room_id },
+              {
+                [Op.or]: [
+                  {
+                    start_time: ignoreSetupTime
+                      ? { 
+                          [Op.gt]: bookingDates[i].startTime, 
+                          [Op.lt]: bookingDates[i].endTime 
+                        }
+                      : {
+                          [Op.gt]: bookingDates[i].startTime, 
+                          [Op.lt]: new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() + 15 * 60000).toTimeString().substring(0, 5),
+                        },
+                  },
+                  {
+                    end_time: ignoreSetupTime
+                      ? {
+                          [Op.gt]: bookingDates[i].startTime, 
+                          [Op.lt]: bookingDates[i].endTime,
+                        }
+                      : {
+                          [Op.gt]: new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5), 
+                          [Op.lt]: bookingDates[i].endTime,
+                        },
+                  },
+                ],
+              },
+            ],
+          },
+        })
 
       //add a conflict bookings to the booking date object, if there is any conflicts
       if (bookingConflicts.length > 0) {
