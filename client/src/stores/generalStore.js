@@ -9,3 +9,5 @@ export let selectionsLoading = writable(false)
 export let secondSelectionsLoading = writable(false)
 
 export let contentLoading = writable(false)
+
+export let backupOptionId = writable("")
