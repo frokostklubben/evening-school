@@ -128,17 +128,26 @@ await Course.bulkCreate([
 ])
 
 await Booking.bulkCreate([
-  { course_id: 1, room_id: 1, start_time: '16:30:00', end_time: '19:30:00', date: '2024-05-22' },
-  { course_id: 2, room_id: 1, start_time: '12:00:00', end_time: '14:00:00', date: '2024-05-24' },
-  { course_id: 3, room_id: 2, start_time: '10:00:00', end_time: '12:00:00', date: '2024-05-25' },
-  { course_id: 4, room_id: 2, start_time: '14:00:00', end_time: '16:00:00', date: '2024-05-26' },
-  { course_id: 5, room_id: 3, start_time: '09:00:00', end_time: '11:00:00', date: '2024-05-27' },
-  { course_id: 6, room_id: 3, start_time: '13:00:00', end_time: '15:00:00', date: '2024-05-28' },
-  { course_id: 7, room_id: 3, start_time: '11:00:00', end_time: '13:00:00', date: '2024-05-29' },
-  { course_id: 8, room_id: 4, start_time: '15:00:00', end_time: '17:00:00', date: '2024-05-30' },
-  { course_id: 9, room_id: 5, start_time: '10:00:00', end_time: '12:00:00', date: '2024-05-31' },
-  { course_id: 10, room_id: 5, start_time: '09:00:00', end_time: '11:00:00', date: '2024-06-01' },
+  { course_id: 1, room_id: 1, start_time: '08:30:00', end_time: '09:30:00', date: '2024-06-25' },
+  { course_id: 1, room_id: 1, start_time: '10:00:00', end_time: '11:00:00', date: '2024-06-25' },
+  { course_id: 1, room_id: 1, start_time: '12:00:00', end_time: '13:00:00', date: '2024-06-25' },
+  { course_id: 1, room_id: 1, start_time: '14:00:00', end_time: '15:00:00', date: '2024-06-25' },
+  { course_id: 1, room_id: 1, start_time: '15:30:00', end_time: '16:00:00', date: '2024-06-25' },
+  { course_id: 1, room_id: 1, start_time: '17:00:00', end_time: '18:00:00', date: '2024-06-25' },
+
+  { course_id: 3, room_id: 2, start_time: '10:00:00', end_time: '12:00:00', date: '2024-06-27' },
+  { course_id: 4, room_id: 2, start_time: '14:00:00', end_time: '16:00:00', date: '2024-06-26' },
+  // Classroom A103, FOF Syd- og Vestsjælland
+  { course_id: 5, room_id: 3, start_time: '09:00:00', end_time: '11:00:00', date: '2024-06-27' },
+  { course_id: 6, room_id: 3, start_time: '13:00:00', end_time: '15:00:00', date: '2024-06-28' },
+  { course_id: 7, room_id: 3, start_time: '11:00:00', end_time: '13:00:00', date: '2024-06-29' },
+
+  { course_id: 8, room_id: 4, start_time: '15:00:00', end_time: '17:00:00', date: '2024-06-29' },
+
+  { course_id: 9, room_id: 5, start_time: '10:00:00', end_time: '12:00:00', date: '2024-06-30' },
+  { course_id: 10, room_id: 5, start_time: '09:00:00', end_time: '11:00:00', date: '2024-06-30' },
   { course_id: 1, room_id: 5, start_time: '12:00:00', end_time: '14:00:00', date: '2024-06-02' },
+
   { course_id: 2, room_id: 6, start_time: '14:00:00', end_time: '16:00:00', date: '2024-06-03' },
   { course_id: 3, room_id: 6, start_time: '16:00:00', end_time: '18:00:00', date: '2024-06-04' },
   { course_id: 4, room_id: 6, start_time: '11:00:00', end_time: '13:00:00', date: '2024-06-05' },

@@ -49,7 +49,7 @@
 	collection={'classrooms'}
 	showButtons={true}
 	showEditButton={true}
-	showDeleteButton={true}
+	showDeleteButton={false}
 	buttons={[
 		{
 			id: 1,

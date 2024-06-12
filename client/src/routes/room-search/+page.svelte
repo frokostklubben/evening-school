@@ -9,6 +9,7 @@
 	let dateRange = [new Date(), new Date()];
 	let startTime;
 	let endTime;
+	let modeRange = true;
 	let startDate = dateRange[0];
 	let endDate = dateRange[1];
 	let availableClassrooms = [];
@@ -43,8 +44,8 @@
 		const requestData = {
 			startDate: startDate,
 			endDate: endDate,
-			startTime: startTime,
-			endTime: endTime
+			startTime: new Date(startTime).toTimeString().split(' ')[0],
+			endTime: new Date(endTime).toTimeString().split(' ')[0]
 		};
 
 		const response = await fetch(`${$BASE_URL}/classrooms/available/${$user.schoolId}`, {
@@ -73,23 +74,27 @@
 		return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear().toString().substr(-2)}`;
 	}
 
-	function formatTime(timeStr) {
-		return timeStr.split(':')[0] + ':' + timeStr.split(':')[1];
-	}
-
 	function showAllTimes(classroom) {
 		selectedClassroom = classroom;
 		modalTitle = `${classroom.room_name} (${classroom.school_name})`;
 		showModal = true;
+	}
+
+	function handleStartTimeChange(event) {
+		startTime = event.detail[1];
+	}
+
+	function handleEndTimeChange(event) {
+		endTime = event.detail[1];
 	}
 </script>
 
 <div class="container">
 	<div class="sidebar">
 		<form on:submit|preventDefault={fetchAvailableClassrooms}>
-			<DatePicker bind:value={dateRange} id="dateRange" label="Vælg dato interval" />
-			<TimePicker bind:value={startTime} id="startTime" />
-			<TimePicker bind:value={endTime} id="endTime" />
+			<DatePicker bind:value={dateRange} id="dateRange" label="Vælg dato interval" {modeRange} />
+			<TimePicker bind:value={startTime} id="startTime" onTimeChange={handleStartTimeChange} />
+			<TimePicker bind:value={endTime} id="endTime" onTimeChange={handleEndTimeChange} />
 			<button type="submit" class="btn btn-primary">Søg</button>
 		</form>
 	</div>
@@ -140,9 +145,7 @@
 <Modal title={modalTitle} bind:open={showModal} autoclose>
 	{#each selectedClassroom.freeTimes as interval}
 		<p>
-			{formatDate(interval.date)}: {interval.times
-				.map((t) => `${formatTime(t.start)} - ${formatTime(t.end)}`)
-				.join(', ')}
+			{formatDate(interval.date)}: {interval.times.map((t) => `${t.start} - ${t.end}`).join(', ')}
 		</p>
 	{/each}
 </Modal>
@@ -201,6 +204,9 @@
 		gap: 20px;
 	}
 	.classroom {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
 		border: 1px solid #ccc;
 		padding: 20px;
 		border-radius: 5px;
@@ -214,6 +220,6 @@
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 	}
 	.available-times {
-		margin-top: 10px;
+		margin-top: auto;
 	}
 </style>
