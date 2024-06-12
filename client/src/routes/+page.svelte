@@ -13,7 +13,7 @@
 <style>
 	.welcome-container {
 		text-align: center;
-		margin-top: 50px;
+		margin-top: 10rem;
 		font-family: Arial, sans-serif;
 	}
 
