@@ -32,12 +32,10 @@
 				body: JSON.stringify(formData)
 			});
 
-			isLoading.set(true);
 
 			const result = await response.json();
 
 			if (response.ok) {
-				isLoading.set(false);
 				// specific for dates
 				if (result.data.start_date && result.data.end_date) {
 					result.data.end_date = new Date(result.data.end_date).toISOString().split('T')[0];

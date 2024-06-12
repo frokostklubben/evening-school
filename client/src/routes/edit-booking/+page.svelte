@@ -14,6 +14,9 @@
 	import { onMount } from 'svelte';
 	import SelectBoxOptions from '../../components/SelectBoxOptions.svelte';
 	import ModalEditBooking from '../../components/ModalEditBooking.svelte';
+	import { contentLoading } from '../../stores/generalStore.js';
+	import Spinner from '../../components/Spinner.svelte';
+
 
 	let collection = 'bookings';
 	let selectedTeacher = 'empty';
@@ -42,7 +45,30 @@
 	});
 
 	onMount(async () => {
-		fetchEditData();
+
+		headerKeysDanish.set([]);
+		contentLoading.set(true)
+		itemList.set([])
+
+		if ($headerKeysDanish.length === 0) {
+			fetchHeaderKeys()
+			.then(() => {
+				const derivedHeaderKeys = derived(itemList, ($itemList) => {
+					if ($itemList.length > 0) {
+						return Object.keys($itemList[0]);
+					} 
+					return headerKeys;
+				});
+
+				derivedHeaderKeys.subscribe((keys) => {
+					if (keys.length > 0) {
+						setHeaderKeys(keys);
+					}
+				});
+			});
+		}
+
+		fetchEditData()
 
 		let response = await fetch(`${$BASE_URL}/bookings`, {
 			credentials: 'include'
@@ -70,33 +96,21 @@
 				return {
 					course_id: booking.courseId
 				};
+
 			});
 
 			teachers = removeDuplicates(teachers, 'teacher_id');
 			courseNames = removeDuplicates(courseNames, 'course_id');
 			courseIds = removeDuplicates(courseIds, 'course_id');
-			groupData();
+			groupData()
+			contentLoading.set(false)
+
 		} else {
 			console.error('Failed to fetch bookings from the server');
 		}
-
-		fetchHeaderKeys().then(() => {
-			const derivedHeaderKeys = derived(itemList, ($itemList) => {
-				if ($itemList.length > 0) {
-					return Object.keys($itemList[0]);
-				} else {
-					fetchHeaderKeys();
-				}
-				return [];
-			});
-
-			derivedHeaderKeys.subscribe((keys) => {
-				if (keys.length > 0) {
-					setHeaderKeys(keys);
-				}
-			});
-		});
 	});
+
+
 
 	async function fetchEditData() {
 		try {
@@ -360,6 +374,7 @@
 	}
 </script>
 
+{#if !$contentLoading}
 <div class="d-flex flex-column align-items-center mx-auto" style="max-width: 400px;">
 	<div class="w-100">
 		<SelectBoxOptions
@@ -465,8 +480,10 @@
 		</div>
 	</div>
 </div>
-
-<ModalEditBooking onEditChanges={handleEditChanges} />
+{:else}
+	<Spinner />
+{/if}
+<ModalEditBooking /> 
 
 <ModalDelete {collection} idKey={'bookingId'} />
 

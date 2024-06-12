@@ -68,7 +68,6 @@
 	let classrooms = [];
 	$: filteredClassrooms = [];
 	$: filteredPurposes = [];
-	let uniquePurpose = [];
 	let bookings = [];
 	let bookingDates = [];
 	let checkedBookings = [];
