@@ -5,7 +5,6 @@
 	import { showAddModal, optionId } from '../stores/modalStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
 	import { headerKeys, itemList } from '../stores/itemListStore.js';
-	import { isLoading } from '../stores/generalStore.js';
 
 	export let idKey;
 	export let collection = '';

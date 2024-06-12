@@ -38,18 +38,18 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
       ],
     })
 
-    let formattedClassrooms = classroomInventories.map(classroom => {
-      return {
-        room_id: classroom.room_id,
-        room_name: classroom.room_name,
-        location_id: classroom.location_id,
-        capacity: classroom.capacity,
-        purpose: classroom.classroom_purpose.purpose,
-        inventories: classroom.Inventories.map(inventory => {
-          return inventory.item_name
-        }),
-      }
-    })
+  let formattedClassrooms = classroomInventories.map(classroom => {
+    return {
+      room_id: classroom.room_id,
+      room_name: classroom.room_name,
+      location_id: classroom.location_id,
+      capacity: classroom.capacity,
+      purpose: classroom.classroom_purpose ? classroom.classroom_purpose.purpose : 'Intet',
+      inventories: classroom.Inventories.map(inventory => {
+        return inventory.item_name
+      }),
+    }
+  })
 
     res.send({ data: formattedClassrooms })
   } catch (error) {

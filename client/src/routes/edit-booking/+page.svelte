@@ -1,6 +1,5 @@
 <script>
 	import ModalDelete from '../../components/ModalDelete.svelte';
-	import { derived } from 'svelte/store';
 	import { headerKeys, headerKeysDanish, itemList } from '../../stores/itemListStore.js';
 	import {
 		optionId,
@@ -16,6 +15,7 @@
 	import ModalEditBooking from '../../components/ModalEditBooking.svelte';
 	import { contentLoading } from '../../stores/generalStore.js';
 	import Spinner from '../../components/Spinner.svelte';
+	import { getKeys } from '../../utils/headerkeys';
 
 
 	let collection = 'bookings';
@@ -50,23 +50,7 @@
 		contentLoading.set(true)
 		itemList.set([])
 
-		if ($headerKeysDanish.length === 0) {
-			fetchHeaderKeys()
-			.then(() => {
-				const derivedHeaderKeys = derived(itemList, ($itemList) => {
-					if ($itemList.length > 0) {
-						return Object.keys($itemList[0]);
-					} 
-					return headerKeys;
-				});
-
-				derivedHeaderKeys.subscribe((keys) => {
-					if (keys.length > 0) {
-						setHeaderKeys(keys);
-					}
-				});
-			});
-		}
+		getKeys("edit-booking")
 
 		fetchEditData()
 
@@ -141,39 +125,6 @@
 		return array.filter(
 			(obj, index, self) => index === self.findIndex((t) => t[prop] === obj[prop])
 		);
-	}
-
-	function setHeaderKeys(data) {
-		const excludeKeys = [
-			'_id',
-			'hashed_password',
-			'roomId',
-			'teacherId',
-			'locationId',
-			'courseId',
-			'courseName',
-			'teacherEmail'
-		];
-
-		// 	Made in cooperation with chatgpt (Marcus)
-		const filteredKeys = data.filter(
-			(key) => !excludeKeys.some((excludeKey) => key.endsWith(excludeKey) || key === excludeKey)
-		);
-		headerKeys.set(filteredKeys);
-		headerKeysDanish.set(filteredKeys.map((key) => displayNames[key] || key));
-	}
-
-	async function fetchHeaderKeys() {
-		const response = await fetch(`${$BASE_URL}/headerKey/edit-booking`, {
-			credentials: 'include'
-		});
-
-		if (response.ok) {
-			const result = await response.json();
-			setHeaderKeys(result.data);
-		} else {
-			console.error('Failed to fetch header keys from the server');
-		}
 	}
 
 	function groupData() {
@@ -427,7 +378,7 @@
 								<thead>
 									<tr>
 										{#each $headerKeysDanish as key (key)}
-											<th>{$displayNames[key]}</th>
+											<th>{key}</th>
 										{/each}
 									</tr>
 								</thead>
