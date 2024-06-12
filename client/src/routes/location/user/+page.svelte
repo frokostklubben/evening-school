@@ -5,6 +5,12 @@
 	import { user } from '../../../stores/userStore.js';
 	import { itemList } from '../../../stores/itemListStore';
 	import { isLoading } from '../../../stores/generalStore.js';
+	import { headerKeysDanish, headerKeys } from '../../../stores/itemListStore.js';
+	import Spinner from '../../../components/Spinner.svelte';
+	import { selectionsLoading } from '../../../stores/generalStore.js';
+
+	selectionsLoading.set(true);
+	headerKeysDanish.set([]);
 
 	displayNames.set({
 		school_name: 'Skole',
@@ -14,7 +20,8 @@
 		street_number: 'Nr.'
 	});
 
-	onMount(() => {
+
+	onMount(() => {	
 		itemList.set([]);
 		fetchLocations();
 	});
@@ -24,12 +31,12 @@
 			credentials: 'include'
 		});
 
-		isLoading.set(true);
 
 		if (response.ok) {
-			isLoading.set(false);
 			const result = await response.json();
 			itemList.set(result.data);
+			selectionsLoading.set(false);
+
 		} else {
 			console.error(`Failed to fetch locations`);
 		}

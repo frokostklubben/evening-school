@@ -40,12 +40,9 @@
 				body: JSON.stringify($selectedItem)
 			});
 
-			isLoading.set(true);
-
 			const result = await response.json();
 
 			if (response.ok) {
-				isLoading.set(false);
 				toast.success('Opdatering vellykket!');
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);

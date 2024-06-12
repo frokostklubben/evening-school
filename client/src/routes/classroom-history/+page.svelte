@@ -8,6 +8,9 @@
 	import { titleStore } from '../../stores/titleStore.js';
 	import GoBackButton from '../../components/GoBackButton.svelte';
 	import { isLoading } from '../../stores/generalStore.js';
+	import { headerKeysDanish } from '../../stores/itemListStore.js';
+
+	headerKeysDanish.set([]);
 
 	displayNames.set({
 		course_name: 'Holdnavn',

@@ -16,14 +16,12 @@
 				method: 'DELETE'
 			});
 
-			isLoading.set(true);
 			const result = await response.json(); // Parse the response body as JSON
 
 			if (!response.ok) {
 				throw new Error(result.message || 'Failed to delete item');
 			}
 
-			isLoading.set(false);
 			toast.success(`${collection}#${$selectedItem[idKey]} er slettet`);
 
 			itemList.update((item) => {
