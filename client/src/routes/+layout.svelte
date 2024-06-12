@@ -8,7 +8,7 @@
 	import { Toaster } from 'svelte-french-toast';
 
 	let isOpen = false;
-	$: testUser = $newUser;
+	$: userToLogin = $newUser;
 	$: loginLoadingSpinner = $loginLoading;
 
 	onMount(async () => {
@@ -110,14 +110,14 @@
 								type="text"
 								placeholder="Email"
 								aria-label="Email"
-								bind:value={testUser.email}
+								bind:value={userToLogin.email}
 							/>
 							<input
 								class="form-control me-2"
 								type="password"
 								placeholder="Password"
 								aria-label="Password"
-								bind:value={testUser.password}
+								bind:value={userToLogin.password}
 							/>
 							<button class="btn btn-outline-success" type="submit">Log&nbspind</button>
 						</form>

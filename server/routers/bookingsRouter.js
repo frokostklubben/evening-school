@@ -231,7 +231,7 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
       teacherEmail: booking.Course.Teacher.email,
       teacherId: booking.Course.teacher_id,
     }
-    console.log(formattedBooking)
+
     res.status(200).send({ data: formattedBooking })
   } catch (error) {
     res.status(500).send({ error: error.message })

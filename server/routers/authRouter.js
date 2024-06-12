@@ -41,7 +41,8 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     const password = await randomPassword()
     const hashed_password = await hashPassword(password)
     const reset_password_token = crypto.randomBytes(20).toString('hex')
-    const reset_password_expires = new Date(Date.now() + 3600000) // 1 hour
+    let oneWeekInMilliseconds = 3600000 * 24 * 7
+    const reset_password_expires = new Date(Date.now() + oneWeekInMilliseconds) // 1 week
 
     const response = await User.create({
       first_name,
@@ -56,7 +57,7 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
 
     // Use localhost for the reset link in development
     const resetLink = `http://localhost:5173/reset-password?token=${reset_password_token}`
-    const message = `>>>>>>>>>> Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i 1 time.<<<<<<<<<<<`
+    const message = `>>>>>>>>>> Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i en uge. <<<<<<<<<<<`
     console.log('send mail: ', message)
 
     res.status(200).send({ data: response })

@@ -116,7 +116,7 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
   }
 })
 
-// TODO OBS OBS BUG: Skal en kontoransat skulle kunne redigere et lokale? admincheck addes evt
+
 router.patch('/api/classrooms/:roomId', async (req, res) => {
   const { roomId } = req.params
   const { location_id, purpose, capacity, inventories, room_name } = req.body

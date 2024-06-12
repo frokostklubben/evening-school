@@ -76,7 +76,7 @@
 		});
 	}
 
-	async function checkBookingDate() {
+	async function checkAndSaveBookingDate() {
 		let booking = [
 			{
 				course_id: $selectedItem.courseId,
@@ -282,7 +282,7 @@
 					type="submit"
 					color="green"
 					on:click={() => {
-						checkBookingDate();
+						checkAndSaveBookingDate();
 					}}
 					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button
 				>
