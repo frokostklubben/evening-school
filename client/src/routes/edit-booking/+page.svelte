@@ -44,10 +44,6 @@
 		locationName: 'Afdeling'
 	});
 
-
-
-
-
 	onMount(async () => {
 
 		headerKeysDanish.set([]);
@@ -55,7 +51,8 @@
 		itemList.set([])
 
 		if ($headerKeysDanish.length === 0) {
-			fetchHeaderKeys().then(() => {
+			fetchHeaderKeys()
+			.then(() => {
 				const derivedHeaderKeys = derived(itemList, ($itemList) => {
 					if ($itemList.length > 0) {
 						return Object.keys($itemList[0]);
@@ -111,7 +108,6 @@
 		} else {
 			console.error('Failed to fetch bookings from the server');
 		}
-		//vi skal hente vores items fra backend og sætte itemstore
 	});
 
 

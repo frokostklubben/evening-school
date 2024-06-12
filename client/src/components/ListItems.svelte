@@ -19,13 +19,13 @@
 	export let showEditButton = false;
 	export let showDeleteButton = false;
 
-	let loadedData = false;
 	let hasSelected = false;
 
 	onMount(() => {
 		if ($headerKeysDanish.length === 0) {
 			selectionsLoading.set(true);
-			fetchHeaderKeys().then(() => {
+			fetchHeaderKeys()
+			.then(() => {
 				const derivedHeaderKeys = derived(itemList, ($itemList) => {
 					if ($itemList.length > 0) {
 						return Object.keys($itemList[0]);

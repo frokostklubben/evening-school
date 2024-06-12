@@ -22,9 +22,7 @@
 
     onMount(async () => {
         selectionsLoading.set(true)
-
-
-
+        
         const response = await fetch(`${$BASE_URL}/holidays`, {
             credentials: 'include',
         })
@@ -50,7 +48,7 @@
     
 
 
-        //bruges i modalen, men har her ingen effekt
+        //is used in the modal, but in this case has no real effect
         optionId.set(1)
     })
 
