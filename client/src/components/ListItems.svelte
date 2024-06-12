@@ -92,7 +92,7 @@
 						<thead>
 							<tr>
 								{#each $headerKeysDanish as key (key)}
-									<th>{key}</th>
+									<th class="pr-6">{key}</th>
 								{/each}
 							</tr>
 						</thead>

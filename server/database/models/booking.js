@@ -32,7 +32,7 @@ const Booking = sequelize.define(
 Classroom.hasMany(Booking, { foreignKey: 'room_id' })
 Booking.belongsTo(Classroom, { foreignKey: 'room_id' })
 
-Course.hasMany(Booking, { foreignKey: 'course_id' })
+Course.hasMany(Booking, { foreignKey: 'course_id', onDelete: 'CASCADE'})
 Booking.belongsTo(Course, { foreignKey: 'course_id' })
 
 export default Booking

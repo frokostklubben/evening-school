@@ -14,7 +14,8 @@
 	displayNames.set({
 		course_id: 'Kursusnr.',
 		course_name: 'Kursusnavn',
-		description: 'Beskrivelse'
+		description: 'Beskrivelse',
+		courseId: 'ID'
 	});
 
 	onMount(() => {
@@ -27,7 +28,13 @@
 		});
 		if (response.ok) {
 			const result = await response.json();
-			itemList.set(result.data);
+			const updatedCourses = result.data.map(course => {
+				return {
+					courseId: course.course_id,
+					...course
+				};
+			})
+			itemList.set(updatedCourses);
 		} else {
 			console.error('Failed to load courses');
 		}
@@ -39,9 +46,17 @@
 <div>
 	<h2 class="pt-3 text-center">Oversigt over hold i lokale {$titleStore}</h2>
 </div>
-
+<!--
 <ListItems
 	idKey={'room_id'}
+	collection={'courses'}
+	showButtons={false}
+	showEditButton={true}
+	showDeleteButton={true}
+/>
+-->
+<ListItems
+	idKey={'course_id'}
 	collection={'courses'}
 	showButtons={false}
 	showEditButton={true}

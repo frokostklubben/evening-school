@@ -12,6 +12,7 @@
 	headerKeysDanish.set([]);
 
 	displayNames.set({
+		courseId: 'ID',
 		course_name: 'Kursusnavn',
 		description: 'Beskrivelse'
 	});
@@ -27,7 +28,14 @@
 		});
 		if (response.ok) {
 			const result = await response.json();
-			itemList.set(result.data);
+			const updatedCourses = result.data.map(course => {
+				return {
+					courseId: course.course_id,
+					...course
+				};
+			})
+
+			itemList.set(updatedCourses);
 		} else {
 			console.error('Failed to load courses');
 		}
