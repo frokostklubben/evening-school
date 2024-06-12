@@ -2,7 +2,24 @@
 	import { user } from '../stores/userStore';
 </script>
 
-<h1>Forside</h1>
+<div class="welcome-container">
+	<h1>Velkommen til Aftenskolernes Booking System</h1>
 
-<span>Du er logget ind som: {$user.email}, med role id: {$user.roleId}</span>
-<div>(1 = admin, 2 = kontoransat)</div>
+	<div class="user-info">
+		Du er logget ind som: {$user.email}
+	</div>
+</div>
+
+<style>
+	.welcome-container {
+		text-align: center;
+		margin-top: 50px;
+		font-family: Arial, sans-serif;
+	}
+
+	.user-info {
+		margin-top: 20px;
+		font-size: 18px;
+		color: #555;
+	}
+</style>
