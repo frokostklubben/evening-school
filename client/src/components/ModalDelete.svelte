@@ -4,7 +4,6 @@
 	import { itemList } from '../stores/itemListStore.js';
 	import { BASE_URL } from '../stores/apiConfig.js';
 	import { showDeleteModal, selectedItem } from '../stores/modalStore.js';
-	import { isLoading } from '../stores/generalStore.js';
 
 	export let collection = '';
 	export let idKey = '';
