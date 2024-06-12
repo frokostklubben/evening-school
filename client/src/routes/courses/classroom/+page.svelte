@@ -13,7 +13,6 @@
 	itemList.set([]);
 
 	displayNames.set({
-		course_id: 'Kursusnr.',
 		course_name: 'Kursusnavn',
 		description: 'Beskrivelse',
 		courseId: 'ID'
@@ -47,15 +46,7 @@
 <div>
 	<h2 class="pt-3 text-center">Oversigt over hold i lokale {$titleStore}</h2>
 </div>
-<!--
-<ListItems
-	idKey={'room_id'}
-	collection={'courses'}
-	showButtons={false}
-	showEditButton={true}
-	showDeleteButton={true}
-/>
--->
+
 <ListItems
 	idKey={'course_id'}
 	collection={'courses'}
