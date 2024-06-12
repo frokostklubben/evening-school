@@ -73,7 +73,15 @@
 						<div class="mb-3">
 							<label for={key} class="form-label">{$displayNames[key]}</label>
 
-							{#if typeof $selectedItem[key] === 'number'}
+							{#if key === "courseId"}
+							<input
+									type="number"
+									class="form-control"
+									id={key}
+									bind:value={$selectedItem[key]}
+									readonly
+								/>
+							{:else if typeof $selectedItem[key] === 'number'}
 								<input
 									type="number"
 									class="form-control"
@@ -97,7 +105,7 @@
 									bind:value={$selectedItem[key]}
 									min={new Date().toISOString().split('T')[0]}
 									required
-								/>
+								/>								
 							{:else}
 								<input
 									type="text"

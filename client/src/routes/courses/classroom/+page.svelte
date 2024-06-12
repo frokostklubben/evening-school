@@ -14,7 +14,8 @@
 
 	displayNames.set({
 		course_name: 'Kursusnavn',
-		description: 'Beskrivelse'
+		description: 'Beskrivelse',
+		courseId: 'ID'
 	});
 
 	onMount(() => {
@@ -27,7 +28,13 @@
 		});
 		if (response.ok) {
 			const result = await response.json();
-			itemList.set(result.data);
+			const updatedCourses = result.data.map(course => {
+				return {
+					courseId: course.course_id,
+					...course
+				};
+			})
+			itemList.set(updatedCourses);
 		} else {
 			console.error('Failed to load courses');
 		}
@@ -41,7 +48,7 @@
 </div>
 
 <ListItems
-	idKey={'room_id'}
+	idKey={'course_id'}
 	collection={'courses'}
 	showButtons={false}
 	showEditButton={true}

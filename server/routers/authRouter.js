@@ -60,6 +60,8 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     const message = `>>>>>>>>>> Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i en uge. <<<<<<<<<<<`
     console.log('send mail: ', message)
 
+
+
     res.status(200).send({ data: response })
   } else {
     res.status(400).send({ data: 'User was not created: user already exists' })

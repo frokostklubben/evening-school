@@ -12,7 +12,7 @@ router.get('/api/users/:schoolId', async (req, res) => {
 
     const users = await User.findAll({
       where: { school_id: schoolId },
-      attributes: { exclude: ['hashed_password'] },
+      attributes: { exclude: ['hashed_password', 'reset_password_token', 'reset_password_expires'] },
     })
 
     res.send({ data: users })
@@ -30,8 +30,16 @@ router.patch('/api/users/:userId', adminCheck, async (req, res) => {
     const user = await User.findByPk(userId)
 
     if (user) {
-      await user.update(updates)
-      res.send({ message: 'Bruger opdateret succesfuldt.', data: user })
+      const updatedUser = await user.update(updates)
+      // Convert Sequelize instance to plain object
+      let userObject = updatedUser.toJSON()
+
+      // Remove sensitive data
+      delete userObject.hashed_password
+      delete userObject.reset_password_token
+      delete userObject.reset_password_expires
+
+      res.send({ message: 'Bruger opdateret succesfuldt.', data: userObject })
     } else {
       res.status(404).send({ message: 'Bruger ikke fundet.' })
     }

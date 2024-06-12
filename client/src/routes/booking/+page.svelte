@@ -53,11 +53,7 @@
 
 	$: courseSaved = false;
 	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
-	$: step2Criteria =
-		selectedLocation == 'empty' ||
-		selectedPurpose == 'empty' ||
-		selectedClassroom == 'empty' ||
-		!courseSaved;
+	$: step2Criteria = selectedLocation == 'empty' || selectedClassroom == 'empty' || !courseSaved;
 	$: locationSaved = false;
 	$: bookingReadyForPreview = false;
 
