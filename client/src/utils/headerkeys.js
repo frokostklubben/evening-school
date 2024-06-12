@@ -10,20 +10,6 @@ export function getKeys(collection) {
 if (get(headerKeysDanish).length === 0) {
     selectionsLoading.set(true);
     fetchHeaderKeys(collection)
-    // .then(() => {
-    //     const derivedHeaderKeys = derived(itemList, ($itemList) => {
-    //         if ($itemList.length > 0) {
-    //             return Object.keys($itemList[0]);
-    //         } 
-    //         return headerKeys;
-    //     });
-
-    //     derivedHeaderKeys.subscribe((keys) => {
-    //         if (keys.length > 0) {
-    //             setHeaderKeys(keys);
-    //         }
-    //     });
-    // });
 }
 }
 
