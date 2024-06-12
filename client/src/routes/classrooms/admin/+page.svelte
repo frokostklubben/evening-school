@@ -9,7 +9,6 @@
 	import { BASE_URL } from '../../../stores/apiConfig.js';
 	import { displayNames } from '../../../stores/dictionaryStore.js';
 	import { selectionsLoading, secondSelectionsLoading } from '../../../stores/generalStore.js';
-	import '../../../components/dropdownAndList.css';
 	import Spinner from '../../../components/Spinner.svelte';
 
 	let modalTitle = 'Nyt lokale';
