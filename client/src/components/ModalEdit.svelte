@@ -97,6 +97,15 @@
 									bind:value={$selectedItem[key]}
 									required
 								/>
+								{:else if key === "description"}
+								<textarea
+									type="text"
+									class="form-control"
+									id={key}
+									bind:value={$selectedItem[key]}
+									style="height: 120px;"
+									required
+								/>
 							{:else if key === 'start_date' || key === 'end_date'}
 								<input
 									type="date"
