@@ -1,38 +1,38 @@
-# create-svelte
+# Aftenskolerne Booking System
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+## Overview
 
-## Creating a project
+This project is developed by FrokostKlubben:
 
-If you're seeing this, you've probably already done this step. Congrats!
+It is a final project for the spring 2024 semester at Københavns Erhvervsakademi (KEA), submitted for the Datamatiker program.
+The project aims to develop a flexible and user-friendly booking system for Aftenskolerne, addressing their unique needs and challenges.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Technologies Used
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+- **Frontend:** SvelteKit
+- **Backend:** Node.js with Express
+- **Database:** MySQL with Sequelize ORM
+- **Version Control:** Git with GitHub
 
-## Developing
+## Installation
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Instructions on how to set up the project locally:
 
-```bash
-npm run dev
+1. Clone the repository:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+   ```bash
+   git clone https://github.com/yourusername/aftenskolerne-booking-system.git
 
-## Building
+   ```
 
-To create a production version of your app:
+2. Make a database called for example evening_school in mySQL.
 
-```bash
-npm run build
-```
+3. Open .env_sample file and edit the database name, SESSION_SECRET etc. and save as .env
 
-You can preview the production build with `npm run preview`.
+4. Run `npm install` in both client and server
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+5. The program produces dummy data, to show the system.
+
+6. Start the client / svelte: ```bash npm run dev
+
+7. Start the server / node: ```bash npm run start:dev
