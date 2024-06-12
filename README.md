@@ -33,6 +33,10 @@ Instructions on how to set up the project locally:
 
 5. The program produces dummy data, to show the system.
 
-6. Start the client / svelte: ```bash npm run dev
+6. Start the client / svelte:
 
-7. Start the server / node: ```bash npm run start:dev
+````bash npm run dev
+
+7. Start the server / node:
+```bash npm run start:dev
+````
