@@ -40,5 +40,5 @@
 {#if $selectionsLoading}
 	<Spinner />
 {:else}
-	<ListItems idKey={'user_id'} collection={'users'} showCoursesButton={false} />
+	<ListItems idKey={'user_id'} collection={'users'}/>
 {/if}
