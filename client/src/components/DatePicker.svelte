@@ -3,18 +3,15 @@
 	import 'flatpickr/dist/flatpickr.min.css';
 
 	export let value = [];
-	//export let value;
 	export let id;
 	export let label;
 	export let modeRange;
 
 	function onDateChange(event) {
 		value = event.detail[0];
-		//	value = event.detail;
 	}
 
 	function formatDate(date) {
-		//TODO: check if date is wrong
 		date = new Date(date);
 
 		const days = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
