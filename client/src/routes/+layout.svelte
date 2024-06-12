@@ -137,22 +137,20 @@
 	</div>
 </nav>
 
-{#if $user.email}
-	<main class="container">
-		{#if !$isLoading}
-			<slot />
-			<Toaster />
-		{:else}
-			<!-- Show spinner while loading -->
-			<div
-				class="d-flex justify-content-center align-items-center"
-				style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; background-color: rgba(255, 255, 255, 0.5);"
-			>
-				<div class="spinner-border text-primary" role="status"></div>
-			</div>
-		{/if}
-	</main>
-{/if}
+<main class="container">
+	{#if !$isLoading}
+		<slot />
+		<Toaster />
+	{:else}
+		<!-- Show spinner while loading -->
+		<div
+			class="d-flex justify-content-center align-items-center"
+			style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; background-color: rgba(255, 255, 255, 0.5);"
+		>
+			<div class="spinner-border text-primary" role="status"></div>
+		</div>
+	{/if}
+</main>
 
 <style>
 	.navbar {

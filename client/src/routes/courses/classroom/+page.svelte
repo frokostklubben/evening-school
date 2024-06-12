@@ -9,6 +9,7 @@
 	import GoBackButton from '../../../components/GoBackButton.svelte';
 
 	displayNames.set({
+		// course_id: 'Kursusnr.',
 		course_name: 'Kursusnavn',
 		description: 'Beskrivelse'
 	});
