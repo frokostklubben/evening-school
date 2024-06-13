@@ -2,13 +2,11 @@ import cookie from 'cookie';
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
-	// Parse cookies from the request header
 	const cookies = cookie.parse(event.request.headers.get('cookie') || '');
 	const sessionId = cookies.sessionId;
 	const roleIdFromCookies = cookies.roleId;
 
-	// Public paths that do not require authentication
-	const publicPaths = ['/', '/reset-password'];
+	const publicPaths = ['/', '/reset-password', '/error'];
 
 	const userPaths = [
 		'/booking',
@@ -18,7 +16,7 @@ export async function handle({ event, resolve }) {
 		'/users/user',
 		'/holiday',
 		'/classroom-history',
-		'/classroom/user'
+		'/classrooms/user'
 	];
 
 	const adminPaths = ['/classrooms/admin', '/users/admin', '/location/admin'];
@@ -27,7 +25,6 @@ export async function handle({ event, resolve }) {
 		return new Response(null, { status: 302, headers: { location: '/' } });
 	}
 
-	// Check if the user is trying to access an admin path without admin role
 	if (adminPaths.some((path) => event.url.pathname.startsWith(path)) && roleIdFromCookies !== '1') {
 		return new Response(null, {
 			status: 302,
@@ -35,7 +32,6 @@ export async function handle({ event, resolve }) {
 		});
 	}
 
-	// Check if the user is trying to access a user path without user role
 	if (userPaths.some((path) => event.url.pathname.startsWith(path)) && roleIdFromCookies !== '2') {
 		return new Response(null, {
 			status: 302,
@@ -43,6 +39,5 @@ export async function handle({ event, resolve }) {
 		});
 	}
 
-	// Continue resolving the request
 	return await resolve(event);
 }
