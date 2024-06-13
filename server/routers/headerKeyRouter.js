@@ -59,6 +59,13 @@ router.get('/api/headerKey/:modelname', async (req, res) => {
       case 'teachers':
         columnNames = Object.keys(Teacher.getAttributes())
         break
+      case 'classroom_history':
+        columnNames = ['course_name', 'start_time', 'end_time', 'date', 'teacher_name']
+        break
+
+        case 'location_history':
+          columnNames = ['room_name', 'start_time', 'end_time', 'date', 'teacher_name']
+          break
 
       default:
         throw new Error('Invalid model name')

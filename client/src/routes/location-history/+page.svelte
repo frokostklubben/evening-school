@@ -66,5 +66,5 @@
 <div>
 	<h2 class="pt-3 text-center">Historik lokaler for: {$titleStore}</h2>
 
-	<ListItems idKey={$user.schoolId} collection={'bookings'} showButtons={false} />
+	<ListItems idKey={$user.schoolId} collection={'location_history'} showButtons={false} />
 </div>
