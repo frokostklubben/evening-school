@@ -108,9 +108,9 @@
 
 			if (response.ok) {
 				let result = await response.json();
-				result.data[0].bookingConflicts = result.data[0].bookingConflicts.filter((item) => item.booking_id !== $selectedItem.bookingId);
+				result.data[0].bookingConflicts = result.data[0].bookingConflicts?.filter((item) => item.booking_id !== $selectedItem.bookingId);
 				
-				if (result.data[0].bookingConflicts.length > 0) {
+				if (result.data[0].bookingConflicts?.length > 0) {
 					toast.error('Konflikt med eksisterende booking', { duration: 5000 });
 				} else {
 					saveChanges();
@@ -167,7 +167,7 @@
 				onEditChanges(editedBooking);
 				showEditModal.set(false);
 			} else {
-				toast.error('Tidspunkter for booking ikke ledig');
+				toast.error('Bookingen kunne ikke opdateres');
 			}
 		} catch (error) {
 			toast.error('Fejl ved opdatering:', error.message);
@@ -225,14 +225,15 @@
 							onOptionChange={handleClassroomChange}
 						/>
 
-						<SelectBoxOptions
-							label={'Underviser'}
-							selected={selectedTeacher}
-							idKey={'teacher_id'}
-							optionName={'email'}
-							options={teachers}
-							onOptionChange={handleTeacherChange}
+						<input
+							type="text"
+							class="form-control"
+							id="courseName"
+							bind:value={$selectedItem['teacherEmail']}
+							readonly
 						/>
+						
+		
 					</div>
 
 					<DatePicker
