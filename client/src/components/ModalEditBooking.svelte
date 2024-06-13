@@ -110,7 +110,7 @@
 				let result = await response.json();
 				result.data[0].bookingConflicts = result.data[0].bookingConflicts?.filter((item) => item.booking_id !== $selectedItem.bookingId);
 				
-				if (result.data[0].bookingConflicts?.length > 0) {
+				if (result.data[0].bookingConflicts?.length > 0 || result.data[0]?.holidayConflict) {
 					toast.error('Konflikt med eksisterende booking', { duration: 5000 });
 				} else {
 					saveChanges();
