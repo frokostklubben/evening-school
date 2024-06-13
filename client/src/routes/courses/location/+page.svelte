@@ -12,7 +12,7 @@
 	headerKeysDanish.set([]);
 
 	displayNames.set({
-		courseId: 'ID',
+		courseIdInclude: 'ID',
 		course_name: 'Kursusnavn',
 		description: 'Beskrivelse'
 	});
@@ -30,7 +30,7 @@
 			const result = await response.json();
 			const updatedCourses = result.data.map(course => {
 				return {
-					courseId: course.course_id,
+					courseIdInclude: course.course_id,
 					...course
 				};
 			})

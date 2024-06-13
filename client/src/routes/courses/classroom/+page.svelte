@@ -15,7 +15,7 @@
 	displayNames.set({
 		course_name: 'Kursusnavn',
 		description: 'Beskrivelse',
-		courseId: 'ID'
+		courseIdInclude: 'ID'
 	});
 
 	onMount(() => {
@@ -30,7 +30,7 @@
 			const result = await response.json();
 			const updatedCourses = result.data.map(course => {
 				return {
-					courseId: course.course_id,
+					courseIdInclude: course.course_id,
 					...course
 				};
 			})
