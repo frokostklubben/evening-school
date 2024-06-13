@@ -23,6 +23,9 @@ router.post('/auth/login', async (req, res) => {
         roleId: foundUser.role_id,
       }
 
+      res.cookie('sessionId', req.session.id, { maxAge: 1000 * 60 * 60, httpOnly: true })
+      res.cookie('roleId', foundUser.role_id, { maxAge: 1000 * 60 * 60, httpOnly: true })
+
       res.status(200).send({ message: 'logged in', data: req.session.user, session: req.session.id })
     } else {
       res.status(400).send({ message: 'not logged in' })
@@ -60,8 +63,6 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     const message = `>>>>>>>>>> Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i en uge. <<<<<<<<<<<`
     console.log('send mail: ', message)
 
-
-
     res.status(200).send({ data: response })
   } else {
     res.status(400).send({ data: 'User was not created: user already exists' })
@@ -70,6 +71,9 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
 
 router.get('/auth/logout', (req, res) => {
   delete req.session.user
+
+  res.clearCookie('sessionId')
+  res.clearCookie('roleId')
 
   req.session.destroy(() => {
     res.status(200).send({ data: 'Logged out' })
@@ -87,6 +91,8 @@ router.post('/auth/validateSession', async (req, res) => {
   if (sid === sessionId) {
     res.status(200).send({ data: req.session.user })
   } else {
+    res.clearCookie('sessionId')
+    res.clearCookie('roleId')
     res.status(400).send({ data: 'Session not validated' })
   }
 })

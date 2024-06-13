@@ -2,13 +2,15 @@
 	import { user } from '../stores/userStore';
 </script>
 
-<div class="welcome-container">
-	<h1>Velkommen til Aftenskolernes Booking System</h1>
+{#if $user.email}
+	<div class="welcome-container">
+		<h1>Velkommen til Aftenskolernes Booking System</h1>
 
-	<div class="user-info">
-		Du er logget ind som: {$user.email}
+		<div class="user-info">
+			Du er logget ind som: {$user.email}
+		</div>
 	</div>
-</div>
+{/if}
 
 <style>
 	.welcome-container {
