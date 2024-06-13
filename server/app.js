@@ -26,7 +26,7 @@ const sessionMiddleware = session({
   saveUninitialized: true,
   cookie: {
     secure: false,
-    maxAge: 1000 * 60 * 60, // 1 time
+    maxAge: 1000 * 60 * 60, // 1 hour
   },
 })
 app.use(sessionMiddleware)
