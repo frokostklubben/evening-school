@@ -73,7 +73,7 @@
 						<div class="mb-3">
 							<label for={key} class="form-label">{$displayNames[key]}</label>
 
-							{#if key === "courseId"}
+							{#if key === "courseIdInclude"}
 							<input
 									type="number"
 									class="form-control"
