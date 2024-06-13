@@ -434,7 +434,7 @@
 {:else}
 	<Spinner />
 {/if}
-<ModalEditBooking /> 
+<ModalEditBooking onEditChanges={handleEditChanges} /> 
 
 <ModalDelete {collection} idKey={'bookingId'} />
 
