@@ -38,7 +38,7 @@ await Role.bulkCreate([{ role: 'admin' }, { role: 'office_employee' }])
 
 // role_id 1 = admin, 2 = office_employee
 await User.bulkCreate([
-  { school_id: 2, first_name: 'admin', last_name: 'jensen', email: 'admin@jensen.dk', role_id: 1, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
+  { school_id: null, first_name: 'admin', last_name: 'jensen', email: 'admin@jensen.dk', role_id: 1, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
   { school_id: 1, first_name: 'Kurt', last_name: 'Konthorsen', email: 'kurt@konthorsen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
   { school_id: 1, first_name: 'Lars', last_name: 'Mortensen', email: 'lars@mortensen.dk', role_id: 2, hashed_password: '$2b$14$ZEBeCFkCJagEIrKR78kahekLnPSkAYHwiCeIZtk92FGmtPc3DwI5a' },
 ])
@@ -128,30 +128,31 @@ await Course.bulkCreate([
 ])
 
 await Booking.bulkCreate([
-  { course_id: 1, room_id: 1, start_time: '08:30:00', end_time: '09:30:00', date: '2024-06-25' },
-  { course_id: 1, room_id: 1, start_time: '10:00:00', end_time: '11:00:00', date: '2024-06-25' },
-  { course_id: 1, room_id: 1, start_time: '12:00:00', end_time: '13:00:00', date: '2024-06-25' },
-  { course_id: 1, room_id: 1, start_time: '14:00:00', end_time: '15:00:00', date: '2024-06-25' },
-  { course_id: 1, room_id: 1, start_time: '15:30:00', end_time: '16:00:00', date: '2024-06-25' },
-  { course_id: 1, room_id: 1, start_time: '17:00:00', end_time: '18:00:00', date: '2024-06-25' },
+  { course_id: 1, room_id: 1, start_time: '08:30:00', end_time: '09:30:00', date: '2024-08-05' },
+  { course_id: 1, room_id: 1, start_time: '10:00:00', end_time: '11:00:00', date: '2024-08-05' },
+  { course_id: 1, room_id: 1, start_time: '12:00:00', end_time: '13:00:00', date: '2024-08-05' },
+  { course_id: 1, room_id: 1, start_time: '14:00:00', end_time: '15:00:00', date: '2024-08-05' },
+  { course_id: 1, room_id: 1, start_time: '15:30:00', end_time: '16:00:00', date: '2024-08-05' },
+  { course_id: 1, room_id: 1, start_time: '17:00:00', end_time: '18:00:00', date: '2024-08-05' },
 
-  { course_id: 3, room_id: 2, start_time: '10:00:00', end_time: '12:00:00', date: '2024-06-27' },
-  { course_id: 4, room_id: 2, start_time: '14:00:00', end_time: '16:00:00', date: '2024-06-26' },
+  { course_id: 3, room_id: 2, start_time: '10:00:00', end_time: '12:00:00', date: '2024-08-07' },
+  { course_id: 4, room_id: 2, start_time: '14:00:00', end_time: '16:00:00', date: '2024-08-06' },
   // Classroom A103, FOF Syd- og Vestsjælland
-  { course_id: 5, room_id: 3, start_time: '09:00:00', end_time: '11:00:00', date: '2024-06-27' },
-  { course_id: 6, room_id: 3, start_time: '13:00:00', end_time: '15:00:00', date: '2024-06-28' },
-  { course_id: 7, room_id: 3, start_time: '11:00:00', end_time: '13:00:00', date: '2024-06-29' },
+  { course_id: 5, room_id: 3, start_time: '09:00:00', end_time: '11:00:00', date: '2024-08-07' },
+  { course_id: 6, room_id: 3, start_time: '13:00:00', end_time: '15:00:00', date: '2024-08-08' },
+  { course_id: 7, room_id: 3, start_time: '11:00:00', end_time: '13:00:00', date: '2024-08-09' },
 
-  { course_id: 8, room_id: 4, start_time: '15:00:00', end_time: '17:00:00', date: '2024-06-29' },
+  { course_id: 8, room_id: 4, start_time: '15:00:00', end_time: '17:00:00', date: '2024-08-09' },
 
-  { course_id: 9, room_id: 5, start_time: '10:00:00', end_time: '12:00:00', date: '2024-06-30' },
-  { course_id: 10, room_id: 5, start_time: '09:00:00', end_time: '11:00:00', date: '2024-06-30' },
-  { course_id: 1, room_id: 5, start_time: '12:00:00', end_time: '14:00:00', date: '2024-06-02' },
+  { course_id: 9, room_id: 5, start_time: '10:00:00', end_time: '12:00:00', date: '2024-08-10' },
+  { course_id: 10, room_id: 5, start_time: '09:00:00', end_time: '11:00:00', date: '2024-08-10' },
+  { course_id: 1, room_id: 5, start_time: '12:00:00', end_time: '14:00:00', date: '2024-08-11' },
 
-  { course_id: 2, room_id: 6, start_time: '14:00:00', end_time: '16:00:00', date: '2024-06-03' },
-  { course_id: 3, room_id: 6, start_time: '16:00:00', end_time: '18:00:00', date: '2024-06-04' },
-  { course_id: 4, room_id: 6, start_time: '11:00:00', end_time: '13:00:00', date: '2024-06-05' },
-])
+  { course_id: 2, room_id: 6, start_time: '14:00:00', end_time: '16:00:00', date: '2024-08-12' },
+  { course_id: 3, room_id: 6, start_time: '16:00:00', end_time: '18:00:00', date: '2024-08-13' },
+  { course_id: 4, room_id: 6, start_time: '11:00:00', end_time: '13:00:00', date: '2024-08-14' },
+]);
+
 
 const inventory = await Inventory.bulkCreate([
   { item_name: 'Borde' },
@@ -189,4 +190,12 @@ await inventory[13].addClassroom(classrooms[4]) // Lydisoleringspaneler til Soft
 await Holiday.bulkCreate([
   { name: 'Juleaften', school_id: '1', start_date: '2024-12-24', end_date: '2024-12-24' },
   { name: 'Sommerferie', school_id: '2', start_date: '2024-06-01', end_date: '2024-08-01' },
-])
+  { name: 'Påskeferie', school_id: '1', start_date: '2024-04-12', end_date: '2024-04-22' },
+  { name: 'Efterårsferie', school_id: '2', start_date: '2024-10-14', end_date: '2024-10-18' },
+  { name: 'Vinterferie', school_id: '1', start_date: '2024-02-12', end_date: '2024-02-16' },
+  { name: 'Grundlovsdag', school_id: '2', start_date: '2024-06-05', end_date: '2024-06-05' },
+  { name: 'Pinseferie', school_id: '1', start_date: '2024-05-19', end_date: '2024-05-20' },
+  { name: 'Nytårsdag', school_id: '2', start_date: '2024-01-01', end_date: '2024-01-01' },
+  { name: 'Store Bededag', school_id: '1', start_date: '2024-05-17', end_date: '2024-05-17' },
+  { name: 'Kristi Himmelfartsdag', school_id: '2', start_date: '2024-05-09', end_date: '2024-05-09' },
+]);
