@@ -402,9 +402,9 @@
 				booking.date = new Date(bookingToCheck.newDate);
 				booking.startTime = bookingToCheck.newStartTime;
 				booking.endTime = bookingToCheck.newEndTime;
+				return booking;
 			}
 
-			return booking;
 		});
 
 		bookingDate = [theBooking];
