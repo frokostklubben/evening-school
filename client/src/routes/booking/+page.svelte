@@ -381,6 +381,7 @@
 	}
 
 	async function checkNewDateAndTime(bookingToCheck) {
+
 		if (bookingToCheck.newDate < new Date().toISOString().split('T')[0]) {
 			toast.error('Datoen kan ikke være før i dag', { duration: 5000 });
 			return;
@@ -391,7 +392,7 @@
 			return;
 		}
 
-		let booking = bookingDates.find((booking) => {
+		let theBooking = bookingDates.find((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
 				booking.date.toISOString() === bookingToCheck.date.toISOString() &&
@@ -406,8 +407,7 @@
 			return booking;
 		});
 
-		bookingDate = [booking];
-
+		bookingDate = [theBooking];
 		try {
 			const response = await fetch(`${$BASE_URL}/check-booking-dates`, {
 				credentials: 'include',
@@ -420,6 +420,7 @@
 
 			if (response.ok) {
 				const result = await response.json();
+
 				bookingDate = result.data.map((booking) => ({
 					...booking,
 					date: new Date(booking.date),
@@ -428,7 +429,7 @@
 
 				checkedBookings = checkedBookings.map((checkedBooking) => {
 					if (
-						checkedBooking.date.toISOString() === bookingToCheck.date.toISOString() &&
+						checkedBooking.date.toDateString() === bookingToCheck.date.toDateString() &&
 						checkedBooking.startTime === bookingToCheck.startTime &&
 						checkedBooking.endTime === bookingToCheck.endTime
 					) {
