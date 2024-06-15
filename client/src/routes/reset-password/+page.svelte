@@ -66,7 +66,7 @@
 	<title>Reset password</title>
 </svelte:head>
 
-<main class="d-flex align-items-center justify-content-center vh-100 py-3 bg-light">
+<main class="d-flex align-items-center justify-content-center vh-100 py-3">
 	<div class="container">
 		<div class="row justify-content-center">
 			<div class="col-md-6">

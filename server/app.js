@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import helmet from 'helmet'
 import { checkAuth } from './middlewares/authMiddleware.js'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 app.use(helmet())
@@ -16,6 +17,8 @@ app.use(
 
 app.use(express.json())
 
+app.use(cookieParser())
+
 import session from 'express-session'
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
@@ -23,12 +26,16 @@ const sessionMiddleware = session({
   saveUninitialized: true,
   cookie: {
     secure: false,
-    maxAge: 1000 * 60 * 60, // 1 time
+    maxAge: 1000 * 60 * 60, // 1 hour
   },
 })
 app.use(sessionMiddleware)
 
 app.use(checkAuth)
+
+app.use((req, res, next) => {
+  setTimeout(next, 500)
+})
 
 import customRouter from './routers/customRouter.js'
 app.use(customRouter)

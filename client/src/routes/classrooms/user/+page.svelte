@@ -8,6 +8,10 @@
 	import { titleStore } from '../../../stores/titleStore.js';
 	import GoBackButton from '../../../components/GoBackButton.svelte';
 	import { isLoading } from '../../../stores/generalStore.js';
+	import { headerKeysDanish } from '../../../stores/itemListStore.js';
+	import { backupOptionId } from '../../../stores/generalStore.js';
+
+	headerKeysDanish.set([]);
 
 	displayNames.set({
 		room_name: 'Rum',
@@ -17,6 +21,12 @@
 	});
 
 	onMount(() => {
+		if ($backupOptionId === "") {
+			backupOptionId.set($optionId);
+		} else {
+			$optionId = $backupOptionId;
+		}
+
 		itemList.set([]);
 		fetchClassrooms();
 	});
@@ -49,7 +59,7 @@
 	collection={'classrooms'}
 	showButtons={true}
 	showEditButton={true}
-	showDeleteButton={true}
+	showDeleteButton={false}
 	buttons={[
 		{
 			id: 1,

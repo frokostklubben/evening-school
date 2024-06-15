@@ -38,18 +38,18 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
       ],
     })
 
-    let formattedClassrooms = classroomInventories.map(classroom => {
-      return {
-        room_id: classroom.room_id,
-        room_name: classroom.room_name,
-        location_id: classroom.location_id,
-        capacity: classroom.capacity,
-        purpose: classroom.classroom_purpose.purpose,
-        inventories: classroom.Inventories.map(inventory => {
-          return inventory.item_name
-        }),
-      }
-    })
+  let formattedClassrooms = classroomInventories.map(classroom => {
+    return {
+      room_id: classroom.room_id,
+      room_name: classroom.room_name,
+      location_id: classroom.location_id,
+      capacity: classroom.capacity,
+      purpose: classroom.classroom_purpose ? classroom.classroom_purpose.purpose : 'Intet formål',
+      inventories: classroom.Inventories.map(inventory => {
+        return inventory.item_name
+      }),
+    }
+  })
 
     res.send({ data: formattedClassrooms })
   } catch (error) {
@@ -59,7 +59,7 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
 })
 
 router.post('/api/classrooms', adminCheck, async (req, res) => {
-  const { location_id, purpose, capacity, inventories, room_name } = req.body
+  let { location_id, purpose, capacity, inventories, room_name } = req.body
 
   const transaction = await connection.transaction()
 
@@ -73,11 +73,12 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       { transaction },
     )
 
-    let newPurpose
-    if (purpose) {
-      newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
-      await newClassroom.setClassroom_purpose(newPurpose, { transaction })
+    if (purpose === "" || purpose == undefined || purpose == null){
+      purpose = "Intet formål"
     }
+
+    let newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
+    await newClassroom.setClassroom_purpose(newPurpose, { transaction })
 
     let newInventories = []
     if (inventories) {
@@ -116,9 +117,10 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
   }
 })
 
-router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
+
+router.patch('/api/classrooms/:roomId', async (req, res) => {
   const { roomId } = req.params
-  const { location_id, purpose, capacity, inventories, room_name } = req.body
+  let { location_id, purpose, capacity, inventories, room_name } = req.body
 
   if (capacity === undefined || capacity === null) {
     return res.status(400).send({ message: 'Kapacitet skal udfyldes' })
@@ -133,6 +135,11 @@ router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
 
     if (classroom) {
       await classroom.update({ location_id, capacity, room_name })
+
+      
+      if (purpose === "" || purpose == undefined || purpose == null){
+        purpose = "Intet formål"
+      }
 
       let classroomPurpose = await Classroom_purpose.findOne({ where: { purpose: purpose } })
       if (!classroomPurpose) {
@@ -149,6 +156,7 @@ router.patch('/api/classrooms/:roomId', adminCheck, async (req, res) => {
         const newInventories = await Inventory.bulkCreate(inventoryItems)
         await classroom.addInventories(newInventories)
       }
+
 
       res.send({ message: 'Classroom updated.', data: classroom })
     } else {
@@ -208,6 +216,7 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   }
 })
 
+// Uses a post to get the available classrooms for a given date and time range posted to the endpoint.
 router.post('/api/classrooms/available/:school_id', async (req, res) => {
   try {
     const schoolId = req.params.school_id
@@ -215,18 +224,9 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
 
     startDate = new Date(startDate)
     endDate = new Date(endDate)
-    startTime = new Date(startTime[0])
-    endTime = new Date(endTime[0])
 
-    startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
-
-    endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
-
-    startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset())
-    endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset())
-
-    startTime = startDate.toISOString().split('T')[1]
-    endTime = endDate.toISOString().split('T')[1]
+    startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0))
+    endDate = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 0, 0, 0))
 
     const allClassrooms = await Classroom.findAll({
       include: [
@@ -247,31 +247,52 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       ],
     })
 
-    const allBookings = await Booking.findAll({
-      where: {
-        date: {
-          [Op.between]: [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]],
-        },
-        [Op.and]: [
-          {
-            [Op.or]: [
-              {
-                start_time: {
-                  [Op.between]: [startTime, endTime],
-                },
-              },
-              {
-                end_time: {
-                  [Op.between]: [startTime, endTime],
-                },
-              },
-              {
-                [Op.and]: [{ start_time: { [Op.lte]: startTime } }, { end_time: { [Op.gte]: endTime } }],
-              },
-            ],
-          },
-        ],
+    const isSameDay = startDate.toISOString().split('T')[0] === endDate.toISOString().split('T')[0]
+
+    // If date range:
+    const whereConditions = {
+      date: {
+        [Op.between]: [startDate, endDate],
       },
+      [Op.and]: [
+        {
+          [Op.or]: [
+            {
+              start_time: {
+                [Op.between]: [startTime, endTime],
+              },
+            },
+            {
+              end_time: {
+                [Op.between]: [startTime, endTime],
+              },
+            },
+            {
+              [Op.and]: [{ start_time: { [Op.lte]: startTime } }, { end_time: { [Op.gte]: endTime } }],
+            },
+          ],
+        },
+      ],
+    }
+
+    // If single day:
+    if (isSameDay) {
+      whereConditions[Op.and].push(
+        {
+          start_time: {
+            [Op.gte]: startTime,
+          },
+        },
+        {
+          end_time: {
+            [Op.lte]: endTime,
+          },
+        },
+      )
+    }
+
+    const allBookings = await Booking.findAll({
+      where: whereConditions,
     })
 
     const allHolidays = await Holiday.findAll({
@@ -291,8 +312,6 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       const holidayStartDate = new Date(holiday.start_date)
       const holidayEndDate = new Date(holiday.end_date)
 
-      console.log(checkDate.toDateString(), holidayStartDate.toDateString(), holidayEndDate.toDateString())
-
       return checkDate.toDateString() === holidayStartDate.toDateString() || (checkDate >= holidayStartDate && checkDate <= holidayEndDate)
     }
 
@@ -300,7 +319,7 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       return allHolidays.some(holiday => isDateWithinHoliday(date, holiday))
     }
 
-    // TODO: explain better?  The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
+    // The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
     const bookingsByClassroom = allBookings.reduce((acc, booking) => {
       const roomId = booking.room_id
       if (!acc[roomId]) {

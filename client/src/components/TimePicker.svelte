@@ -1,15 +1,10 @@
 <script>
 	import Datepicker from 'svelte-flatpickr';
 	import 'flatpickr/dist/flatpickr.min.css';
-	import { toast } from 'svelte-french-toast';
 
 	export let value;
 	export let id;
-
-	function onTimeChange(event) {
-		value = event.detail[0];
-	}
-	
+	export let onTimeChange;
 </script>
 
 <Datepicker
@@ -20,7 +15,6 @@
 	options={{
 		enableTime: true,
 		inline: true,
-		mode: 'range',
 		time_24hr: true,
 		minTime: '08:00',
 		maxTime: '23:00',

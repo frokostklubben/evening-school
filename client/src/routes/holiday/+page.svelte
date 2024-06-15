@@ -7,11 +7,22 @@
     import ModalAdd from '../../components/ModalAdd.svelte'
     import { optionId, showAddModal } from '../../stores/modalStore.js'
     import { Button } from 'flowbite-svelte';
+    import { headerKeysDanish } from '../../stores/itemListStore.js';
+    import { selectionsLoading } from '../../stores/generalStore.js';
+    import Spinner from '../../components/Spinner.svelte';
+
+    headerKeysDanish.set([])
+    itemList.set([])
+
+    displayNames.set({
+            name: 'Navn',
+            start_date: 'Startdato',
+            end_date: 'Slutdato'
+        })
 
     onMount(async () => {
-
-        itemList.set([])
-
+        selectionsLoading.set(true)
+        
         const response = await fetch(`${$BASE_URL}/holidays`, {
             credentials: 'include',
         })
@@ -30,17 +41,14 @@
             })
 
             itemList.set(modifiedResult)
+            selectionsLoading.set(false)
         } else {
             console.error('Failed to fetch holidays')
         }
     
-        displayNames.set({
-            name: 'Navn',
-            start_date: 'Startdato',
-            end_date: 'Slutdato'
-        })
 
-        //bruges i modalen, men har her ingen effekt
+
+        //is used in the modal, but in this case has no real effect
         optionId.set(1)
     })
 
@@ -51,15 +59,19 @@
 </script>
 
 <div class="pt-3">
-    <div class="text-center">
-        <Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}
-            >Ny helligdag/ferie</Button
-        >
-    </div>
+   {#if $selectionsLoading}
+        <Spinner />
+    {:else}
+        <div class="text-center">
+            <Button style="margin-top: 6px;" type="submit" color="green" on:click={addItem}
+                >Ny helligdag/ferie</Button
+            >
+        </div>
+        <ListItems idKey={"holiday_id"} collection={"holidays"} showButtons={false} showDeleteButton={true} showEditButton={true}/>
+    {/if}
 
     {#if $showAddModal}
         <ModalAdd collection={"holidays"} idKey={"holiday_id"} modalTitle={"Ferie eller helligdag" } />
     {/if}
 
-    <ListItems idKey={"holiday_id"} collection={"holidays"} showButtons={false} showDeleteButton={true} showEditButton={true}/>
 </div>

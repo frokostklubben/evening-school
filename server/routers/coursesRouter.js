@@ -93,4 +93,27 @@ router.post('/api/courses', async (req, res) => {
   }
 })
 
+
+router.delete('/api/courses/:courseId', async (req, res) => {
+  const courseId = req.params.courseId
+  console.log('courseId before try catch:', courseId);
+
+  try {
+    const course = await Course.findByPk(courseId)
+
+    console.log('course found by id:', course);
+
+    if (!course) {
+      return res.status(404).send({ data: 'Course not found' })
+    }
+
+    await course.destroy()
+
+    res.status(200).send({ data: 'Course deleted' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).send({ data: 'Server error deleting course' })
+  }
+})
+
 export default router

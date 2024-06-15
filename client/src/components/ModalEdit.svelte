@@ -5,7 +5,6 @@
 	import { selectedItem, showEditModal } from '../stores/modalStore.js';
 	import { itemList } from '../stores/itemListStore.js';
 	import { displayNames } from '../stores/dictionaryStore.js';
-	import { isLoading } from '../stores/generalStore.js';
 
 	export let idKey;
 	export let collection = '';
@@ -40,12 +39,9 @@
 				body: JSON.stringify($selectedItem)
 			});
 
-			isLoading.set(true);
-
 			const result = await response.json();
 
 			if (response.ok) {
-				isLoading.set(false);
 				toast.success('Opdatering vellykket!');
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
@@ -77,7 +73,15 @@
 						<div class="mb-3">
 							<label for={key} class="form-label">{$displayNames[key]}</label>
 
-							{#if typeof $selectedItem[key] === 'number'}
+							{#if key === "courseIdInclude"}
+							<input
+									type="number"
+									class="form-control"
+									id={key}
+									bind:value={$selectedItem[key]}
+									readonly
+								/>
+							{:else if typeof $selectedItem[key] === 'number'}
 								<input
 									type="number"
 									class="form-control"
@@ -93,6 +97,15 @@
 									bind:value={$selectedItem[key]}
 									required
 								/>
+								{:else if key === "description"}
+								<textarea
+									type="text"
+									class="form-control"
+									id={key}
+									bind:value={$selectedItem[key]}
+									style="height: 120px;"
+									required
+								/>
 							{:else if key === 'start_date' || key === 'end_date'}
 								<input
 									type="date"
@@ -101,7 +114,7 @@
 									bind:value={$selectedItem[key]}
 									min={new Date().toISOString().split('T')[0]}
 									required
-								/>
+								/>								
 							{:else}
 								<input
 									type="text"

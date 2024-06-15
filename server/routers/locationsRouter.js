@@ -46,6 +46,7 @@ router.post('/api/locations', adminCheck, async (req, res) => {
   }
 })
 
+
 router.patch('/api/locations/:locationId', adminCheck, async (req, res) => {
   const { locationId } = req.params
   const updates = req.body

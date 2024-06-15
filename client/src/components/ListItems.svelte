@@ -1,14 +1,14 @@
 <script>
 	import ModalDelete from './ModalDelete.svelte';
 	import ModalEdit from './ModalEdit.svelte';
-	import { derived } from 'svelte/store';
 	import { headerKeys, headerKeysDanish, itemList } from '../stores/itemListStore.js';
 	import { optionId, selectedItem, showDeleteModal, showEditModal } from '../stores/modalStore.js';
-	import { displayNames } from '../stores/dictionaryStore.js';
 	import { goto } from '$app/navigation';
-	import { BASE_URL } from '../stores/apiConfig.js';
 	import { onMount } from 'svelte';
 	import { titleStore } from '../stores/titleStore.js';
+	import { selectionsLoading, secondSelectionsLoading } from '../stores/generalStore';
+	import Spinner from './Spinner.svelte';
+	import { getKeys } from '../utils/headerkeys';
 
 	export let collection;
 	export let idKey;
@@ -17,59 +17,10 @@
 	export let showEditButton = false;
 	export let showDeleteButton = false;
 
-	let hasSelected = false;
-
 	onMount(() => {
-		fetchHeaderKeys().then(() => {
-			const derivedHeaderKeys = derived(itemList, ($itemList) => {
-				if ($itemList.length > 0) {
-					return Object.keys($itemList[0]);
-				} else {
-					fetchHeaderKeys();
-				}
-				return [];
-			});
-
-			derivedHeaderKeys.subscribe((keys) => {
-				if (keys.length > 0) {
-					setHeaderKeys(keys);
-				}
-			});
-		});
+	 getKeys(collection);
 	});
 
-	function setHeaderKeys(data) {
-		const excludeKeys = [
-			'_id',
-			'hashed_password',
-			'reset_password_token',
-			'reset_password_expires'
-		];
-
-		// 	Made in cooperation with chatgpt (Marcus)
-		const filteredKeys = data.filter(
-			(key) => !excludeKeys.some((excludeKey) => key.endsWith(excludeKey) || key === excludeKey)
-		);
-		headerKeys.set(filteredKeys);
-		headerKeysDanish.set(filteredKeys.map((key) => displayNames[key] || key));
-	}
-
-	async function fetchHeaderKeys() {
-		if (collection.includes('classrooms/available')) {
-			collection = 'classrooms/available';
-		}
-		const response = await fetch(`${$BASE_URL}/headerKey/${collection}`, {
-			credentials: 'include'
-		});
-
-		if (response.ok) {
-			const result = await response.json();
-			setHeaderKeys(result.data);
-			hasSelected = true;
-		} else {
-			console.error('Failed to fetch header keys from the server');
-		}
-	}
 
 	function formatInventory(inventories) {
 		if (!inventories) return '';
@@ -86,7 +37,7 @@
 						<thead>
 							<tr>
 								{#each $headerKeysDanish as key (key)}
-									<th>{$displayNames[key]}</th>
+									<th class="pr-6">{key}</th>
 								{/each}
 							</tr>
 						</thead>
@@ -154,8 +105,12 @@
 						</tbody>
 					</table>
 				</div>
-			{:else if $optionId}
-				<div class="alert alert-warning" role="alert">Ingen data</div>
+			{:else if $optionId != 'empty'}
+				{#if $itemList.length == 0 && !$selectionsLoading && !$secondSelectionsLoading}
+					<div class="alert alert-warning" role="alert">Ingen data</div>
+				{:else }
+					<Spinner />
+				{/if}
 			{/if}
 		</div>
 	</div>

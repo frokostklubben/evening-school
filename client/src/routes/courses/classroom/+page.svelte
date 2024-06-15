@@ -7,10 +7,15 @@
 	import { itemList } from '../../../stores/itemListStore.js';
 	import { titleStore } from '../../../stores/titleStore.js';
 	import GoBackButton from '../../../components/GoBackButton.svelte';
+	import { headerKeysDanish } from '../../../stores/itemListStore.js';
+
+	headerKeysDanish.set([]);
+	itemList.set([]);
 
 	displayNames.set({
 		course_name: 'Kursusnavn',
-		description: 'Beskrivelse'
+		description: 'Beskrivelse',
+		courseIdInclude: 'ID'
 	});
 
 	onMount(() => {
@@ -23,7 +28,13 @@
 		});
 		if (response.ok) {
 			const result = await response.json();
-			itemList.set(result.data);
+			const updatedCourses = result.data.map(course => {
+				return {
+					courseIdInclude: course.course_id,
+					...course
+				};
+			})
+			itemList.set(updatedCourses);
 		} else {
 			console.error('Failed to load courses');
 		}
@@ -37,7 +48,7 @@
 </div>
 
 <ListItems
-	idKey={'room_id'}
+	idKey={'course_id'}
 	collection={'courses'}
 	showButtons={false}
 	showEditButton={true}

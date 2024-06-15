@@ -53,11 +53,7 @@
 
 	$: courseSaved = false;
 	$: step1Criteria = title == '' || description == '' || selectedTeacher == 'empty';
-	$: step2Criteria =
-		selectedLocation == 'empty' ||
-		selectedPurpose == 'empty' ||
-		selectedClassroom == 'empty' ||
-		!courseSaved;
+	$: step2Criteria = selectedLocation == 'empty' || selectedClassroom == 'empty' || !courseSaved;
 	$: locationSaved = false;
 	$: bookingReadyForPreview = false;
 
@@ -68,7 +64,6 @@
 	let classrooms = [];
 	$: filteredClassrooms = [];
 	$: filteredPurposes = [];
-	let uniquePurpose = [];
 	let bookings = [];
 	let bookingDates = [];
 	let checkedBookings = [];
@@ -386,6 +381,7 @@
 	}
 
 	async function checkNewDateAndTime(bookingToCheck) {
+
 		if (bookingToCheck.newDate < new Date().toISOString().split('T')[0]) {
 			toast.error('Datoen kan ikke være før i dag', { duration: 5000 });
 			return;
@@ -396,7 +392,7 @@
 			return;
 		}
 
-		let booking = bookingDates.find((booking) => {
+		let theBooking = bookingDates.find((booking) => {
 			// Check if the booking date and time matches the bookingToCheck date and time
 			if (
 				booking.date.toISOString() === bookingToCheck.date.toISOString() &&
@@ -406,13 +402,12 @@
 				booking.date = new Date(bookingToCheck.newDate);
 				booking.startTime = bookingToCheck.newStartTime;
 				booking.endTime = bookingToCheck.newEndTime;
+				return booking;
 			}
 
-			return booking;
 		});
 
-		bookingDate = [booking];
-
+		bookingDate = [theBooking];
 		try {
 			const response = await fetch(`${$BASE_URL}/check-booking-dates`, {
 				credentials: 'include',
@@ -425,6 +420,7 @@
 
 			if (response.ok) {
 				const result = await response.json();
+
 				bookingDate = result.data.map((booking) => ({
 					...booking,
 					date: new Date(booking.date),
@@ -433,7 +429,7 @@
 
 				checkedBookings = checkedBookings.map((checkedBooking) => {
 					if (
-						checkedBooking.date.toISOString() === bookingToCheck.date.toISOString() &&
+						checkedBooking.date.toDateString() === bookingToCheck.date.toDateString() &&
 						checkedBooking.startTime === bookingToCheck.startTime &&
 						checkedBooking.endTime === bookingToCheck.endTime
 					) {
@@ -579,7 +575,7 @@
 	}
 </script>
 
-<h2>Event/foredrag</h2>
+<h2>Booking</h2>
 
 <div class="border border-2 p-3 m-3">
 	<p><strong>Trin 1</strong></p>
@@ -628,7 +624,7 @@
 		label={'Vælg afdeling'}
 		selected={selectedLocation}
 		idKey={'location_id'}
-		optionName={'street_name'}
+		optionName={'school_name'}
 		options={locations}
 		onOptionChange={handleLocationChange}
 	/>
@@ -802,7 +798,7 @@
 									{new Date(booking.holidayConflict.start_date).toLocaleDateString()} -
 									{new Date(booking.holidayConflict.end_date).toLocaleDateString()}
 								</div>
-							{:else if booking.conflicts}
+							{:else if booking.conflict}
 								<span class="text-danger">Ikke ledig: </span>
 								{booking.bookingConflicts
 									.map((conflict) => {
