@@ -1,31 +1,77 @@
 <script>
-	import { onMount } from 'svelte';
 	import DatePickerOneDay from '../bookingComponents/DatePickerOneDay.svelte';
-	import { writable } from 'svelte/store';
-	import { toast } from 'svelte-french-toast';
 	import { allInfoGiven } from '../../stores/bookingStore';
 
-	let weeks = 1;
-	let selectedDays = [];
-	let ignoreSetupTime = false;
-	let startDate = new Date();
+	export let weeks = 1;
+	export let selectedDays = [];
+	export let ignoreSetupTime = false;
+	export let courseStartDate = new Date();
 	let startTime = '08:00';
 	let endTime = '23:00';
 
 	let days = [
-		{ name: 'Mandag', startTime: '08:00', endTime: '23:00', selected: false, startDate: '' },
-		{ name: 'Tirsdag', startTime: '08:00', endTime: '23:00', selected: false, startDate: '' },
-		{ name: 'Onsdag', startTime: '08:00', endTime: '23:00', selected: false, startDate: '' },
-		{ name: 'Torsdag', startTime: '08:00', endTime: '23:00', selected: false, startDate: '' },
-		{ name: 'Fredag', startTime: '08:00', endTime: '23:00', selected: false, startDate: '' },
-		{ name: 'Lørdag', startTime: '08:00', endTime: '23:00', selected: false, startDate: '' },
-		{ name: 'Søndag', startTime: '08:00', endTime: '23:00', selected: false, startDate: '' }
+		{
+			name: 'Mandag',
+			startTime: '08:00',
+			endTime: '23:00',
+			selected: false,
+			startDate: '',
+			room_id: null
+		},
+		{
+			name: 'Tirsdag',
+			startTime: '08:00',
+			endTime: '23:00',
+			selected: false,
+			startDate: '',
+			room_id: null
+		},
+		{
+			name: 'Onsdag',
+			startTime: '08:00',
+			endTime: '23:00',
+			selected: false,
+			startDate: '',
+			room_id: null
+		},
+		{
+			name: 'Torsdag',
+			startTime: '08:00',
+			endTime: '23:00',
+			selected: false,
+			startDate: '',
+			room_id: null
+		},
+		{
+			name: 'Fredag',
+			startTime: '08:00',
+			endTime: '23:00',
+			selected: false,
+			startDate: '',
+			room_id: null
+		},
+		{
+			name: 'Lørdag',
+			startTime: '08:00',
+			endTime: '23:00',
+			selected: false,
+			startDate: '',
+			room_id: null
+		},
+		{
+			name: 'Søndag',
+			startTime: '08:00',
+			endTime: '23:00',
+			selected: false,
+			startDate: '',
+			room_id: null
+		}
 	];
 
 	function toggleDay(day) {
 		day.selected = !day.selected;
 		if (day.selected) {
-			selectedDays.push(day);
+			selectedDays = [...selectedDays, day];
 		} else {
 			selectedDays = selectedDays.filter((d) => d.name !== day.name);
 		}
@@ -48,9 +94,7 @@
 	}
 
 	function updateStartDates(event) {
-		let startDateCopy = new Date(
-			Date.UTC(event.detail[0].getFullYear(), event.detail[0].getMonth(), event.detail[0].getDate())
-		);
+		let startDateCopy = new Date(event.detail[0]);
 		let dayOfWeek = startDateCopy.getUTCDay();
 		if (dayOfWeek === 0) dayOfWeek = 7;
 		startDateCopy.setUTCDate(startDateCopy.getUTCDate() - dayOfWeek + 1);
@@ -81,10 +125,6 @@
 			);
 		allInfoGiven.set(allInfo);
 	}
-
-	$: if (startDate) {
-		updateStartDates({ detail: [startDate] });
-	}
 </script>
 
 <div class="border border-2 p-3 m-3">
@@ -97,7 +137,7 @@
 		<label for="startdate" class="form-label">Vælg en dato fra startugen:</label>
 		<DatePickerOneDay
 			id="startdate"
-			bind:date={startDate}
+			bind:date={courseStartDate}
 			label="Start Date"
 			on:dateChange={updateStartDates}
 		/>
@@ -115,16 +155,16 @@
 			</div>
 		</div>
 
-		{#if new Date(startDate) > new Date()}
+		{#if new Date(courseStartDate) > new Date()}
 			<div class="mb-3">
 				<label for="timeRange" class="form-label">Vælg tidsinterval for alle dage:</label>
 				<div class="d-flex align-items-center gap-2">
 					<input type="time" id="startTime" bind:value={startTime} />
 					<span>til</span>
 					<input type="time" id="endTime" bind:value={endTime} />
-					<button type="button" class="btn btn-secondary" on:click={applyTimeRangeToAllDays}>
-						Anvend til alle dage
-					</button>
+					<button type="button" class="btn btn-secondary" on:click={applyTimeRangeToAllDays}
+						>Anvend til alle dage</button
+					>
 				</div>
 			</div>
 

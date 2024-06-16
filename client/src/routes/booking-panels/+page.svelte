@@ -5,8 +5,9 @@
 	import Step1 from '../../components/bookingComponents/Step1.svelte';
 	import Step2 from '../../components/bookingComponents/Step2.svelte';
 	import Step3 from '../../components/bookingComponents/Step3.svelte';
+	import Step4 from '../../components/bookingComponents/Step4.svelte';
 	import { fetchBookingFormInfo, checkBookingDates } from '../../services/bookingService.js';
-	import { allInfoGiven } from '../../stores/bookingStore';
+	import { allInfoGiven, bookingData } from '../../stores/bookingStore';
 
 	let title = '';
 	let description = '';
@@ -18,8 +19,9 @@
 	let weeks = 1;
 	let selectedDays = [];
 	let ignoreSetupTime = false;
-	let courseStartDate = null;
+	let courseStartDate = new Date();
 
+	let checkedBookings = [];
 	let teachers = [];
 	let courses = [];
 	let previousBookings = [];
@@ -29,7 +31,6 @@
 
 	const currentStep = writable(1);
 	const maxStep = 4;
-	//	const allInfoGiven = writable(false);
 
 	onMount(fetchFormInfo);
 
@@ -78,13 +79,8 @@
 
 	async function handleCheckBookingDates() {
 		try {
-			if (!selectedDays.length) {
-				toast.error('Please select at least one day.');
-				return;
-			}
-
 			const result = await checkBookingDates({ weeks, selectedDays, ignoreSetupTime });
-			console.log('result.data:', result.data); // Handle the result as needed
+			bookingData.update((data) => ({ ...data, checkedBookings: result.data }));
 			nextStep();
 		} catch (error) {
 			toast.error('Error checking booking dates');
@@ -122,7 +118,7 @@
 		<Step3 bind:weeks bind:selectedDays bind:ignoreSetupTime bind:courseStartDate {allInfoGiven} />
 	{/if}
 	{#if $currentStep === 4}
-		<!-- Step4 component -->
+		<Step4 checkedBookings={$bookingData.checkedBookings} {selectedCourse} />
 	{/if}
 
 	<div class="d-flex justify-content-between mt-3">

@@ -1,14 +1,15 @@
 <script>
-	import { bookingData } from '../../stores/bookingData.js';
-	import { saveBooking, checkNewDateAndTime } from '../../services/bookingService.js';
+	import { bookingData } from '../../stores/bookingStore.js';
+	import { saveBooking, checkSingleBookingDate } from '../../services/bookingService.js';
 	import { toast } from 'svelte-french-toast';
 
-	let checkedBookings = [];
+	export let checkedBookings = [];
+	export let selectedCourse;
+
 	let sortOrderDate = 'asc';
 	let sortOrderStatus = 'asc';
 	let showChangedColumn = false;
 
-	$: checkedBookings = $bookingData.checkedBookings || [];
 	$: showChangedColumn = checkedBookings.some((booking) => booking.changed);
 
 	function deleteSingleBooking(bookingToBeDeleted) {
@@ -51,7 +52,7 @@
 
 	async function handleSaveBooking() {
 		try {
-			await saveBooking(checkedBookings);
+			await saveBooking(checkedBookings, selectedCourse);
 			toast.success('Booking saved successfully');
 		} catch (error) {
 			toast.error('Error saving booking');
@@ -60,7 +61,19 @@
 
 	async function handleCheckNewDateAndTime(bookingToCheck) {
 		try {
-			await checkNewDateAndTime(bookingToCheck);
+			const result = await checkSingleBookingDate({
+				date: bookingToCheck.newDate,
+				startTime: bookingToCheck.newStartTime,
+				endTime: bookingToCheck.newEndTime,
+				room_id: bookingToCheck.room_id
+			});
+			const updatedBooking = result[0];
+			bookingToCheck.conflict = updatedBooking.conflict;
+			bookingToCheck.bookingConflicts = updatedBooking.bookingConflicts;
+			bookingData.update((data) => {
+				data.checkedBookings = checkedBookings;
+				return data;
+			});
 		} catch (error) {
 			toast.error('Error checking new date and time');
 		}
@@ -72,14 +85,14 @@
 	<table class="table">
 		<thead>
 			<tr>
-				<th scope="col" class="sortable" on:click={sortCheckedBookingByDate}
-					>Dato {sortOrderDate === 'asc' ? '▲' : '▼'}</th
-				>
+				<th scope="col" class="sortable" on:click={sortCheckedBookingByDate}>
+					Dato {sortOrderDate === 'asc' ? '▲' : '▼'}
+				</th>
 				<th scope="col">Starttidspunkt</th>
 				<th scope="col">Sluttidspunkt</th>
-				<th scope="col" class="sortable" on:click={sortCheckedBookingByConflict}
-					>Status {sortOrderStatus === 'asc' ? '▲' : '▼'}</th
-				>
+				<th scope="col" class="sortable" on:click={sortCheckedBookingByConflict}>
+					Status {sortOrderStatus === 'asc' ? '▲' : '▼'}
+				</th>
 				<th scope="col" class="col-4">Ny tid</th>
 				{#if showChangedColumn}
 					<th scope="col"></th>
@@ -90,11 +103,11 @@
 		<tbody>
 			{#each checkedBookings as booking}
 				<tr>
-					<td
-						>{booking.date.toLocaleDateString('da-DK', { weekday: 'long' })[0].toUpperCase() +
+					<td>
+						{booking.date.toLocaleDateString('da-DK', { weekday: 'long' })[0].toUpperCase() +
 							booking.date.toLocaleDateString('da-DK', { weekday: 'long' }).slice(1).toLowerCase()}
-						{booking.date.getDate()}/{booking.date.getMonth() + 1}/{booking.date.getFullYear()}</td
-					>
+						{booking.date.getDate()}/{booking.date.getMonth() + 1}/{booking.date.getFullYear()}
+					</td>
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
 					<td>
@@ -131,16 +144,17 @@
 							class="btn btn-primary"
 							on:click={() => handleCheckNewDateAndTime(booking)}
 							disabled={!booking.newDate || !booking.newStartTime || !booking.newEndTime}
-							>Tjek</button
 						>
+							Tjek
+						</button>
 					</td>
 					{#if showChangedColumn}
 						<td>{booking.changed ? 'Ændret tidspunkt' : ''}</td>
 					{/if}
 					<td>
-						<button class="btn" on:click={() => deleteSingleBooking(booking)}
-							><i class="bi bi-trash-fill"></i></button
-						>
+						<button class="btn" on:click={() => deleteSingleBooking(booking)}>
+							<i class="bi bi-trash-fill"></i>
+						</button>
 					</td>
 				</tr>
 			{/each}
@@ -150,6 +164,7 @@
 		class="btn btn-primary"
 		on:click={handleSaveBooking}
 		disabled={!checkedBookings.every((booking) => !booking.conflict) || !checkedBookings.length}
-		>Færdiggør booking</button
 	>
+		Færdiggør booking
+	</button>
 </div>
