@@ -219,17 +219,11 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
     const schoolId = req.params.school_id
     let { startDate, endDate, startTime, endTime } = req.body
 
-    console.log('startDate', startDate)
-    console.log('endDate', endDate)
-
     startDate = new Date(startDate)
     endDate = new Date(endDate)
 
     startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0))
     endDate = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 0, 0, 0))
-
-    console.log('startDate after:', startDate)
-    console.log('endDate after:', endDate)
 
     const allClassrooms = await Classroom.findAll({
       include: [

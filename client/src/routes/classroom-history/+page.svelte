@@ -9,6 +9,7 @@
 	import GoBackButton from '../../components/GoBackButton.svelte';
 	import { isLoading } from '../../stores/generalStore.js';
 	import { headerKeysDanish } from '../../stores/itemListStore.js';
+	import { formatTime, formatDate } from '../../utils/timeAndDateUtils.js';
 
 	headerKeysDanish.set([]);
 
@@ -25,16 +26,6 @@
 		fetchBookings();
 	});
 
-	function formatTime(timeString) {
-		const [hours, minutes] = timeString.split(':');
-		return `${hours}:${minutes}`;
-	}
-
-	function formatDate(dateString) {
-		const options = { year: 'numeric', month: 'long', day: 'numeric' };
-		return new Date(dateString).toLocaleDateString(undefined, options);
-	}
-
 	async function fetchBookings() {
 		let formattedData = [];
 
@@ -47,8 +38,6 @@
 		if (response.ok) {
 			isLoading.set(false);
 			const result = await response.json();
-
-			console.log('result data:', result.data);
 
 			formattedData = result.data.map((item) => {
 				item.date = formatDate(item.date);

@@ -80,7 +80,7 @@ router.get('/api/booking-form-info', async (req, res) => {
       },
     })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(500).send({ error: 'Failed to get form info' })
   }
 })
@@ -114,7 +114,7 @@ router.get('/api/edit-booking-form-info', async (req, res) => {
       },
     })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(500).send({ error: 'Failed to get form info' })
   }
 })
@@ -123,8 +123,6 @@ router.post('/api/check-booking-dates', async (req, res) => {
   try {
     let { bookingDates, ignoreSetupTime } = req.body
     let school_id = req.session.user.schoolId
-
-    console.log('bokingDates in check-booking_dates:', bookingDates)
 
     // loop thought each booking date and check for conflicts
     for (let i = 0; i < bookingDates.length; i++) {
@@ -204,11 +202,9 @@ router.post('/api/check-booking-dates', async (req, res) => {
       }
     }
 
-    console.log('bookingDates before returning from backend:', bookingDates)
-
     res.status(200).send({ data: bookingDates })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(500).send({ error: 'Failed to check booking dates' })
   }
 })
