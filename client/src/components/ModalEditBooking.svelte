@@ -15,7 +15,6 @@
 	let idKey = 'bookingId';
 	let modeRange = false;
 
-	// $: teachers = $editData.teachers;
 	$: locations = $editData.locations;
 	$: classrooms = $editData.locations
 		? $editData.locations.map((location) => location.Classrooms).flat()
@@ -55,8 +54,6 @@
 	}
 
 	function formatTime(time, initialTime) {
-		console.log('time:', time);
-
 		if (!time) {
 			return initialTime;
 		}

@@ -38,18 +38,18 @@ router.get('/api/classrooms/:locationId', async (req, res) => {
       ],
     })
 
-  let formattedClassrooms = classroomInventories.map(classroom => {
-    return {
-      room_id: classroom.room_id,
-      room_name: classroom.room_name,
-      location_id: classroom.location_id,
-      capacity: classroom.capacity,
-      purpose: classroom.classroom_purpose ? classroom.classroom_purpose.purpose : 'Intet formål',
-      inventories: classroom.Inventories.map(inventory => {
-        return inventory.item_name
-      }),
-    }
-  })
+    let formattedClassrooms = classroomInventories.map(classroom => {
+      return {
+        room_id: classroom.room_id,
+        room_name: classroom.room_name,
+        location_id: classroom.location_id,
+        capacity: classroom.capacity,
+        purpose: classroom.classroom_purpose ? classroom.classroom_purpose.purpose : 'Intet formål',
+        inventories: classroom.Inventories.map(inventory => {
+          return inventory.item_name
+        }),
+      }
+    })
 
     res.send({ data: formattedClassrooms })
   } catch (error) {
@@ -73,8 +73,8 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       { transaction },
     )
 
-    if (purpose === "" || purpose == undefined || purpose == null){
-      purpose = "Intet formål"
+    if (purpose === '' || purpose == undefined || purpose == null) {
+      purpose = 'Intet formål'
     }
 
     let newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
@@ -117,7 +117,6 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
   }
 })
 
-
 router.patch('/api/classrooms/:roomId', async (req, res) => {
   const { roomId } = req.params
   let { location_id, purpose, capacity, inventories, room_name } = req.body
@@ -136,9 +135,8 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
     if (classroom) {
       await classroom.update({ location_id, capacity, room_name })
 
-      
-      if (purpose === "" || purpose == undefined || purpose == null){
-        purpose = "Intet formål"
+      if (purpose === '' || purpose == undefined || purpose == null) {
+        purpose = 'Intet formål'
       }
 
       let classroomPurpose = await Classroom_purpose.findOne({ where: { purpose: purpose } })
@@ -156,7 +154,6 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
         const newInventories = await Inventory.bulkCreate(inventoryItems)
         await classroom.addInventories(newInventories)
       }
-
 
       res.send({ message: 'Classroom updated.', data: classroom })
     } else {

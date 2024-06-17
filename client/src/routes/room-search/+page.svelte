@@ -42,8 +42,18 @@
 
 	async function fetchAvailableClassrooms() {
 		const requestData = {
-			startDate: startDate,
-			endDate: endDate,
+			startDate: new Date(
+				new Date(startDate).setMinutes(
+					new Date(startDate).getMinutes() - new Date(startDate).getTimezoneOffset()
+				)
+			).toISOString(),
+
+			endDate: new Date(
+				new Date(endDate).setMinutes(
+					new Date(endDate).getMinutes() - new Date(endDate).getTimezoneOffset()
+				)
+			).toISOString(),
+
 			startTime: new Date(startTime).toTimeString().split(' ')[0],
 			endTime: new Date(endTime).toTimeString().split(' ')[0]
 		};
