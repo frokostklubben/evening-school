@@ -17,7 +17,6 @@
 	import Spinner from '../../components/Spinner.svelte';
 	import { getKeys } from '../../utils/headerkeys';
 
-
 	let collection = 'bookings';
 	let selectedTeacher = 'empty';
 	let selectedCourseName = 'empty';
@@ -45,14 +44,13 @@
 	});
 
 	onMount(async () => {
-
 		headerKeysDanish.set([]);
-		contentLoading.set(true)
-		itemList.set([])
+		contentLoading.set(true);
+		itemList.set([]);
 
-		getKeys("edit-booking")
+		getKeys('edit-booking');
 
-		fetchEditData()
+		fetchEditData();
 
 		let response = await fetch(`${$BASE_URL}/bookings`, {
 			credentials: 'include'
@@ -80,21 +78,17 @@
 				return {
 					course_id: booking.courseId
 				};
-
 			});
 
 			teachers = removeDuplicates(teachers, 'teacher_id');
 			courseNames = removeDuplicates(courseNames, 'course_id');
 			courseIds = removeDuplicates(courseIds, 'course_id');
-			groupData()
-			contentLoading.set(false)
-
+			groupData();
+			contentLoading.set(false);
 		} else {
 			console.error('Failed to fetch bookings from the server');
 		}
 	});
-
-
 
 	async function fetchEditData() {
 		try {
@@ -326,115 +320,117 @@
 </script>
 
 {#if !$contentLoading}
-<div class="d-flex flex-column align-items-center mx-auto" style="max-width: 400px;">
-	<div class="w-100">
-		<SelectBoxOptions
-			label={'Holdnavn'}
-			selected={selectedCourseName}
-			idKey={'course_name'}
-			optionName={'course_name'}
-			options={filteredCourseNames}
-			onOptionChange={handleCourseNameChange}
-		/>
+	<div class="d-flex flex-column align-items-center mx-auto" style="max-width: 400px;">
+		<div class="w-100">
+			<SelectBoxOptions
+				label={'Holdnavn'}
+				selected={selectedCourseName}
+				idKey={'course_name'}
+				optionName={'course_name'}
+				options={filteredCourseNames}
+				onOptionChange={handleCourseNameChange}
+			/>
+		</div>
+
+		<div class="w-100">
+			<SelectBoxOptions
+				label={'Underviser'}
+				selected={selectedTeacher}
+				idKey={'email'}
+				optionName={'email'}
+				options={filteredTeachers}
+				onOptionChange={handleTeacherChange}
+			/>
+		</div>
+
+		<div class="w-100">
+			<SelectBoxOptions
+				label={'Kursus ID'}
+				selected={selectedCourseId}
+				idKey={'course_id'}
+				optionName={'course_id'}
+				options={filteredCourseIds}
+				onOptionChange={handleCourseIdChange}
+			/>
+		</div>
+
+		<button class="btn btn-primary btn-md mt-3" title="Nulstil filtre" on:click={resetFilters}
+			>Nulstil</button
+		>
 	</div>
 
-	<div class="w-100">
-		<SelectBoxOptions
-			label={'Underviser'}
-			selected={selectedTeacher}
-			idKey={'email'}
-			optionName={'email'}
-			options={filteredTeachers}
-			onOptionChange={handleTeacherChange}
-		/>
-	</div>
-
-	<div class="w-100">
-		<SelectBoxOptions
-			label={'Kursus ID'}
-			selected={selectedCourseId}
-			idKey={'course_id'}
-			optionName={'course_id'}
-			options={filteredCourseIds}
-			onOptionChange={handleCourseIdChange}
-		/>
-	</div>
-
-	<button class="btn btn-primary btn-md mt-3" title="Nulstil filtre" on:click={resetFilters}
-		>Nulstil</button
-	>
-</div>
-
-<div class="container mt-5">
-	<div class="row justify-content-center">
-		<div class="col-12 col-lg-10">
-			{#if filteredBookings.length > 0}
-				{#each Object.keys(groupedData) as courseId}
-					<div class="mt-3 border border-2 p-3 mb-3">
-						<h4>{groupedData[courseId][0].courseName} | Kursus ID #{courseId}</h4>
-						<h5>{groupedData[courseId][0].teacherEmail}</h5>
-						<div class="list-group mt-6">
-							<table class="w-100 spaced-table">
-								<thead>
-									<tr>
-										{#each $headerKeysDanish as key (key)}
-											<th>{key}</th>
-										{/each}
-									</tr>
-								</thead>
-								<tbody>
-									{#each groupedData[courseId] as listItem}
-										<tr class="hover-row">
-											{#each $headerKeys as key (key)}
-												<td>
-													{#if key === 'date'}
-														{new Date(listItem[key]).toLocaleDateString()}
-													{:else}
-														{listItem[key]}
-													{/if}
-												</td>
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-12 col-lg-10">
+				{#if filteredBookings.length > 0}
+					{#each Object.keys(groupedData) as courseId}
+						<div class="mt-3 border border-2 p-3 mb-3">
+							<h4>{groupedData[courseId][0].courseName} | Kursus ID #{courseId}</h4>
+							<h5>{groupedData[courseId][0].teacherEmail}</h5>
+							<div class="list-group mt-6">
+								<table class="w-100 spaced-table">
+									<thead>
+										<tr>
+											{#each $headerKeysDanish as key (key)}
+												<th>{key}</th>
 											{/each}
-											<td>
-												<button
-													class="btn"
-													on:click={() => {
-														selectedItem.set(listItem);
-														showEditModal.set(true);
-													}}
-													title="Rediger"
-												>
-													<i class="bi bi-pencil-square"></i>
-												</button>
-											</td>
-											<td>
-												<button
-													class="btn"
-													on:click={() => {
-														selectedItem.set(listItem);
-														showDeleteModal.set(true);
-													}}
-													title="Slet"
-												>
-													<i class="bi bi-trash-fill"></i>
-												</button>
-											</td>
 										</tr>
-									{/each}
-								</tbody>
-							</table>
+									</thead>
+									<tbody>
+										{#each groupedData[courseId] as listItem}
+											<tr class="hover-row">
+												{#each $headerKeys as key (key)}
+													<td>
+														{#if key === 'date'}
+															{new Date(listItem[key]).toLocaleDateString()}
+														{:else if key === 'startTime' || key === 'endTime'}
+															{listItem[key].split(':').slice(0, 2).join(':')}
+														{:else}
+															{listItem[key]}
+														{/if}
+													</td>
+												{/each}
+												<td>
+													<button
+														class="btn"
+														on:click={() => {
+															selectedItem.set(listItem);
+															showEditModal.set(true);
+														}}
+														title="Rediger"
+													>
+														<i class="bi bi-pencil-square"></i>
+													</button>
+												</td>
+												<td>
+													<button
+														class="btn"
+														on:click={() => {
+															selectedItem.set(listItem);
+															showDeleteModal.set(true);
+														}}
+														title="Slet"
+													>
+														<i class="bi bi-trash-fill"></i>
+													</button>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
 						</div>
-					</div>
-				{/each}
-			{:else if $optionId}
-				<div class="alert alert-warning" role="alert">Ingen data</div>
-			{/if}
+					{/each}
+				{:else if $optionId}
+					<div class="alert alert-warning" role="alert">Ingen data</div>
+				{/if}
+			</div>
 		</div>
 	</div>
-</div>
 {:else}
 	<Spinner />
 {/if}
-<ModalEditBooking onEditChanges={handleEditChanges} /> 
+<ModalEditBooking onEditChanges={handleEditChanges} />
 
 <ModalDelete {collection} idKey={'bookingId'} />
 
