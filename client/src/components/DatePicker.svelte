@@ -8,7 +8,8 @@
 	export let modeRange;
 
 	function onDateChange(event) {
-		value = event.detail[0];
+		value = event.detail[0]; // TODO 1??
+		console.log('onDateChange i DatePicker:', value);
 	}
 
 	function formatDate(date) {
