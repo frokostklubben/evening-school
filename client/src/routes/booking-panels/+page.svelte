@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
+	import { writable, get } from 'svelte/store';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import Step1 from '../../components/bookingComponents/Step1.svelte';
 	import Step2 from '../../components/bookingComponents/Step2.svelte';
@@ -49,28 +49,19 @@
 	async function fetchFormInfo() {
 		try {
 			const result = await fetchBookingFormInfo();
-			teachers = result.data.teachers;
-			courses = result.data.coursesWithoutBooking;
-			locations = result.data.locations;
-			classrooms = result.data.classrooms;
-
-			let allCourses = result.data.courses;
-			let filteredBookings = result.data.filteredBookings;
-			previousBookings = allCourses.filter((course) => {
-				return filteredBookings.some(
-					(booking) => Number(booking.course_id) === Number(course.course_id)
-				);
-			});
-
-			purposes = classrooms
-				.map((classroom) => classroom.classroom_purpose)
-				.filter((classroom) => classroom !== null);
-
-			let purposeMap = new Map();
-			purposes.forEach((obj) => {
-				purposeMap.set(obj.purpose, obj);
-			});
-			purposes = Array.from(purposeMap.values());
+			// Set fetched data to bookingData store
+			bookingData.update((data) => ({
+				...data,
+				teachers: result.data.teachers,
+				courses: result.data.coursesWithoutBooking,
+				locations: result.data.locations,
+				classrooms: result.data.classrooms,
+				previousBookings: result.data.courses.filter((course) =>
+					result.data.filteredBookings.some(
+						(booking) => Number(booking.course_id) === Number(course.course_id)
+					)
+				)
+			}));
 		} catch (error) {
 			console.error('Error fetching booking form info:', error);
 			toast.error('Error fetching booking form info');
@@ -78,6 +69,7 @@
 	}
 
 	async function handleCheckBookingDates() {
+		const { weeks, selectedDays, ignoreSetupTime } = get(bookingData);
 		try {
 			const result = await checkBookingDates({ weeks, selectedDays, ignoreSetupTime });
 			bookingData.update((data) => ({ ...data, checkedBookings: result.data }));
@@ -115,7 +107,14 @@
 		/>
 	{/if}
 	{#if $currentStep === 3}
-		<Step3 bind:weeks bind:selectedDays bind:ignoreSetupTime bind:courseStartDate {allInfoGiven} />
+		<!-- <Step3 bind:weeks bind:selectedDays bind:ignoreSetupTime bind:courseStartDate {allInfoGiven} /> -->
+		<Step3
+			bind:weeks={$bookingData.weeks}
+			bind:selectedDays={$bookingData.selectedDays}
+			bind:ignoreSetupTime={$bookingData.ignoreSetupTime}
+			bind:courseStartDate={$bookingData.courseStartDate}
+			{allInfoGiven}
+		/>
 	{/if}
 	{#if $currentStep === 4}
 		<Step4 checkedBookings={$bookingData.checkedBookings} {selectedCourse} />

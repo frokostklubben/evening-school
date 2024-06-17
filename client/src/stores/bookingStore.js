@@ -1,4 +1,3 @@
-// src/stores/bookingStore.js
 import { writable } from 'svelte/store';
 
 export const bookingData = writable({
@@ -11,6 +10,8 @@ export const bookingData = writable({
 	selectedPurpose: 'empty',
 	selectedDays: [],
 	weeks: 1,
+	ignoreSetupTime: false,
+	courseStartDate: new Date(),
 	checkedBookings: []
 });
 

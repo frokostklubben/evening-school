@@ -60,10 +60,6 @@ export async function checkSingleBookingDate(booking) {
 }
 
 export async function checkBookingDates({ weeks, selectedDays, ignoreSetupTime }) {
-	console.log('weeks', weeks);
-	console.log('selectedDays', selectedDays);
-	console.log('ignoreSetupTime', ignoreSetupTime);
-
 	try {
 		if (weeks < 1) {
 			weeks = 1;

@@ -3,14 +3,16 @@
 	import { saveBooking, checkSingleBookingDate } from '../../services/bookingService.js';
 	import { toast } from 'svelte-french-toast';
 
-	export let checkedBookings = [];
 	export let selectedCourse;
+
+	let checkedBookings = $bookingData.checkedBookings || ['tom'];
 
 	let sortOrderDate = 'asc';
 	let sortOrderStatus = 'asc';
 	let showChangedColumn = false;
 
-	$: showChangedColumn = checkedBookings.some((booking) => booking.changed);
+	$: showChangedColumn =
+		Array.isArray(checkedBookings) && checkedBookings.some((booking) => booking.changed);
 
 	function deleteSingleBooking(bookingToBeDeleted) {
 		checkedBookings = checkedBookings.filter((booking) => booking !== bookingToBeDeleted);
@@ -104,9 +106,16 @@
 			{#each checkedBookings as booking}
 				<tr>
 					<td>
-						{booking.date.toLocaleDateString('da-DK', { weekday: 'long' })[0].toUpperCase() +
-							booking.date.toLocaleDateString('da-DK', { weekday: 'long' }).slice(1).toLowerCase()}
-						{booking.date.getDate()}/{booking.date.getMonth() + 1}/{booking.date.getFullYear()}
+						{new Date(booking.date)
+							.toLocaleDateString('da-DK', { weekday: 'long' })[0]
+							.toUpperCase() +
+							new Date(booking.date)
+								.toLocaleDateString('da-DK', { weekday: 'long' })
+								.slice(1)
+								.toLowerCase()}
+						{new Date(booking.date).getDate()}/{new Date(booking.date).getMonth() + 1}/{new Date(
+							booking.date
+						).getFullYear()}
 					</td>
 					<td>{booking.startTime}</td>
 					<td>{booking.endTime}</td>
@@ -119,7 +128,7 @@
 									booking.holidayConflict.end_date
 								).toLocaleDateString()}
 							</div>
-						{:else if booking.conflicts}
+						{:else if booking.conflict}
 							<span class="text-danger">Ikke ledig: </span>
 							{booking.bookingConflicts
 								.map((conflict) => {
