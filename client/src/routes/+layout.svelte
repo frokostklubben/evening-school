@@ -12,6 +12,21 @@
 	$: userToLogin = $newUser;
 	$: loginLoadingSpinner = $loginLoading;
 
+    const translations = {
+        '/': 'Hjem',
+        '/classrooms/admin': 'Lokaler',
+        '/users/admin': 'Kontoransatte',
+        '/location/admin': 'Afdelinger',
+        '/booking': 'Booking',
+        '/edit-booking': 'Rediger booking',
+        '/location/user': 'Afdelinger',
+        '/room-search': 'Ledige lokaler',
+        '/users/user': 'Medarbejdere',
+        '/holiday': 'Helligdage/ferier',
+    };
+
+	$: tabTitle = 'Aftenskolerne - ' + translations[$page.url.pathname] || "";
+
 	onMount(async () => {
 		validateSession();
 	});
@@ -20,6 +35,10 @@
 		isOpen = !isOpen;
 	}
 </script>
+
+<svelte:head>
+  <title>{tabTitle}</title>
+</svelte:head>
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
 	<div class="container-fluid">
