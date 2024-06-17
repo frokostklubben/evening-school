@@ -10,8 +10,6 @@
 	let startTime;
 	let endTime;
 	let modeRange = true;
-	let startDate = dateRange[0];
-	let endDate = dateRange[1];
 	let availableClassrooms = [];
 	let showModal = false;
 	let modalTitle = '';

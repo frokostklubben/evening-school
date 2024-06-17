@@ -8,7 +8,11 @@
 	export let modeRange;
 
 	function onDateChange(event) {
-		value = event.detail[1];
+		if (modeRange) {
+			value = event.detail[0];
+		} else {
+			value = event.detail[1];
+		}
 	}
 
 	function formatDate(date) {
