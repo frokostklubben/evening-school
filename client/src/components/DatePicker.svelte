@@ -8,7 +8,7 @@
 	export let modeRange;
 
 	function onDateChange(event) {
-		value = event.detail[0]; // TODO 1??
+		value = event.detail[1]; // TODO 1??
 		console.log('onDateChange i DatePicker:', value);
 	}
 
@@ -30,6 +30,11 @@
 			'nov.',
 			'dec.'
 		];
+
+		console.log(
+			`${date.getDate().toString().padStart(2, '0')}. ${months[date.getMonth()]} ${date.getFullYear()}`
+		);
+
 		return modeRange
 			? `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}. ${months[date.getMonth()]} ${date.getFullYear()}`
 			: `${date.getDate().toString().padStart(2, '0')}. ${months[date.getMonth()]} ${date.getFullYear()}`;

@@ -83,9 +83,16 @@
 				room_id: $selectedItem.roomId,
 				startTime: new Date($selectedItem.startTime).toTimeString().split(' ')[0], // 'HH:MM:SS' format
 				endTime: new Date($selectedItem.endTime).toTimeString().split(' ')[0],
-				date: new Date($selectedItem.date).toISOString()
+				date: new Date(
+					new Date($selectedItem.date).setMinutes(
+						new Date($selectedItem.date).getMinutes() -
+							new Date($selectedItem.date).getTimezoneOffset()
+					)
+				).toISOString()
 			}
 		];
+
+		console.log('new Date($selectedItem.date)', new Date($selectedItem.date).toString());
 
 		let allStartDatesBeforeEndDates = booking.every(
 			(booking) => booking.startTime < booking.endTime
@@ -108,10 +115,14 @@
 
 			if (response.ok) {
 				let result = await response.json();
-				result.data[0].bookingConflicts = result.data[0].bookingConflicts?.filter((item) => item.booking_id !== $selectedItem.bookingId);
-				
-				if (result.data[0].bookingConflicts?.length > 0 || result.data[0]?.holidayConflict) {
+				result.data[0].bookingConflicts = result.data[0].bookingConflicts?.filter(
+					(item) => item.booking_id !== $selectedItem.bookingId
+				);
+
+				if (result.data[0].bookingConflicts?.length > 0) {
 					toast.error('Konflikt med eksisterende booking', { duration: 5000 });
+				} else if (result.data[0]?.holidayConflict) {
+					toast.error('Konflikt med ferie/helligdag', { duration: 5000 });
 				} else {
 					saveChanges();
 				}
@@ -232,8 +243,6 @@
 							bind:value={$selectedItem['teacherEmail']}
 							readonly
 						/>
-						
-		
 					</div>
 
 					<DatePicker

@@ -124,6 +124,8 @@ router.post('/api/check-booking-dates', async (req, res) => {
     let { bookingDates, ignoreSetupTime } = req.body
     let school_id = req.session.user.schoolId
 
+    console.log('bokingDates in check-booking_dates:', bookingDates)
+
     // loop thought each booking date and check for conflicts
     for (let i = 0; i < bookingDates.length; i++) {
       //see if any holidays conflict with the booking date
@@ -140,59 +142,57 @@ router.post('/api/check-booking-dates', async (req, res) => {
         continue
       }
 
-let startTime = new Date('1970/01/01 ' + bookingDates[i].startTime).toTimeString().substring(0, 5);
-let endTime = new Date('1970/01/01 ' + bookingDates[i].endTime).toTimeString().substring(0, 5);
+      let startTime = new Date('1970/01/01 ' + bookingDates[i].startTime).toTimeString().substring(0, 5)
+      let endTime = new Date('1970/01/01 ' + bookingDates[i].endTime).toTimeString().substring(0, 5)
 
-if (!ignoreSetupTime) {
-  startTime = new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5);
-  endTime = new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() + 15 * 60000).toTimeString().substring(0, 5);
-} else {
-  endTime = new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() - 1000).toTimeString().substring(0, 5);
-  startTime = new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() + 1000).toTimeString().substring(0, 5);
-}
+      if (!ignoreSetupTime) {
+        startTime = new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() - 15 * 60000).toTimeString().substring(0, 5)
+        endTime = new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() + 15 * 60000).toTimeString().substring(0, 5)
+      } else {
+        endTime = new Date(new Date('1970/01/01 ' + bookingDates[i].endTime).getTime() - 1000).toTimeString().substring(0, 5)
+        startTime = new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() + 1000).toTimeString().substring(0, 5)
+      }
 
-let bookingConflicts = await booking.findAll({
-  where: {
-    [Op.and]: [
-      { date: bookingDates[i].date },
-      { room_id: bookingDates[i].room_id },
-      {
-        [Op.or]: [
-          {
-            [Op.and]: [
-              {
-                start_time: {
-                  [Op.lt]: endTime,
+      let bookingConflicts = await booking.findAll({
+        where: {
+          [Op.and]: [
+            { date: bookingDates[i].date },
+            { room_id: bookingDates[i].room_id },
+            {
+              [Op.or]: [
+                {
+                  [Op.and]: [
+                    {
+                      start_time: {
+                        [Op.lt]: endTime,
+                      },
+                    },
+                    {
+                      end_time: {
+                        [Op.gt]: startTime,
+                      },
+                    },
+                  ],
                 },
-              },
-              {
-                end_time: {
-                  [Op.gt]: startTime,
+                {
+                  [Op.and]: [
+                    {
+                      start_time: {
+                        [Op.lt]: endTime,
+                      },
+                    },
+                    {
+                      end_time: {
+                        [Op.gt]: startTime,
+                      },
+                    },
+                  ],
                 },
-              },
-            ],
-          },
-          {
-            [Op.and]: [
-              {
-                start_time: {
-                  [Op.lt]: endTime,
-                },
-              },
-              {
-                end_time: {
-                  [Op.gt]: startTime,
-                },
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-});
-
-
+              ],
+            },
+          ],
+        },
+      })
 
       //add a conflict bookings to the booking date object, if there is any conflicts
       if (bookingConflicts.length > 0) {
@@ -203,6 +203,8 @@ let bookingConflicts = await booking.findAll({
         bookingDates[i].conflict = false
       }
     }
+
+    console.log('bookingDates before returning from backend:', bookingDates)
 
     res.status(200).send({ data: bookingDates })
   } catch (err) {
