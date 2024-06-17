@@ -23,6 +23,11 @@
         '/room-search': 'Ledige lokaler',
         '/users/user': 'Medarbejdere',
         '/holiday': 'Helligdage/ferier',
+		'/classrooms/user': 'Lokaler',
+		'/classroom-history': 'Historik',
+		'/courses/classroom': 'Kurser',
+		'/courses/location': 'Kurser',
+		'/location-history': 'Historik',
     };
 
 	$: tabTitle = 'Aftenskolerne - ' + translations[$page.url.pathname] || "";
