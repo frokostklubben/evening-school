@@ -5,6 +5,7 @@ import Classroom from '../database/models/classroom.js'
 import Course from '../database/models/course.js'
 import Teacher from '../database/models/teacher.js'
 import Location from '../database/models/location.js'
+import { Op } from 'sequelize'
 
 router.get('/api/bookings', async (req, res) => {
   try {
@@ -62,13 +63,20 @@ router.get('/api/bookings', async (req, res) => {
   }
 })
 
-// History for bookings to a classroom
 router.get('/api/bookings/:roomId/room-history', async (req, res) => {
   try {
     let roomId = req.params.roomId
 
+    // Get today's date in the format 'YYYY-MM-DD'
+    let today = new Date().toISOString().split('T')[0]
+
     let bookings = await Booking.findAll({
-      where: { room_id: roomId },
+      where: {
+        room_id: roomId,
+        date: {
+          [Op.lt]: today,
+        },
+      },
     })
     // Add the classroom, course and teacher information to the bookings
     bookings = bookings.map(async booking => {
@@ -103,8 +111,16 @@ router.get('/api/bookings/:courseId/course-history', async (req, res) => {
   try {
     let courseId = req.params.courseId
 
+    // Get today's date in the format 'YYYY-MM-DD'
+    let today = new Date().toISOString().split('T')[0]
+
     let bookings = await Booking.findAll({
-      where: { course_id: courseId },
+      where: {
+        course_id: courseId,
+        date: {
+          [Op.lt]: today,
+        },
+      },
     })
 
     // Map over the bookings to get the room ids

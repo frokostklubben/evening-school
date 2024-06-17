@@ -26,14 +26,24 @@
 	});
 
 	function formatTime(timeString) {
-		const options = { hour: '2-digit', minute: '2-digit' };
-		return new Date(`1970-01-01T${timeString}Z`).toLocaleTimeString(undefined, options);
+		const [hours, minutes] = timeString.split(':');
+		return `${hours}:${minutes}`;
 	}
 
 	function formatDate(dateString) {
 		const options = { year: 'numeric', month: 'long', day: 'numeric' };
 		return new Date(dateString).toLocaleDateString(undefined, options);
 	}
+
+	// function formatTime(timeString) {
+	// 	const options = { hour: '2-digit', minute: '2-digit' };
+	// 	return new Date(`1970-01-01T${timeString}Z`).toLocaleTimeString(undefined, options);
+	// }
+
+	// function formatDate(dateString) {
+	// 	const options = { year: 'numeric', month: 'long', day: 'numeric' };
+	// 	return new Date(dateString).toLocaleDateString(undefined, options);
+	// }
 
 	async function fetchBookings() {
 		let formattedData = [];

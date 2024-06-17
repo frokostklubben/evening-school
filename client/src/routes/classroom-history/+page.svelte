@@ -26,8 +26,8 @@
 	});
 
 	function formatTime(timeString) {
-		const options = { hour: '2-digit', minute: '2-digit' };
-		return new Date(`1970-01-01T${timeString}Z`).toLocaleTimeString(undefined, options);
+		const [hours, minutes] = timeString.split(':');
+		return `${hours}:${minutes}`;
 	}
 
 	function formatDate(dateString) {
@@ -47,6 +47,8 @@
 		if (response.ok) {
 			isLoading.set(false);
 			const result = await response.json();
+
+			console.log('result data:', result.data);
 
 			formattedData = result.data.map((item) => {
 				item.date = formatDate(item.date);
