@@ -8,6 +8,7 @@
 	import { titleStore } from '../../../stores/titleStore.js';
 	import GoBackButton from '../../../components/GoBackButton.svelte';
 	import { headerKeysDanish } from '../../../stores/itemListStore.js';
+	import { backupOptionId } from '../../../stores/generalStore.js';
 
 	headerKeysDanish.set([]);
 
@@ -19,7 +20,16 @@
 
 	onMount(() => {
 		itemList.set([]);
+
+		if ($backupOptionId === "") {
+			backupOptionId.set($optionId);
+		} else {
+			$optionId = $backupOptionId;
+		}
+		
 		loadCourses();
+
+
 	});
 
 	async function loadCourses() {
