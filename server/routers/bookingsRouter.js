@@ -191,6 +191,9 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
   const { bookingId } = req.params
   const { teacherId, roomId, locationId, date, startTime, endTime } = req.body
 
+  console.log('date: ', date)
+  console.log('startTime', startTime)
+
   try {
     const [updated] = await Booking.update(
       {
@@ -257,6 +260,7 @@ router.patch('/api/bookings/:bookingId', async (req, res) => {
 router.delete('/api/bookings/:bookingId', async (req, res) => {
   const { bookingId } = req.params
 
+  console.log('bookingId >>>>>>>>>>>>>>> ', bookingId)
   try {
     const deleted = await Booking.destroy({
       where: { booking_id: bookingId },

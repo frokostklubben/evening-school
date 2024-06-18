@@ -11,6 +11,9 @@
 	export let modalTitle;
 	let formData = {};
 
+	$: if ($showAddModal) {
+		formData = {};
+	}
 
 	async function addItem() {
 		formData[idKey] = $optionId;
@@ -30,7 +33,6 @@
 				},
 				body: JSON.stringify(formData)
 			});
-
 
 			const result = await response.json();
 

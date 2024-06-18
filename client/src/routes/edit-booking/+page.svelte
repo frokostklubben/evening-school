@@ -317,6 +317,17 @@
 
 		filterList();
 	}
+
+	function handleDeleteClick(item) {
+		selectedItem.set(item);
+		showDeleteModal.set(true);
+	}
+
+	function handleDeleteConfirm() {
+		itemList.update((items) => items.filter((item) => item.bookingId !== $selectedItem.bookingId));
+		filteredBookings = $itemList;
+		groupData();
+	}
 </script>
 
 {#if !$contentLoading}
@@ -405,10 +416,7 @@
 												<td>
 													<button
 														class="btn"
-														on:click={() => {
-															selectedItem.set(listItem);
-															showDeleteModal.set(true);
-														}}
+														on:click={() => handleDeleteClick(listItem)}
 														title="Slet"
 													>
 														<i class="bi bi-trash-fill"></i>
@@ -432,7 +440,7 @@
 {/if}
 <ModalEditBooking onEditChanges={handleEditChanges} />
 
-<ModalDelete {collection} idKey={'bookingId'} />
+<ModalDelete {collection} idKey={'bookingId'} on:confirm={handleDeleteConfirm} />
 
 <style>
 	.hover-row:hover {
