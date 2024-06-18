@@ -317,17 +317,6 @@
 
 		filterList();
 	}
-
-	function handleDeleteClick(item) {
-		selectedItem.set(item);
-		showDeleteModal.set(true);
-	}
-
-	function handleDeleteConfirm() {
-		itemList.update((items) => items.filter((item) => item.bookingId !== $selectedItem.bookingId));
-		filteredBookings = $itemList;
-		groupData();
-	}
 </script>
 
 {#if !$contentLoading}
@@ -416,7 +405,10 @@
 												<td>
 													<button
 														class="btn"
-														on:click={() => handleDeleteClick(listItem)}
+														on:click={() => {
+															selectedItem.set(listItem);
+															showDeleteModal.set(true);
+														}}
 														title="Slet"
 													>
 														<i class="bi bi-trash-fill"></i>
