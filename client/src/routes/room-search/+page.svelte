@@ -5,6 +5,7 @@
 	import { user } from '../../stores/userStore.js';
 	import TimePicker from '../../components/TimePicker.svelte';
 	import { Modal } from 'flowbite-svelte';
+	import { toast } from 'svelte-french-toast';
 
 	let dateRange = [new Date(), new Date()];
 	let startTime;
@@ -39,6 +40,10 @@
 	});
 
 	async function fetchAvailableClassrooms() {
+		if (endTime <= startTime) {
+			toast.error('Sluttid skal være efter starttid');
+			return;
+		}
 		const requestData = {
 			startDate: new Date(
 				new Date(startDate).setMinutes(

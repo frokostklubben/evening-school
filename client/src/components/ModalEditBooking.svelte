@@ -14,7 +14,6 @@
 	let itemKeys = [];
 	let idKey = 'bookingId';
 	let modeRange = false;
-	// $: hasNoChanges = true;
 
 	$: locations = $editData.locations;
 	$: classrooms = $editData.locations
@@ -59,7 +58,6 @@
 	}
 
 	function handleStartTimeChange(event) {
-		// hasNoChanges = false;
 		selectedStartTime = event.detail[1];
 		selectedStartTime = formatTime(selectedStartTime, $selectedItem.startTime);
 
@@ -69,7 +67,6 @@
 	}
 
 	function handleEndTimeChange(event) {
-		// hasNoChanges = false;
 		selectedEndTime = event.detail[1];
 		selectedEndTime = formatTime(selectedEndTime, $selectedItem.endTime);
 
@@ -93,8 +90,6 @@
 				).toISOString()
 			}
 		];
-
-		console.log('booking <<<<<<<<<<<<<', booking);
 
 		let allStartDatesBeforeEndDates = booking.every(
 			(booking) => booking.startTime < booking.endTime
@@ -188,23 +183,13 @@
 	}
 
 	function handleLocationChange(event) {
-		// hasNoChanges = false;
 		selectedLocation = Number(event.target.value);
 		selectedClassroom = null;
 	}
 
 	function handleClassroomChange(event) {
-		// hasNoChanges = false;
 		selectedClassroom = Number(event.target.value);
 	}
-
-	// function checkForChangesAndSave() {
-	// 	if (hasNoChanges) {
-	// 		toast.error('Du skal lave en ændring først', { duration: 5000 });
-	// 		return;
-	// 	}
-	// 	checkAndSaveBookingDate();
-	// }
 </script>
 
 <Modal

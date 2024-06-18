@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import SelectBoxOptions from '../../components/SelectBoxOptions.svelte';
 	import { BASE_URL } from '../../stores/apiConfig.js';
-	import { toast, Toaster } from 'svelte-french-toast';
+	import { toast } from 'svelte-french-toast';
 
 	onMount(async () => {
 		try {
@@ -864,8 +864,6 @@
 		>
 	</div>
 {/if}
-
-<Toaster />
 
 <style>
 	.sortable:hover {
