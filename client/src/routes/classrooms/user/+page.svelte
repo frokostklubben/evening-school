@@ -21,7 +21,7 @@
 	});
 
 	onMount(() => {
-		if ($backupOptionId === "") {
+		if ($backupOptionId === '') {
 			backupOptionId.set($optionId);
 		} else {
 			$optionId = $backupOptionId;
@@ -63,7 +63,7 @@
 	buttons={[
 		{
 			id: 1,
-			key: 'location_id',
+			key: 'room_id',
 			url: '/classroom-history',
 			text: 'Historik',
 			store: 'room_name'
