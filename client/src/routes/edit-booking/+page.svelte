@@ -25,16 +25,16 @@
 	let courseNames = [];
 	let courseIds = [];
 	let filteredBookings;
+	$: filteredTeachers = teachers;
+	$: filteredCourseIds = courseIds;
+	$: filteredCourseNames = courseNames;
+	$: groupedData = {};
+
 	itemList.subscribe((value) => {
 		filteredBookings = value;
 		filterList();
 		prepareDropdownData(value);
 	});
-	$: filteredTeachers = teachers;
-	$: filteredCourseIds = courseIds;
-	$: filteredCourseNames = courseNames;
-
-	$: groupedData = {};
 
 	displayNames.set({
 		bookingId: 'Booking ID',
