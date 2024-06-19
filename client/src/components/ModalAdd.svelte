@@ -57,7 +57,23 @@
 		}
 	}
 	function isEmail(value) {
+		// This regex pattern is used to validate email addresses
 		const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+		/* Explanation made with chatGPT:
+	Breakdown of the regex pattern:
+	^                - Asserts position at the start of the string.
+	[\w-\.]+         - Matches one or more word characters (a-z, A-Z, 0-9, _) or hyphens (-) or dots (.).
+	@                - Matches the @ symbol, which is mandatory in email addresses.
+	([\w-]+\.)       - Matches a group consisting of one or more word characters or hyphens, followed by a dot. 
+										 This represents the domain's subdomain or main domain.
+	+                - Ensures that the previous group can be repeated one or more times to match domains like sub.example.
+	[\w-]{2,4}       - Matches between 2 and 4 word characters or hyphens.
+										 This represents the top-level domain (like .com, .org, .net, etc.).
+	$                - Asserts position at the end of the string.
+	*/
+
+		// The test method checks if the value matches the regex pattern.
 		return emailPattern.test(value);
 	}
 </script>

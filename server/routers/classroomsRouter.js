@@ -77,7 +77,19 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
       purpose = 'Intet formål'
     }
 
-    let newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
+    // Look for an existing purpose
+    let existingPurpose = await Classroom_purpose.findOne({
+      where: connection.where(connection.fn('LOWER', connection.col('purpose')), 'LIKE', '%' + purpose.toLowerCase() + '%'),
+      transaction,
+    })
+
+    // If the purpose already exist, reuse that, or else make a new.
+    let newPurpose
+    if (existingPurpose) {
+      newPurpose = existingPurpose
+    } else {
+      newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
+    }
     await newClassroom.setClassroom_purpose(newPurpose, { transaction })
 
     let newInventories = []
@@ -113,6 +125,7 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
     res.status(200).send({ data: classroom })
   } catch (error) {
     await transaction.rollback()
+    console.error('Transaction error:', error)
     res.status(500).send({ error: 'Failed to create classroom', details: error.message })
   }
 })
@@ -121,8 +134,10 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
   const { roomId } = req.params
   let { location_id, purpose, capacity, inventories, room_name } = req.body
 
+  const transaction = await connection.transaction()
+
   try {
-    const classroom = await Classroom.findByPk(roomId)
+    const classroom = await Classroom.findByPk(roomId, { transaction })
 
     if (classroom) {
       const updateData = { location_id, capacity, room_name }
@@ -142,33 +157,61 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
         purpose = 'Intet formål'
       }
 
-      await classroom.update(updateData)
+      await classroom.update(updateData, { transaction })
 
-      if (purpose !== undefined) {
-        let classroomPurpose = await Classroom_purpose.findOne({ where: { purpose: purpose } })
-        if (!classroomPurpose) {
-          classroomPurpose = await Classroom_purpose.create({ purpose })
-        }
+      // Look for an existing purpose
+      let existingPurpose = await Classroom_purpose.findOne({
+        where: connection.where(connection.fn('LOWER', connection.col('purpose')), 'LIKE', '%' + purpose.toLowerCase() + '%'),
+        transaction,
+      })
 
-        await classroom.setClassroom_purpose(classroomPurpose)
+      // If the purpose already exist, reuse that, or else make a new.
+      let newPurpose
+      if (existingPurpose) {
+        newPurpose = existingPurpose
+      } else {
+        newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
       }
+      await classroom.setClassroom_purpose(newPurpose, { transaction })
 
       if (inventories !== undefined && typeof inventories === 'string' && inventories.trim().length > 0) {
-        const oldInventories = await classroom.getInventories()
-        await classroom.removeInventories(oldInventories)
+        const oldInventories = await classroom.getInventories({ transaction })
+        await classroom.removeInventories(oldInventories, { transaction })
 
         const inventoryItems = inventories.split(',').map(item => ({ item_name: item.trim() }))
-        const newInventories = await Inventory.bulkCreate(inventoryItems)
-        await classroom.addInventories(newInventories)
+        const newInventories = await Inventory.bulkCreate(inventoryItems, { transaction })
+        await classroom.addInventories(newInventories, { transaction })
       }
 
-      res.send({ message: 'Classroom updated.', data: classroom })
+      await transaction.commit()
+
+      const updatedClassroom = await Classroom.findByPk(classroom.room_id, {
+        include: [
+          { model: Classroom_purpose, attributes: ['purpose'] },
+          { model: Inventory, attributes: ['item_name'] },
+        ],
+      })
+
+      let responseClassroom = {
+        room_id: updatedClassroom.room_id,
+        room_name: updatedClassroom.room_name,
+        location_id: updatedClassroom.location_id,
+        capacity: updatedClassroom.capacity,
+        purpose: updatedClassroom.classroom_purpose.purpose,
+        inventories: updatedClassroom.Inventories.map(inventory => {
+          return inventory.item_name
+        }),
+      }
+
+      res.send({ message: 'Classroom updated.', data: responseClassroom })
     } else {
+      await transaction.rollback()
       res.status(404).send({ message: 'Classroom not found.' })
     }
   } catch (error) {
+    await transaction.rollback()
     console.error('Server Error:', error)
-    res.status(500).send({ message: 'Server error while updating classroom.' })
+    res.status(500).send({ message: 'Server error while updating classroom.', details: error.message })
   }
 })
 

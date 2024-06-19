@@ -2,7 +2,6 @@ import { DataTypes } from 'sequelize'
 import sequelize from '../database.js'
 import Classroom_purpose from './classroomPurpose.js'
 import Inventory from './inventory.js'
-// import Booking from './booking.js'
 
 const Classroom = sequelize.define(
   'Classroom',
