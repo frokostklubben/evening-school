@@ -39,16 +39,6 @@
 		}
 	}
 
-	let initialValues = {
-		teacherId: $selectedItem.teacherId,
-		roomId: $selectedItem.roomId,
-		locationId: $selectedItem.locationId,
-		date: new Date($selectedItem.date),
-		startTime: $selectedItem.startTime,
-		endTime: $selectedItem.endTime,
-		ignoreSetupTime: false
-	};
-
 	function dateToTimeString(date) {
 		return date.toTimeString().split(' ')[0];
 	}
@@ -185,7 +175,7 @@
 				onEditChanges(editedBooking);
 				showEditModal.set(false);
 			} else {
-				toast.error('Bookingen kunne ikke opdateres');
+				toast.error('Bookingen kunne ikke opdateres. Har du husket at lave en ændring?');
 			}
 		} catch (error) {
 			toast.error('Fejl ved opdatering:', error.message);
@@ -200,30 +190,6 @@
 	function handleClassroomChange(event) {
 		selectedClassroom = Number(event.target.value);
 	}
-
-	function hasChanges() {
-		return (
-			initialValues.teacherId !== selectedTeacher ||
-			initialValues.roomId !== selectedClassroom ||
-			initialValues.locationId !== selectedLocation ||
-			initialValues.date.getTime() !== new Date(selectedDate).getTime() ||
-			initialValues.startTime !== selectedStartTime ||
-			initialValues.endTime !== selectedEndTime ||
-			initialValues.ignoreSetupTime !== ignoreSetupTime
-		);
-	}
-
-	function checkForChangesAndSave() {
-		if (!hasChanges()) {
-			toast.error('Du skal lave en ændring først', { duration: 5000 });
-			return;
-		}
-		checkAndSaveBookingDate();
-	}
-	// TODO: skulle ikke teacher kun være readonly? Fjerne denne?
-	// function handleTeacherChange(event) {
-	// 	selectedTeacher = Number(event.target.value);
-	// }
 </script>
 
 <Modal
@@ -319,7 +285,7 @@
 					class="me-2"
 					type="submit"
 					color="green"
-					on:click={checkForChangesAndSave}
+					on:click={checkAndSaveBookingDate}
 					disabled={!selectedLocation || !selectedClassroom || !selectedTeacher}>Gem</Button
 				>
 				<Button color="red">Afbryd</Button>

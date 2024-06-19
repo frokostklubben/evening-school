@@ -58,23 +58,26 @@
 
 		if (response.ok) {
 			let result = await response.json();
-			itemList.set(result.data);
+			let today = new Date().toISOString().split('T')[0];
+			let futureBookings = result.data.filter((booking) => booking.date >= today);
 
-			teachers = result.data.map((booking) => {
+			itemList.set(futureBookings);
+
+			teachers = futureBookings.map((booking) => {
 				return {
 					teacher_id: booking.teacherId,
 					email: booking.teacherEmail
 				};
 			});
 
-			courseNames = result.data.map((booking) => {
+			courseNames = futureBookings.map((booking) => {
 				return {
 					course_id: booking.courseId,
 					course_name: booking.courseName
 				};
 			});
 
-			courseIds = result.data.map((booking) => {
+			courseIds = futureBookings.map((booking) => {
 				return {
 					course_id: booking.courseId
 				};
