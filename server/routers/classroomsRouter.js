@@ -133,6 +133,69 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
     const classroom = await Classroom.findByPk(roomId)
 
     if (classroom) {
+      const updateData = { location_id, capacity, room_name }
+
+      // Only update the fields that are provided in the request body
+      if (location_id !== undefined) {
+        updateData.location_id = location_id
+      }
+      if (capacity !== undefined) {
+        updateData.capacity = capacity
+      }
+      if (room_name !== undefined) {
+        updateData.room_name = room_name
+      }
+
+      if (purpose === '' || purpose == undefined || purpose == null) {
+        purpose = 'Intet formål'
+      }
+
+      await classroom.update(updateData)
+
+      if (purpose !== undefined) {
+        let classroomPurpose = await Classroom_purpose.findOne({ where: { purpose: purpose } })
+        if (!classroomPurpose) {
+          classroomPurpose = await Classroom_purpose.create({ purpose })
+        }
+
+        await classroom.setClassroom_purpose(classroomPurpose)
+      }
+
+      if (inventories !== undefined && typeof inventories === 'string' && inventories.trim().length > 0) {
+        const oldInventories = await classroom.getInventories()
+        await classroom.removeInventories(oldInventories)
+
+        const inventoryItems = inventories.split(',').map(item => ({ item_name: item.trim() }))
+        const newInventories = await Inventory.bulkCreate(inventoryItems)
+        await classroom.addInventories(newInventories)
+      }
+
+      res.send({ message: 'Classroom updated.', data: classroom })
+    } else {
+      res.status(404).send({ message: 'Classroom not found.' })
+    }
+  } catch (error) {
+    console.error('Server Error:', error)
+    res.status(500).send({ message: 'Server error while updating classroom.' })
+  }
+})
+
+/* router.patch('/api/classrooms/:roomId', async (req, res) => {
+  const { roomId } = req.params
+  let { location_id, purpose, capacity, inventories, room_name } = req.body
+
+  if (capacity === undefined || capacity === null) {
+    return res.status(400).send({ message: 'Kapacitet skal udfyldes' })
+  }
+
+  if (!room_name) {
+    return res.status(400).send({ message: 'Navn på lokalet skal defineres' })
+  }
+
+  try {
+    const classroom = await Classroom.findByPk(roomId)
+
+    if (classroom) {
       await classroom.update({ location_id, capacity, room_name })
 
       if (purpose === '' || purpose == undefined || purpose == null) {
@@ -163,7 +226,7 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
     console.error('Server Error:', error)
     res.status(500).send({ message: 'Server error while updating classroom.' })
   }
-})
+}) */
 
 router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   const { roomId } = req.params
