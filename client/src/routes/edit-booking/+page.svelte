@@ -63,9 +63,12 @@
 
 		if (response.ok) {
 			let result = await response.json();
-			itemList.set(result.data);
+			let today = new Date().toISOString().split('T')[0];
+			let futureBookings = result.data.filter((booking) => booking.date >= today);
 
-			prepareDropdownData(result.data);
+			itemList.set(futureBookings);
+
+			prepareDropdownData(futureBookings);
 			groupData();
 			contentLoading.set(false);
 		} else {

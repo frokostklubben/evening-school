@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import SelectBoxOptions from '../../components/SelectBoxOptions.svelte';
 	import { BASE_URL } from '../../stores/apiConfig.js';
-	import { toast, Toaster } from 'svelte-french-toast';
+	import { toast } from 'svelte-french-toast';
 
 	onMount(async () => {
 		try {
@@ -381,7 +381,6 @@
 	}
 
 	async function checkNewDateAndTime(bookingToCheck) {
-
 		if (bookingToCheck.newDate < new Date().toISOString().split('T')[0]) {
 			toast.error('Datoen kan ikke være før i dag', { duration: 5000 });
 			return;
@@ -404,7 +403,6 @@
 				booking.endTime = bookingToCheck.newEndTime;
 				return booking;
 			}
-
 		});
 
 		bookingDate = [theBooking];
@@ -717,6 +715,8 @@
 									<td
 										><input
 											type="time"
+											min="08:00"
+											max="23:00"
 											step="900"
 											bind:value={day.startTime}
 											on:change={(event) => updateStartTime(day, event)}
@@ -725,6 +725,8 @@
 									<td
 										><input
 											type="time"
+											min="08:00"
+											max="23:00"
 											step="900"
 											bind:value={day.endTime}
 											on:change={(event) => updateEndTime(day, event)}
@@ -817,8 +819,20 @@
 								min={new Date().toISOString().split('T')[0]}
 								bind:value={booking.newDate}
 							/>
-							<input type="time" bind:value={booking.newStartTime} step="900" />
-							<input type="time" bind:value={booking.newEndTime} step="900" />
+							<input
+								type="time"
+								min="08:00"
+								max="23:00"
+								bind:value={booking.newStartTime}
+								step="900"
+							/>
+							<input
+								type="time"
+								min="08:00"
+								max="23:00"
+								bind:value={booking.newEndTime}
+								step="900"
+							/>
 
 							<button
 								class="btn btn-primary"
@@ -850,8 +864,6 @@
 		>
 	</div>
 {/if}
-
-<Toaster />
 
 <style>
 	.sortable:hover {
