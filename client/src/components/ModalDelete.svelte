@@ -24,7 +24,7 @@
 			toast.success(`${collection}#${$selectedItem[idKey]} er slettet`);
 
 			itemList.update((item) => {
-				return item.filter((item) => item[idKey] !== $selectedItem[idKey]);
+				return item.filter((booking) => booking[idKey] !== $selectedItem[idKey]);
 			});
 
 			return 'Deleted Successfully';

@@ -24,7 +24,12 @@
 	let teachers = [];
 	let courseNames = [];
 	let courseIds = [];
-	$: filteredBookings = $itemList;
+	let filteredBookings;
+	itemList.subscribe((value) => {
+		filteredBookings = value;
+		filterList();
+		prepareDropdownData(value);
+	});
 	$: filteredTeachers = teachers;
 	$: filteredCourseIds = courseIds;
 	$: filteredCourseNames = courseNames;
@@ -60,35 +65,39 @@
 			let result = await response.json();
 			itemList.set(result.data);
 
-			teachers = result.data.map((booking) => {
-				return {
-					teacher_id: booking.teacherId,
-					email: booking.teacherEmail
-				};
-			});
-
-			courseNames = result.data.map((booking) => {
-				return {
-					course_id: booking.courseId,
-					course_name: booking.courseName
-				};
-			});
-
-			courseIds = result.data.map((booking) => {
-				return {
-					course_id: booking.courseId
-				};
-			});
-
-			teachers = removeDuplicates(teachers, 'teacher_id');
-			courseNames = removeDuplicates(courseNames, 'course_id');
-			courseIds = removeDuplicates(courseIds, 'course_id');
+			prepareDropdownData(result.data);
 			groupData();
 			contentLoading.set(false);
 		} else {
 			console.error('Failed to fetch bookings from the server');
 		}
 	});
+
+	async function prepareDropdownData(data) {
+		teachers = data.map((booking) => {
+			return {
+				teacher_id: booking.teacherId,
+				email: booking.teacherEmail
+			};
+		});
+
+		courseNames = data.map((booking) => {
+			return {
+				course_id: booking.courseId,
+				course_name: booking.courseName
+			};
+		});
+
+		courseIds = data.map((booking) => {
+			return {
+				course_id: booking.courseId
+			};
+		});
+
+		teachers = removeDuplicates(teachers, 'teacher_id');
+		courseNames = removeDuplicates(courseNames, 'course_id');
+		courseIds = removeDuplicates(courseIds, 'course_id');
+	}
 
 	async function fetchEditData() {
 		try {
