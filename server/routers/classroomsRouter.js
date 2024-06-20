@@ -9,6 +9,7 @@ import connection from '../database/database.js'
 import Booking from '../database/models/booking.js'
 import Location from '../database/models/location.js'
 import Holiday from '../database/models/holiday.js'
+import { handleInventoriesAndPurpose, handleClassroom } from '../services/classroomService.js'
 
 router.get('/api/classrooms', adminCheck, async (req, res) => {
   const classrooms = await Classroom.findAll()
@@ -64,69 +65,35 @@ router.post('/api/classrooms', adminCheck, async (req, res) => {
   const transaction = await connection.transaction()
 
   try {
-    const newClassroom = await Classroom.create(
-      {
-        location_id,
-        capacity,
-        room_name,
-      },
-      { transaction },
-    )
-
-    if (purpose === '' || purpose == undefined || purpose == null) {
-      purpose = 'Intet formål'
-    }
-
-    // Look for an existing purpose
-    let existingPurpose = await Classroom_purpose.findOne({
-      where: connection.where(connection.fn('LOWER', connection.col('purpose')), 'LIKE', '%' + purpose.toLowerCase() + '%'),
+    const { classroom, newPurpose, newInventories } = await handleClassroom({
+      location_id,
+      purpose,
+      capacity,
+      inventories,
+      room_name,
       transaction,
     })
 
-    // If the purpose already exist, reuse that, or else make a new.
-    let newPurpose
-    if (existingPurpose) {
-      newPurpose = existingPurpose
-    } else {
-      newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
-    }
-    await newClassroom.setClassroom_purpose(newPurpose, { transaction })
-
-    let newInventories = []
-    if (inventories) {
-      const inventoryItems = inventories.split(',').map(item => ({
-        item_name: item.trim(),
-      }))
-      newInventories = await Inventory.bulkCreate(inventoryItems, { transaction })
-      await newClassroom.addInventories(newInventories, { transaction })
-    }
-
     await transaction.commit()
 
-    // This approach ensures the classroom and all associated data are fetched together once the transaction is committed.
-    const completeClassroom = await Classroom.findByPk(newClassroom.room_id, {
-      include: [
-        { model: Classroom_purpose, attributes: ['purpose'] },
-        { model: Inventory, attributes: ['item_name'] },
-      ],
-    })
-
-    let classroom = {
-      room_id: completeClassroom.room_id,
-      room_name: completeClassroom.room_name,
-      location_id: completeClassroom.location_id,
-      capacity: completeClassroom.capacity,
-      purpose: completeClassroom.classroom_purpose.purpose,
-      inventories: completeClassroom.Inventories.map(inventory => {
-        return inventory.item_name
-      }),
+    let responseClassroom = {
+      room_id: classroom.room_id,
+      room_name: classroom.room_name,
+      location_id: classroom.location_id,
+      capacity: classroom.capacity,
+      purpose: newPurpose.purpose,
+      inventories: newInventories,
     }
 
-    res.status(200).send({ data: classroom })
+    res.status(200).send({ data: responseClassroom })
   } catch (error) {
     await transaction.rollback()
-    console.error('Transaction error:', error)
-    res.status(500).send({ error: 'Failed to create classroom', details: error.message })
+    console.error('Transaction error:', error.message)
+    if (error.message.includes('already exists')) {
+      res.status(400).send({ error: error.message })
+    } else {
+      res.status(500).send({ error: 'Failed to create classroom', details: error.message })
+    }
   }
 })
 
@@ -140,67 +107,29 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
     const classroom = await Classroom.findByPk(roomId, { transaction })
 
     if (classroom) {
-      const updateData = { location_id, capacity, room_name }
-
-      // Only update the fields that are provided in the request body
-      if (location_id !== undefined) {
-        updateData.location_id = location_id
-      }
-      if (capacity !== undefined) {
-        updateData.capacity = capacity
-      }
-      if (room_name !== undefined) {
-        updateData.room_name = room_name
-      }
-
-      if (purpose === '' || purpose == undefined || purpose == null) {
-        purpose = 'Intet formål'
-      }
-
-      await classroom.update(updateData, { transaction })
-
-      // Look for an existing purpose
-      let existingPurpose = await Classroom_purpose.findOne({
-        where: connection.where(connection.fn('LOWER', connection.col('purpose')), 'LIKE', '%' + purpose.toLowerCase() + '%'),
+      const {
+        classroom: updatedClassroom,
+        newPurpose,
+        newInventories,
+      } = await handleClassroom({
+        location_id,
+        purpose,
+        capacity,
+        inventories,
+        room_name,
         transaction,
+        classroom,
       })
-
-      // If the purpose already exist, reuse that, or else make a new.
-      let newPurpose
-      if (existingPurpose) {
-        newPurpose = existingPurpose
-      } else {
-        newPurpose = await Classroom_purpose.create({ purpose: purpose }, { transaction })
-      }
-      await classroom.setClassroom_purpose(newPurpose, { transaction })
-
-      if (inventories !== undefined && typeof inventories === 'string' && inventories.trim().length > 0) {
-        const oldInventories = await classroom.getInventories({ transaction })
-        await classroom.removeInventories(oldInventories, { transaction })
-
-        const inventoryItems = inventories.split(',').map(item => ({ item_name: item.trim() }))
-        const newInventories = await Inventory.bulkCreate(inventoryItems, { transaction })
-        await classroom.addInventories(newInventories, { transaction })
-      }
 
       await transaction.commit()
-
-      const updatedClassroom = await Classroom.findByPk(classroom.room_id, {
-        include: [
-          { model: Classroom_purpose, attributes: ['purpose'] },
-          { model: Inventory, attributes: ['item_name'] },
-        ],
-      })
 
       let responseClassroom = {
         room_id: updatedClassroom.room_id,
         room_name: updatedClassroom.room_name,
         location_id: updatedClassroom.location_id,
         capacity: updatedClassroom.capacity,
-        purpose: updatedClassroom.classroom_purpose.purpose,
-        inventories: updatedClassroom.Inventories.map(inventory => {
-          return inventory.item_name
-        }),
+        purpose: newPurpose.purpose,
+        inventories: newInventories,
       }
 
       res.send({ message: 'Classroom updated.', data: responseClassroom })
@@ -210,8 +139,12 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
     }
   } catch (error) {
     await transaction.rollback()
-    console.error('Server Error:', error)
-    res.status(500).send({ message: 'Server error while updating classroom.', details: error.message })
+    console.error('Server Error:', error.message)
+    if (error.message.includes('already exists')) {
+      res.status(400).send({ error: error.message })
+    } else {
+      res.status(500).send({ message: 'Server error while updating classroom.', details: error.message })
+    }
   }
 })
 

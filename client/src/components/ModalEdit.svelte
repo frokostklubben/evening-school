@@ -46,12 +46,12 @@
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 				if (index !== -1) {
-					$itemList[index] = result.data; // DONT change this, this is important to automatically update the list
+					$itemList[index] = result.data;
 				}
 
 				showEditModal.set(false);
 			} else {
-				toast.error(`Fejl ved opdatering:, ${result.message}`);
+				toast.error(`Fejl ved opdatering: ${result.error || result.message}`);
 			}
 		} catch (error) {
 			toast.error(`Fejl ved opdatering: ${error.message}`);
