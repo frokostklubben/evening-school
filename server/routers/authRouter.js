@@ -1,13 +1,22 @@
 import { Router } from 'express'
 import bcrypt from 'bcrypt'
 import { hashPassword, randomPassword } from '../encrypt/encryption.js'
-import connection from '../database/database.js'
 import User from '../database/models/user.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
 import crypto from 'crypto'
-//import { sendMail } from '../nodemailer/sendEmail.js';
 import { Op } from 'sequelize'
 const router = Router()
+
+router.get('/auth/logout', (req, res) => {
+  delete req.session.user
+
+  res.clearCookie('sessionId')
+  res.clearCookie('roleId')
+
+  req.session.destroy(() => {
+    res.status(200).send({ data: 'Logged out' })
+  })
+})
 
 router.post('/auth/login', async (req, res) => {
   const { email, password } = req.body
@@ -67,17 +76,6 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
   } else {
     res.status(400).send({ data: 'User was not created: user already exists' })
   }
-})
-
-router.get('/auth/logout', (req, res) => {
-  delete req.session.user
-
-  res.clearCookie('sessionId')
-  res.clearCookie('roleId')
-
-  req.session.destroy(() => {
-    res.status(200).send({ data: 'Logged out' })
-  })
 })
 
 router.post('/auth/validateSession', async (req, res) => {

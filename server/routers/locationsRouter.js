@@ -30,6 +30,11 @@ router.get('/api/locations/:schoolId', async (req, res) => {
 router.post('/api/locations', adminCheck, async (req, res) => {
   const { school_id, zip_code, school_name, city, street_name, street_number } = req.body
 
+  const existingLocation = await Location.findOne({ where: { school_name } })
+  if (existingLocation) {
+    return res.status(400).send({ error: 'En afdeling findes allerede med dette navn' })
+  }
+
   try {
     const newLocation = await Location.create({
       school_name: school_name,
@@ -46,7 +51,6 @@ router.post('/api/locations', adminCheck, async (req, res) => {
   }
 })
 
-
 router.patch('/api/locations/:locationId', adminCheck, async (req, res) => {
   const { locationId } = req.params
   const updates = req.body
@@ -54,12 +58,19 @@ router.patch('/api/locations/:locationId', adminCheck, async (req, res) => {
   try {
     const location = await Location.findByPk(locationId)
 
-    if (location) {
-      await location.update(updates)
-      res.send({ message: 'Afdeling opdateret.', data: location })
-    } else {
-      res.status(404).send({ message: 'Afdeling ikke fundet.' })
+    if (!location) {
+      return res.status(404).send({ message: 'Afdeling ikke fundet.' })
     }
+
+    if (updates.school_name) {
+      const existingLocation = await Location.findOne({ where: { school_name: updates.school_name } })
+      if (existingLocation && existingLocation.id !== locationId) {
+        return res.status(400).send({ error: 'En afdeling findes allerede med dette navn' })
+      }
+    }
+
+    await location.update(updates)
+    res.send({ message: 'Afdeling opdateret.', data: location })
   } catch (error) {
     console.error('Server Error:', error)
     res.status(500).send({ message: 'Serverfejl under opdatering af afdeling.' })

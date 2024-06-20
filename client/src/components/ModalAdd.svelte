@@ -15,7 +15,25 @@
 		formData = {};
 	}
 
+	function validateFormData() {
+		if (Object.keys(formData).length === 0) {
+			toast.error('Fyld ud skema');
+			return false;
+		}
+
+		if ('email' in formData && !isEmail(formData.email)) {
+			toast.error('Fejl email format.');
+			return false;
+		}
+
+		return true;
+	}
+
 	async function addItem() {
+		if (!validateFormData()) {
+			return;
+		}
+
 		formData[idKey] = $optionId;
 
 		let url = `${$BASE_URL}/${collection}`;
@@ -48,9 +66,9 @@
 				});
 
 				toast.success('Oprettelse vellykket!');
-				showAddModal.set(false);
 			} else {
-				console.error(`Fejl ved oprettelse: ${result.message || 'Oprettelse mislykkedes'}`);
+				toast.error(result.data || result.error); // NB! = error message: 'User was not created: user already exists'
+				console.error(`Fejl ved oprettelse: ${result.data}`);
 			}
 		} catch (error) {
 			console.error('Fejl ved oprettelse:', error.message);
@@ -95,7 +113,8 @@
 									bind:value={formData[key]}
 									required
 								/>
-							{:else if isEmail(formData[key])}
+								<!-- {:else if isEmail(formData[key])} -->
+							{:else if key === 'email' || key === 'Email'}
 								<input
 									type="email"
 									class="form-control"
