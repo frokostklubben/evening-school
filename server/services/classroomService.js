@@ -41,13 +41,33 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
 }
 
+async function removeUnusedInventories(classroom, inventoriesToRemove, transaction) {
+  await classroom.removeInventories(inventoriesToRemove, { transaction })
+
+  for (const inv of inventoriesToRemove) {
+    const inventoryInUse = await Inventory.findOne({
+      where: { item_name: inv.item_name },
+      include: [
+        {
+          model: Classroom,
+          through: { attributes: [] },
+        },
+      ],
+      transaction,
+    })
+
+    if (!inventoryInUse || inventoryInUse.Classrooms.length === 0) {
+      await inv.destroy({ transaction })
+    }
+  }
+}
+
 export async function handleInventoriesAndPurpose(classroom, purpose, inventories, transaction) {
   if (!purpose) {
     purpose = 'Intet formål'
   }
 
   let existingPurpose = await Classroom_purpose.findOne({
-    // made with chatgpt, marcus - to compare a lower case purpose with the database
     where: connection.where(connection.fn('LOWER', connection.col('purpose')), 'LIKE', '%' + purpose.toLowerCase() + '%'),
     transaction,
   })
@@ -70,27 +90,8 @@ export async function handleInventoriesAndPurpose(classroom, purpose, inventorie
     const currentInventories = await classroom.getInventories({ transaction })
     const inventoriesToRemove = currentInventories.filter(inv => !lowerCaseInventoryItems.includes(inv.item_name.toLowerCase()))
 
-    // Remove inventories that are not in the new inventoryItems list
     if (inventoriesToRemove.length > 0) {
-      await classroom.removeInventories(inventoriesToRemove, { transaction })
-
-      // Check if removed inventories are used by other classrooms, destroy if not
-      for (const inv of inventoriesToRemove) {
-        const inventoryInUse = await Inventory.findOne({
-          where: { item_name: inv.item_name },
-          include: [
-            {
-              model: Classroom,
-              through: { attributes: [] },
-            },
-          ],
-          transaction,
-        })
-
-        if (!inventoryInUse || inventoryInUse.Classrooms.length === 0) {
-          await inv.destroy({ transaction })
-        }
-      }
+      await removeUnusedInventories(classroom, inventoriesToRemove, transaction)
     }
 
     let existingInventories = await Inventory.findAll({
@@ -105,7 +106,6 @@ export async function handleInventoriesAndPurpose(classroom, purpose, inventorie
     const existingInventoryNames = existingInventories.map(inv => inv.item_name.toLowerCase())
     const newInventoryItems = inventoryItems.filter(item => !existingInventoryNames.includes(item.toLowerCase()))
 
-    // Create new inventories for the items that do not already exist
     if (newInventoryItems.length > 0) {
       const newInventoryRecords = newInventoryItems.map(item => ({
         item_name: capitalizeFirstLetter(item),
@@ -118,35 +118,15 @@ export async function handleInventoriesAndPurpose(classroom, purpose, inventorie
 
     await classroom.addInventories(updatedInventories, { transaction })
   } else {
-    // If no inventories are provided, remove all current inventories
     const currentInventories = await classroom.getInventories({ transaction })
     if (currentInventories.length > 0) {
-      await classroom.removeInventories(currentInventories, { transaction })
-
-      // Check if removed inventories are used by other classrooms
-      for (const inv of currentInventories) {
-        const inventoryInUse = await Inventory.findOne({
-          where: { item_name: inv.item_name },
-          include: [
-            {
-              model: Classroom,
-              through: { attributes: [] },
-            },
-          ],
-          transaction,
-        })
-
-        if (!inventoryInUse || inventoryInUse.Classrooms.length === 0) {
-          await inv.destroy({ transaction })
-        }
-      }
+      await removeUnusedInventories(classroom, currentInventories, transaction)
     }
     updatedInventories = []
   }
 
   updatedInventories = await classroom.getInventories({ transaction })
 
-  // Return the inventories with original case, ensuring the first letter is capitalized if needed
   originalCaseInventories = updatedInventories.map(inv => {
     const originalCaseName = inventories
       ? inventories
@@ -154,7 +134,8 @@ export async function handleInventoriesAndPurpose(classroom, purpose, inventorie
           .map(item => item.trim())
           .find(item => item.toLowerCase() === inv.item_name.toLowerCase())
       : inv.item_name
-    return originalCaseName ? capitalizeFirstLetter(originalCaseName) : capitalizeFirstLetter(inv.item_name)
+
+    return capitalizeFirstLetter(originalCaseName)
   })
 
   return {
