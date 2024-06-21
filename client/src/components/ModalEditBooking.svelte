@@ -175,7 +175,7 @@
 				onEditChanges(editedBooking);
 				showEditModal.set(false);
 			} else {
-				toast.error('Bookingen kunne ikke opdateres. Har du husket at lave en ændring?');
+				toast.error(result.error);
 			}
 		} catch (error) {
 			toast.error('Fejl ved opdatering:', error.message);

@@ -46,12 +46,12 @@
 
 				const index = $itemList.findIndex((item) => item[idKey] === $selectedItem[idKey]);
 				if (index !== -1) {
-					$itemList[index] = $selectedItem;
+					$itemList[index] = result.data;
 				}
 
 				showEditModal.set(false);
 			} else {
-				toast.error(`Fejl ved opdatering:, ${result.message}`);
+				toast.error(`Fejl ved opdatering: ${result.error || result.message}`);
 			}
 		} catch (error) {
 			toast.error(`Fejl ved opdatering: ${error.message}`);
@@ -73,8 +73,8 @@
 						<div class="mb-3">
 							<label for={key} class="form-label">{$displayNames[key]}</label>
 
-							{#if key === "courseIdInclude"}
-							<input
+							{#if key === 'courseIdInclude'}
+								<input
 									type="number"
 									class="form-control"
 									id={key}
@@ -97,7 +97,7 @@
 									bind:value={$selectedItem[key]}
 									required
 								/>
-								{:else if key === "description"}
+							{:else if key === 'description'}
 								<textarea
 									type="text"
 									class="form-control"
@@ -114,7 +114,7 @@
 									bind:value={$selectedItem[key]}
 									min={new Date().toISOString().split('T')[0]}
 									required
-								/>								
+								/>
 							{:else}
 								<input
 									type="text"

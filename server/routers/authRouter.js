@@ -1,13 +1,22 @@
 import { Router } from 'express'
 import bcrypt from 'bcrypt'
 import { hashPassword, randomPassword } from '../encrypt/encryption.js'
-import connection from '../database/database.js'
 import User from '../database/models/user.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
 import crypto from 'crypto'
-//import { sendMail } from '../nodemailer/sendEmail.js';
 import { Op } from 'sequelize'
 const router = Router()
+
+router.get('/auth/logout', (req, res) => {
+  delete req.session.user
+
+  res.clearCookie('sessionId')
+  res.clearCookie('roleId')
+
+  req.session.destroy(() => {
+    res.status(200).send({ data: 'Logged out' })
+  })
+})
 
 router.post('/auth/login', async (req, res) => {
   const { email, password } = req.body
@@ -47,7 +56,7 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     let oneWeekInMilliseconds = 3600000 * 24 * 7
     const reset_password_expires = new Date(Date.now() + oneWeekInMilliseconds) // 1 week
 
-    const response = await User.create({
+    let user = await User.create({
       first_name,
       last_name,
       email,
@@ -63,21 +72,15 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     const message = `>>>>>>>>>> Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i en uge. <<<<<<<<<<<`
     console.log('send mail: ', message)
 
+    const response = { ...user.dataValues }
+    delete response.hashed_password
+    delete response.reset_password_token
+    delete response.reset_password_expires
+
     res.status(200).send({ data: response })
   } else {
     res.status(400).send({ data: 'User was not created: user already exists' })
   }
-})
-
-router.get('/auth/logout', (req, res) => {
-  delete req.session.user
-
-  res.clearCookie('sessionId')
-  res.clearCookie('roleId')
-
-  req.session.destroy(() => {
-    res.status(200).send({ data: 'Logged out' })
-  })
 })
 
 router.post('/auth/validateSession', async (req, res) => {

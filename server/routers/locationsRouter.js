@@ -2,6 +2,7 @@ import Router from 'express'
 const router = Router()
 import Location from '../database/models/location.js'
 import { adminCheck } from '../middlewares/authMiddleware.js'
+import { Op } from 'sequelize'
 
 router.get('/api/locations', adminCheck, async (req, res) => {
   const locations = await Location.findAll()
@@ -46,7 +47,6 @@ router.post('/api/locations', adminCheck, async (req, res) => {
   }
 })
 
-
 router.patch('/api/locations/:locationId', adminCheck, async (req, res) => {
   const { locationId } = req.params
   const updates = req.body
@@ -54,12 +54,12 @@ router.patch('/api/locations/:locationId', adminCheck, async (req, res) => {
   try {
     const location = await Location.findByPk(locationId)
 
-    if (location) {
-      await location.update(updates)
-      res.send({ message: 'Afdeling opdateret.', data: location })
-    } else {
-      res.status(404).send({ message: 'Afdeling ikke fundet.' })
+    if (!location) {
+      return res.status(404).send({ message: 'Afdeling ikke fundet.' })
     }
+
+    await location.update(updates)
+    res.send({ message: 'Afdeling opdateret.', data: location })
   } catch (error) {
     console.error('Server Error:', error)
     res.status(500).send({ message: 'Serverfejl under opdatering af afdeling.' })

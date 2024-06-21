@@ -28,6 +28,7 @@ const Teacher = sequelize.define(
     },
     email: {
       type: DataTypes.STRING(55),
+      unique: true,
       allowNull: false,
     },
     is_active: {
