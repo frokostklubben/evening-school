@@ -151,6 +151,9 @@ router.post('/api/check-booking-dates', async (req, res) => {
         startTime = new Date(new Date('1970/01/01 ' + bookingDates[i].startTime).getTime() + 1000).toTimeString().substring(0, 5)
       }
 
+      let originalDate = new Date(bookingDates[i].date);
+      bookingDates[i].date = new Date(Date.UTC(originalDate.getUTCFullYear(), originalDate.getUTCMonth(), originalDate.getUTCDate())).toISOString();
+      
       let bookingConflicts = await booking.findAll({
         where: {
           [Op.and]: [
@@ -159,38 +162,22 @@ router.post('/api/check-booking-dates', async (req, res) => {
             {
               [Op.or]: [
                 {
-                  [Op.and]: [
-                    {
-                      start_time: {
-                        [Op.lt]: endTime,
-                      },
-                    },
-                    {
-                      end_time: {
-                        [Op.gt]: startTime,
-                      },
-                    },
-                  ],
+                  start_time: {
+                    [Op.gt]: startTime,
+                    [Op.lt]: endTime,
+                  },
                 },
                 {
-                  [Op.and]: [
-                    {
-                      start_time: {
-                        [Op.lt]: endTime,
-                      },
-                    },
-                    {
-                      end_time: {
-                        [Op.gt]: startTime,
-                      },
-                    },
-                  ],
+                  end_time: {
+                    [Op.gt]: startTime,
+                    [Op.lt]: endTime,
+                  },
                 },
               ],
             },
           ],
         },
-      })
+      });
 
       //add a conflict bookings to the booking date object, if there is any conflicts
       if (bookingConflicts.length > 0) {
