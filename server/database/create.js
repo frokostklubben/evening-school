@@ -162,8 +162,8 @@ await Booking.bulkCreate([
 ])
 
 await Booking.bulkCreate([
-  { course_id: 1, room_id: 1, start_time: '08:30:00', end_time: '09:30:00', date: '2024-08-05' },
   { course_id: 1, room_id: 1, start_time: '10:00:00', end_time: '11:00:00', date: '2024-08-05' },
+  { course_id: 1, room_id: 1, start_time: '08:30:00', end_time: '09:30:00', date: '2024-08-05' },
   { course_id: 1, room_id: 1, start_time: '12:00:00', end_time: '13:00:00', date: '2024-08-05' },
   { course_id: 1, room_id: 1, start_time: '14:00:00', end_time: '15:00:00', date: '2024-08-05' },
   { course_id: 1, room_id: 1, start_time: '15:30:00', end_time: '16:00:00', date: '2024-08-05' },
