@@ -113,8 +113,7 @@
 									bind:value={formData[key]}
 									required
 								/>
-								<!-- {:else if isEmail(formData[key])} -->
-							{:else if key === 'email' || key === 'Email'}
+							{:else if key === 'email'}
 								<input
 									type="email"
 									class="form-control"
