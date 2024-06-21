@@ -6,10 +6,11 @@ import { Op } from 'sequelize'
 
 export async function handleClassroom({ location_id, purpose, capacity, inventories, room_name, transaction, classroom }) {
   if (!classroom) {
-    const existingClassroom = await Classroom.findOne({ where: { room_name }, transaction })
+    const existingClassroom = await Classroom.findOne({ where: { room_name, location_id }, transaction })
     if (existingClassroom) {
       throw new Error(`Classroom with room_name "${room_name}" already exists.`)
     }
+
     classroom = await Classroom.create(
       {
         location_id,
@@ -20,7 +21,7 @@ export async function handleClassroom({ location_id, purpose, capacity, inventor
     )
   } else {
     // Check if room_name already exists for update
-    const existingClassroom = await Classroom.findOne({ where: { room_name, room_id: { [Op.ne]: classroom.room_id } }, transaction })
+    const existingClassroom = await Classroom.findOne({ where: { room_name, location_id, room_id: { [Op.ne]: classroom.room_id } }, transaction })
     if (existingClassroom) {
       throw new Error(`Classroom with room_name "${room_name}" already exists.`)
     }
@@ -46,6 +47,7 @@ export async function handleInventoriesAndPurpose(classroom, purpose, inventorie
   }
 
   let existingPurpose = await Classroom_purpose.findOne({
+    // made with chatgpt, marcus - to compare a lower case purpose with the database
     where: connection.where(connection.fn('LOWER', connection.col('purpose')), 'LIKE', '%' + purpose.toLowerCase() + '%'),
     transaction,
   })
@@ -61,7 +63,7 @@ export async function handleInventoriesAndPurpose(classroom, purpose, inventorie
   let updatedInventories = []
   let originalCaseInventories = []
 
-  if (inventories && inventories.trim() !== '') {
+  if (inventories && typeof inventories === 'string' && inventories.trim() !== '') {
     const inventoryItems = inventories.split(',').map(item => item.trim())
     const lowerCaseInventoryItems = inventoryItems.map(item => item.toLowerCase())
 

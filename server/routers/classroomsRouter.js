@@ -9,7 +9,7 @@ import connection from '../database/database.js'
 import Booking from '../database/models/booking.js'
 import Location from '../database/models/location.js'
 import Holiday from '../database/models/holiday.js'
-import { handleInventoriesAndPurpose, handleClassroom } from '../services/classroomService.js'
+import { handleClassroom } from '../services/classroomService.js'
 
 router.get('/api/classrooms', adminCheck, async (req, res) => {
   const classrooms = await Classroom.findAll()
@@ -300,6 +300,7 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
     }
 
     // The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
+    // Made with chatgpt, Marcus
     const bookingsByClassroom = allBookings.reduce((acc, booking) => {
       const roomId = booking.room_id
       if (!acc[roomId]) {
@@ -313,6 +314,7 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       return acc
     }, {})
 
+    // Made with chatgpt, Marcus
     const calculateFreeTimes = (bookings, startHour, endHour) => {
       const intervals = []
       const bookingsByDate = bookings.reduce((acc, booking) => {

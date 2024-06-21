@@ -34,9 +34,9 @@ app.use(sessionMiddleware)
 
 app.use(checkAuth)
 
-// app.use((req, res, next) => {
-//   setTimeout(next, 500)
-// })
+app.use((req, res, next) => {
+  setTimeout(next, 500)
+})
 
 import customRouter from './routers/customRouter.js'
 app.use(customRouter)

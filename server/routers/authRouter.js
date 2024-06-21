@@ -56,7 +56,7 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     let oneWeekInMilliseconds = 3600000 * 24 * 7
     const reset_password_expires = new Date(Date.now() + oneWeekInMilliseconds) // 1 week
 
-    const response = await User.create({
+    let user = await User.create({
       first_name,
       last_name,
       email,
@@ -71,6 +71,11 @@ router.post('/auth/signup', adminCheck, async (req, res) => {
     const resetLink = `http://localhost:5173/reset-password?token=${reset_password_token}`
     const message = `>>>>>>>>>> Velkommen til Aftenskolerne. Du skal ændre dit kodeord med dette link: ${resetLink}. Linken er gyldig i en uge. <<<<<<<<<<<`
     console.log('send mail: ', message)
+
+    const response = { ...user.dataValues }
+    delete response.hashed_password
+    delete response.reset_password_token
+    delete response.reset_password_expires
 
     res.status(200).send({ data: response })
   } else {
