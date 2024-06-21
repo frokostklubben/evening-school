@@ -18,9 +18,8 @@
 	export let showDeleteButton = false;
 
 	onMount(() => {
-	 getKeys(collection);
+		getKeys(collection);
 	});
-
 
 	function formatInventory(inventories) {
 		if (!inventories) return '';
@@ -46,7 +45,8 @@
 								<tr class="hover-row">
 									{#each $headerKeys as key (key)}
 										<td>
-											{#if key === 'inventories' || key === 'inventory' || key === 'item_list' || key === 'Inventories'}
+											{#if key === 'inventories'}
+												<!-- || key === 'inventory' || key === 'item_list' || key === 'Inventories' -->
 												{formatInventory(listItem[key])}
 											{:else if key === 'start_date' || key === 'end_date'}
 												{new Date(formatInventory(listItem[key])).toLocaleDateString()}
@@ -108,7 +108,7 @@
 			{:else if $optionId != 'empty'}
 				{#if $itemList.length == 0 && !$selectionsLoading && !$secondSelectionsLoading}
 					<div class="alert alert-warning" role="alert">Ingen data</div>
-				{:else }
+				{:else}
 					<Spinner />
 				{/if}
 			{/if}
