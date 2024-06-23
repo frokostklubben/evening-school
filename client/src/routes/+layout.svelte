@@ -6,31 +6,31 @@
 	import { login, logout, validateSession } from '../utils/auth.js';
 	import { isLoading, loginLoading } from '../stores/generalStore.js';
 	import { Toaster } from 'svelte-french-toast';
-	import Spinner from '../components/Spinner.svelte';
 
 	let isOpen = false;
 	$: userToLogin = $newUser;
 	$: loginLoadingSpinner = $loginLoading;
 
-    const translations = {
-        '/': 'Hjem',
-        '/classrooms/admin': 'Lokaler',
-        '/users/admin': 'Kontoransatte',
-        '/location/admin': 'Afdelinger',
-        '/booking': 'Booking',
-        '/edit-booking': 'Rediger booking',
-        '/location/user': 'Afdelinger',
-        '/room-search': 'Ledige lokaler',
-        '/users/user': 'Medarbejdere',
-        '/holiday': 'Helligdage/ferier',
+	const translations = {
+		'/': 'Hjem',
+		'/classrooms/admin': 'Lokaler',
+		'/users/admin': 'Kontoransatte',
+		'/location/admin': 'Afdelinger',
+		'/booking': 'Booking',
+		'/edit-booking': 'Rediger booking',
+		'/location/user': 'Afdelinger',
+		'/room-search': 'Ledige lokaler',
+		'/users/user': 'Medarbejdere',
+		'/holiday': 'Helligdage/ferier',
 		'/classrooms/user': 'Lokaler',
 		'/classroom-history': 'Historik',
 		'/courses/classroom': 'Kurser',
 		'/courses/location': 'Kurser',
 		'/location-history': 'Historik',
-    };
+		'/error': 'Error'
+	};
 
-	$: tabTitle = 'Aftenskolerne - ' + translations[$page.url.pathname] || "";
+	$: tabTitle = 'Aftenskolerne - ' + translations[$page.url.pathname] || '';
 
 	onMount(async () => {
 		validateSession();
@@ -42,7 +42,7 @@
 </script>
 
 <svelte:head>
-  <title>{tabTitle}</title>
+	<title>{tabTitle}</title>
 </svelte:head>
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary">

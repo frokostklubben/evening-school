@@ -46,7 +46,6 @@
 									{#each $headerKeys as key (key)}
 										<td>
 											{#if key === 'inventories'}
-												<!-- || key === 'inventory' || key === 'item_list' || key === 'Inventories' -->
 												{formatInventory(listItem[key])}
 											{:else if key === 'start_date' || key === 'end_date'}
 												{new Date(formatInventory(listItem[key])).toLocaleDateString()}

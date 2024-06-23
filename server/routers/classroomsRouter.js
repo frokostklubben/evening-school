@@ -128,7 +128,7 @@ router.patch('/api/classrooms/:roomId', async (req, res) => {
         room_name: updatedClassroom.room_name,
         location_id: updatedClassroom.location_id,
         capacity: updatedClassroom.capacity,
-        purpose: newPurpose.purpose,
+        purpose: newPurpose ? newPurpose.purpose : null,
         inventories: newInventories,
       }
 
@@ -166,25 +166,51 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
 
       const inventories = await classroom.getInventories({ transaction })
 
-      const purpose = await classroom.getClassroom_purpose({ transaction })
+      const purposeId = classroom.purpose_id
+      // if purposeId is not defined, it sets purpose to null
+      const purpose = purposeId ? await Classroom_purpose.findByPk(purposeId, { transaction }) : null
 
-      if (purpose && purpose.length > 0) {
-        for (let p of purpose) {
-          await p.destroy({ transaction })
+      // Remove classroom
+      await classroom.destroy({ transaction })
+
+      // Check if purpose is used by other classrooms
+      if (purpose) {
+        const otherClassroomsWithPurpose = await Classroom.findAll({
+          where: { purpose_id: purposeId },
+          transaction,
+        })
+
+        if (otherClassroomsWithPurpose.length === 0) {
+          await purpose.destroy({ transaction })
         }
       }
 
+      // Check if inventories are used by other classrooms
       if (inventories && inventories.length > 0) {
         for (let inventory of inventories) {
-          await inventory.destroy({ transaction })
+          const inventoryId = inventory.inventory_id
+          if (inventoryId) {
+            const otherClassroomsWithInventory = await Classroom.findAll({
+              include: [
+                {
+                  model: Inventory,
+                  where: { inventory_id: inventoryId },
+                  through: { attributes: [] },
+                },
+              ],
+              transaction,
+            })
+
+            if (otherClassroomsWithInventory.length === 0) {
+              await inventory.destroy({ transaction })
+            }
+          }
         }
       }
-
-      await classroom.destroy({ transaction })
 
       await transaction.commit()
 
-      res.send({ message: 'Classroom, its purpose and inventories deleted successfully.' })
+      res.send({ message: 'Classroom deleted successfully.' })
     } else {
       await transaction.rollback()
       res.status(404).send({ message: 'Classroom not found.' })
@@ -192,7 +218,7 @@ router.delete('/api/classrooms/:roomId', adminCheck, async (req, res) => {
   } catch (error) {
     await transaction.rollback()
     console.error('Server Error:', error)
-    res.status(500).send({ message: 'Server error while deleting classroom, its purpose and inventories.' })
+    res.status(500).send({ message: 'Server error while deleting classroom.' })
   }
 })
 
@@ -205,6 +231,7 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
     startDate = new Date(startDate)
     endDate = new Date(endDate)
 
+    // Convert startDate and endDate to UTC at midnight
     startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0))
     endDate = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 0, 0, 0))
 
@@ -227,15 +254,16 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       ],
     })
 
-    const isSameDay = startDate.toISOString().split('T')[0] === endDate.toISOString().split('T')[0]
-
     // If date range:
+
     const whereConditions = {
       date: {
         [Op.between]: [startDate, endDate],
       },
       [Op.and]: [
         {
+          // This checks whether the start_time falls between startTime and endTime, or the end_time falls between startTime and endTime,
+          // or if the start_time is less than or equal to startTime and the end_time is greater than or equal to endTime.
           [Op.or]: [
             {
               start_time: {
@@ -255,7 +283,10 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       ],
     }
 
-    // If single day:
+    // format: 2023-06-21T00:00:00.000Z
+    const isSameDay = startDate.toISOString().split('T')[0] === endDate.toISOString().split('T')[0]
+
+    // If it's the same day, add additional time conditions
     if (isSameDay) {
       whereConditions[Op.and].push(
         {
@@ -299,27 +330,41 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       return allHolidays.some(holiday => isDateWithinHoliday(date, holiday))
     }
 
-    // The bookingsByClassroom object is a dictionary where the key is the room_id and the value is an array of bookings for that room.
     // Made with chatgpt, Marcus
+    // The bookingsByClassroom object is a list where the key is the room_id and the value is an array of bookings for that room.
+    // organize a list of bookings in an object, where the key is the roomId, and the value is a list of bookings in that classroom
+    // For every booking in the allBookings list, the reduce function "udføres"
+    // RoomId is extracted from every booking
     const bookingsByClassroom = allBookings.reduce((acc, booking) => {
+      // accumulator = empty object
       const roomId = booking.room_id
+      // if roomId not already exists in the acc, an empty list is made
       if (!acc[roomId]) {
         acc[roomId] = []
       }
+      // Add the booking to the roomId´s list
       acc[roomId].push({
         start_time: booking.start_time,
         end_time: booking.end_time,
         date: booking.date,
       })
+      // after every iteration, the updated acc, returns to the next iteration
       return acc
     }, {})
 
     // Made with chatgpt, Marcus
     const calculateFreeTimes = (bookings, startHour, endHour) => {
       const intervals = []
+
+      // Group bookings by date
+      // The reduce method iterates over the bookings array and accumulates the results in acc (the accumulator).
+      // This ensures that all bookings are grouped by their date in the acc object,
+      // where each date (dateStr) has an associated list of booking objects.
       const bookingsByDate = bookings.reduce((acc, booking) => {
         const dateStr = booking.date.toISOString().split('T')[0]
+        // if dateStr is not a key in the acc, it adds the dateStr as a key in acc, with an empty list as value
         if (!acc[dateStr]) acc[dateStr] = []
+        // Adds the current booking to the list of bookings under the key dateStr in acc.
         acc[dateStr].push(booking)
         return acc
       }, {})
@@ -327,14 +372,18 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
       const current = new Date(startDate)
       const end = new Date(endDate)
 
+      // Loop through each date from startDate to endDate
       while (current <= end) {
-        const dateStr = current.toISOString().split('T')[0]
-        const dayBookings = bookingsByDate[dateStr] || []
+        const dateStr = current.toISOString().split('T')[0] // Get the date part of format 2023-06-21T00:00:00.000Z
+        const dayBookings = bookingsByDate[dateStr] || [] // Get bookings for the current date or an empty array if none
+
+        // localCompare: -1 if a.start_time is before b.start_time, 0 if same value, 1 if a efter b
         dayBookings.sort((a, b) => a.start_time.localeCompare(b.start_time))
 
-        let currentStart = startHour
-        const dayIntervals = []
+        let currentStart = startHour // Initialize the start time for free intervals
+        const dayIntervals = [] // Initialize an array to store free intervals for the current date
 
+        //  Loop through the bookings for the current date
         dayBookings.forEach(booking => {
           if (currentStart < booking.start_time) {
             dayIntervals.push({ start: currentStart, end: booking.start_time })
@@ -347,23 +396,26 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
         }
 
         intervals.push({ date: dateStr, times: dayIntervals })
-        current.setDate(current.getDate() + 1)
+        current.setDate(current.getDate() + 1) // Move to the next date
       }
 
-      return intervals
+      return intervals // Return the array of free intervals
     }
 
+    // Calculate free times for each classroom
     const classroomsWithAvailability = allClassrooms.map(classroom => {
       const roomId = classroom.room_id
-      const bookings = bookingsByClassroom[roomId] || []
+      const bookings = bookingsByClassroom[roomId] || [] // Get bookings for the room or an empty array if none
       let freeTimes
 
       if (bookings.length === 0) {
+        // If there are no bookings, initialize free times for the entire date range
         freeTimes = []
         const current = new Date(startDate)
         const end = new Date(endDate)
 
         while (current <= end) {
+          // Check if the current date is during any holidays
           if (!isDateDuringAnyHoliday(current, allHolidays)) {
             const dateStr = current.toISOString().split('T')[0]
             freeTimes.push({
@@ -374,9 +426,10 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
           current.setDate(current.getDate() + 1)
         }
       } else {
+        // If there are bookings, calculate free times using the calculateFreeTimes function
         freeTimes = calculateFreeTimes(bookings, startTime, endTime)
       }
-
+      // Return an object representing the classroom with its free times
       return {
         room_id: roomId,
         room_name: classroom.room_name,
