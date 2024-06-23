@@ -255,7 +255,6 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
     })
 
     // If date range:
-
     const whereConditions = {
       date: {
         [Op.between]: [startDate, endDate],
@@ -333,8 +332,6 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
     // Made with chatgpt, Marcus
     // The bookingsByClassroom object is a list where the key is the room_id and the value is an array of bookings for that room.
     // organize a list of bookings in an object, where the key is the roomId, and the value is a list of bookings in that classroom
-    // For every booking in the allBookings list, the reduce function "udføres"
-    // RoomId is extracted from every booking
     const bookingsByClassroom = allBookings.reduce((acc, booking) => {
       // accumulator = empty object
       const roomId = booking.room_id
@@ -399,23 +396,21 @@ router.post('/api/classrooms/available/:school_id', async (req, res) => {
         current.setDate(current.getDate() + 1) // Move to the next date
       }
 
-      return intervals // Return the array of free intervals
+      return intervals // array of free intervals
     }
 
     // Calculate free times for each classroom
     const classroomsWithAvailability = allClassrooms.map(classroom => {
       const roomId = classroom.room_id
-      const bookings = bookingsByClassroom[roomId] || [] // Get bookings for the room or an empty array if none
+      const bookings = bookingsByClassroom[roomId] || []
       let freeTimes
 
       if (bookings.length === 0) {
-        // If there are no bookings, initialize free times for the entire date range
         freeTimes = []
         const current = new Date(startDate)
         const end = new Date(endDate)
 
         while (current <= end) {
-          // Check if the current date is during any holidays
           if (!isDateDuringAnyHoliday(current, allHolidays)) {
             const dateStr = current.toISOString().split('T')[0]
             freeTimes.push({

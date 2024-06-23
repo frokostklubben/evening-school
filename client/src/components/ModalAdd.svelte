@@ -67,7 +67,7 @@
 
 				toast.success('Oprettelse vellykket!');
 			} else {
-				toast.error(result.data || result.error); // NB! = error message: 'User was not created: user already exists'
+				toast.error(result.data || result.error);
 				console.error(`Fejl ved oprettelse: ${result.data}`);
 			}
 		} catch (error) {

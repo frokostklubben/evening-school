@@ -8,6 +8,7 @@ router.get('/api/schools', adminCheck, async (req, res) => {
   res.send({ data: schools })
 })
 
+// NB! No UI for create a new evening school. Use Postman
 router.post('/api/schools', adminCheck, async (req, res) => {
   const { name } = req.body
 

@@ -126,7 +126,9 @@
 				<label for="purposeSelect">Vælg formål</label>
 				<select id="purposeSelect" bind:value={selectedPurpose} class="filter-select">
 					<option value="">Alle formål</option>
-					{#each Array.from(new Set(filteredClassrooms.map((c) => c.purpose))) as purpose}
+					{#each Array.from(new Set(filteredClassrooms
+								.map((c) => c.purpose)
+								.filter(Boolean))) as purpose}
 						<option>{purpose}</option>
 					{/each}
 				</select>
@@ -231,6 +233,7 @@
 	.classroom:hover {
 		transform: translateY(-5px);
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+		background-color: #dfe6d2;
 	}
 	.available-times {
 		margin-top: auto;
